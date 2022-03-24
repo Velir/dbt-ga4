@@ -1,0 +1,30 @@
+name: 'ga4'
+version: '1.0.0'
+config-version: 2
+profile: 'ga4'
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"  # directory which will store compiled SQL files
+clean-targets:         # directories to be removed by `dbt clean`
+  - "target"
+  - "dbt_packages"
+
+vars:
+    start_date: "20201230" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model. 20201230 produces about 1GB of data scanned.
+    project: "bigquery-public-data"
+    dataset: "ga4_obfuscated_sample_ecommerce"
+
+# Configuring models
+# Full documentation: https://docs.getdbt.com/docs/configuring-models
+
+# In this example config, we tell dbt to build all models in the example/ directory
+# as tables. These settings can be overridden in the individual model files
+# using the `{{ config(...) }}` macro.
+models:
+  ga4:
+    +materialized: view

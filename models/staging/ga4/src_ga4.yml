@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: ga4
+    database: "{{var('project','bigquery-public-data')}}" #Default to bigquery-public-data
+    schema: "{{var('dataset', 'ga4_obfuscated_sample_ecommerce')}}" #Default to ga4_obfuscated_sample_ecommerce
+    tables:
+      - name: events
+        identifier: events_*
+
