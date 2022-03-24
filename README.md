@@ -24,6 +24,10 @@ Create the following variables scoped to the ga4 package in your dbt_project.yml
 - Create stg_sessions model
 - Create stg_users model
 
-- Recreate Fivetran ga3 models with ga4 data
+- Recreate common Fivetran ga3 models with ga4 data
 
 - Convert basic unnesting operations into macros
+
+- Add a surrogate key of user_pseudo_id+event_name+event_timestamp for the base events model
+
+- Add integration tests
