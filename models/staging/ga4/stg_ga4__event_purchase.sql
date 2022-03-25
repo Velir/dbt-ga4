@@ -43,6 +43,7 @@ group by 1,2,3,4,5,6,7,8
 
 select 
     *,
+    {{extract_hostname_from_url('page_location')}} as page_hostname,
     case
         when ga_session_number = 1 then TRUE
         else FALSE

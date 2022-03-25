@@ -11,7 +11,8 @@ with session_start_dims as (
         traffic_source_source,
         traffic_source_medium,
         ga_session_number,
-        page_location as landing_page
+        page_location as landing_page,
+        {{extract_hostname_from_url('page_location')}} as landing_page_hostname,
 
     from {{ref("stg_ga4__event_session_start")}}
 
