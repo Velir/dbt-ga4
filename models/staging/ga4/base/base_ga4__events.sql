@@ -19,16 +19,6 @@
 
 with source as (
     select 
-        *
-    from {{ source('ga4', 'events') }}
-    where cast(_table_suffix as int64) >= {{var('start_date')}}
-    {% if is_incremental() %}
-        -- recalculate yesterday + today
-        and parse_date('%Y%m%d',_TABLE_SUFFIX) in ({{ partitions_to_replace | join(',') }})
-    {% endif %}
-),
-renamed as (
-    select 
         parse_date('%Y%m%d',event_date) as event_date_dt,
         event_timestamp,
         event_name,
@@ -52,7 +42,12 @@ renamed as (
         --event_dimensions, -- This is present in the sample dataset, but not the GA4 BQ export spec https://support.google.com/firebase/answer/7029846?hl=en
         ecommerce,
         items
-    from source
+    from {{ source('ga4', 'events') }}
+    where cast(_table_suffix as int64) >= {{var('start_date')}}
+    {% if is_incremental() %}
+        -- recalculate yesterday + today
+        and parse_date('%Y%m%d',_TABLE_SUFFIX) in ({{ partitions_to_replace | join(',') }})
+    {% endif %}
 )
 
-select * from renamed
+select * from source

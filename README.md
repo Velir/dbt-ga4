@@ -41,3 +41,4 @@ Create the following variables scoped to the ga4 package in your dbt_project.yml
 - intraday support
 - bring in sample queries from Google https://support.google.com/analytics/answer/9037342?hl=en&ref_topic=9359001#zippy=%2Cin-this-article
 - better handling of streams
+- Set dynamic vs. static partitioning using a variable
