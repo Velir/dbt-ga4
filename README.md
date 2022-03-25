@@ -12,8 +12,6 @@ Create the following variables scoped to the ga4 package in your dbt_project.yml
 # TODO
 
 - Rerun everything using a new GA4 dataset
-
-- Macro to extract hostname from URL
 - Create staging tables for the following events:
     - scroll
     - first_visit
@@ -42,3 +40,4 @@ Create the following variables scoped to the ga4 package in your dbt_project.yml
 - bring in sample queries from Google https://support.google.com/analytics/answer/9037342?hl=en&ref_topic=9359001#zippy=%2Cin-this-article
 - better handling of streams
 - Set dynamic vs. static partitioning using a variable
+- Seed file for channel grouping
