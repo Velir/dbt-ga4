@@ -2,7 +2,7 @@ with purchase_with_params as (
     select 
         event_date_dt, 
         user_id,
-        user_pseudo_id, 
+        client_id, 
         event_timestamp, 
         event_name, params, 
         traffic_source 
@@ -25,7 +25,7 @@ with purchase_with_params as (
 pivoted as (
 select 
     event_date_dt, 
-    user_pseudo_id, 
+    client_id, 
     user_id,
     event_timestamp, 
     event_name, 

@@ -1,7 +1,7 @@
 with session_start_with_params as (
     select 
         event_date_dt, 
-        user_pseudo_id, 
+        client_id, 
         user_id,
         event_timestamp, 
         event_name, 
@@ -15,7 +15,7 @@ with session_start_with_params as (
 pivoted as (
 select 
     event_date_dt, 
-    user_pseudo_id, 
+    client_id, 
     user_id,
     event_timestamp, 
     event_name, 
