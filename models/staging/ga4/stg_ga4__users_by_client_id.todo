@@ -1,0 +1,3 @@
+-- user dims and metrics
+-- dims: first traffic source, last traffic source, first seen, user_id
+-- metrics: num sessions, num events
