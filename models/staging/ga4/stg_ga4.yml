@@ -4,7 +4,11 @@ models:
   - name: base_ga4__events
     description: Base events model that pulls all fields from raw data. Resulting table is partitioned on event_date and is useful in that BQ queries can be cached against this table, but not against wildcard searches from the original tables which are sharded on date.   
   - name: stg_ga4__events
-    description: Light transformation and renaming beyond the base events model. This is required because BigQuery struct data types cannot be renamed when building an incremental model.    
+    description: Light transformation and renaming beyond the base events model. Adds surrogate keys for sessions and events
+    columns:
+      - name: event_key
+        tests:
+          - unique
   - name: stg_ga4__event_page_view
     description: GA4 events filtered to only show 'page_view' events. Pivots common event parameters into separate columns. 
   - name: stg_ga4__event_session_start
@@ -15,5 +19,3 @@ models:
     description: Inventory of all sessions with accompanying information. Unique on client_id + ga_session_id
     columns:
       - name: session_key
-        tests:
-          - unique

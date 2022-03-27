@@ -38,10 +38,16 @@ include_session_id as (
     select 
         renamed.*,
         params.value.int_value as ga_session_id,
-        md5(CONCAT(stream_id, client_id, cast(params.value.int_value as STRING))) as session_key -- Surrogate key to determine unique session across streams and users
+        md5(CONCAT(stream_id, client_id, cast(params.value.int_value as STRING))) as session_key -- Surrogate key to determine unique session across streams and users. Sessions do NOT reset after midnight in GA4
     from renamed,
         UNNEST(event_params) as params
     where params.key = 'ga_session_id'
+),
+include_event_key as (
+    select 
+        include_session_id.*,
+        md5(CONCAT(event_name, CAST(event_timestamp as STRING), CAST(TO_BASE64(session_key) as STRING))) as event_key -- Surrogate key for unique events
+    from include_session_id
 )
 
-select * from include_session_id
+select * from include_event_key
