@@ -15,7 +15,7 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "dbt_packages"
 
 vars:
-    start_date: "20201230" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model. 20201230 produces about 1GB of data scanned.
+    start_date: "20210120" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model. 
     project: "bigquery-public-data"
     dataset: "ga4_obfuscated_sample_ecommerce"
 
