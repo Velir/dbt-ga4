@@ -20,20 +20,16 @@ Create the following variables scoped to the ga4 package in your dbt_project.yml
     - add_to_cart
     - purchase
     - Full event reference: https://developers.google.com/analytics/devguides/collection/ga4/reference/events
-    
 - Create stg_sessions model
 - Create stg_users model
 
+
 - Recreate common Fivetran ga3 models with ga4 data
+    - https://fivetran.com/docs/applications/google-analytics/prebuilt-reports#traffic
 
 - Convert basic unnesting operations into macros
-
-- Add a surrogate key of user_pseudo_id+event_name+event_timestamp for the base events model
-    - add uniqueness tests as appropriate 
-
 - Add integration tests
-
-- Window functions to sequence events by session or user
+- Window functions to sequence pageviews, purchases, etc. Mark the first and last
 
 - spec out some output reports
 - intraday support

@@ -1,7 +1,7 @@
 name: 'ga4'
 version: '1.0.0'
 config-version: 2
-profile: 'ga4'
+profile: 'velir-website-analytics' # TODO: Remove
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -15,9 +15,9 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "dbt_packages"
 
 vars:
-    start_date: "20210120" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model. 
-    project: "bigquery-public-data"
-    dataset: "ga4_obfuscated_sample_ecommerce"
+    start_date: "20220101" # "20210120" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model. 
+    project: "velir-website-analytics" # "bigquery-public-data"
+    dataset: "analytics_237690264" # "ga4_obfuscated_sample_ecommerce"
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
