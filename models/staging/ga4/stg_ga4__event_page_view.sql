@@ -16,6 +16,7 @@ with page_view_with_params as (
 pivoted as (
 select 
     stream_id,
+    event_key,
     event_date_dt, 
     client_id, 
     user_id,
@@ -33,7 +34,7 @@ select
     MAX(if(key = "value", value.float_value, NULL)) as value
     
 from page_view_with_params
-group by 1,2,3,4,5,6,7,8,9,10
+group by 1,2,3,4,5,6,7,8,9,10,11
 )
 
 select 

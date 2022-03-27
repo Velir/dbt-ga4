@@ -11,6 +11,7 @@ with session_start_with_params as (
 pivoted as (
 select 
     event_date_dt, 
+    event_key,
     client_id, 
     user_id,
     event_timestamp, 
@@ -23,7 +24,7 @@ select
     MAX(if(key = "ga_session_id", value.int_value, NULL)) as ga_session_id,
     MAX(if(key = "ga_session_number", value.int_value, NULL)) as ga_session_number,
 from session_start_with_params
-group by 1,2,3,4,5,6,7,8,9
+group by 1,2,3,4,5,6,7,8,9,10
 )
 
 select 

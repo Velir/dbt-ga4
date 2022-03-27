@@ -18,6 +18,7 @@ with purchase_with_params as (
 pivoted as (
 select 
     event_date_dt, 
+    event_key,
     client_id, 
     user_id,
     event_timestamp, 
@@ -38,7 +39,7 @@ select
     -- TODO how to handle items array?
     
 from purchase_with_params
-group by 1,2,3,4,5,6,7,8,9
+group by 1,2,3,4,5,6,7,8,9,10
 )
 
 select 
