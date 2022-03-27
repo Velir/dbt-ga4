@@ -1,11 +1,9 @@
 with count_pageviews as (
     select 
-        stream_id,
-        event_date_dt,
         session_key,
         count(page_title) as pageviews
     from {{ref('stg_ga4__event_page_view')}}
-    group by 1,2,3
+    group by 1
 ),
 bounced_sessions as (
     select
