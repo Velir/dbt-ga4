@@ -43,7 +43,8 @@ with source as (
         ecommerce,
         items
     from {{ source('ga4', 'events') }}
-    where cast(_table_suffix as int64) >= {{var('start_date')}}
+    where _table_suffix not like '%intraday%' and -- TODO: support blending intraday events as well
+        cast(_table_suffix as int64) >= {{var('start_date')}}
     {% if is_incremental() %}
         -- recalculate yesterday + today
         and parse_date('%Y%m%d',_TABLE_SUFFIX) in ({{ partitions_to_replace | join(',') }})
