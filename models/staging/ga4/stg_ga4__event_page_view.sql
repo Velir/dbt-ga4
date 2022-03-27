@@ -6,7 +6,6 @@ with page_view_with_params as (
         and 
         (
             params.key = 'page_location' or 
-            params.key = 'ga_session_id' or 
             params.key = 'ga_session_number' or
             params.key = 'entrances' or 
             params.key = 'page_title' or 
@@ -25,8 +24,8 @@ select
     traffic_source_campaign_name,
     traffic_source_source,
     traffic_source_medium,
+    session_key,
     MAX(if(key = "page_location", value.string_value, NULL)) as page_location,
-    MAX(if(key = "ga_session_id", value.int_value, NULL)) as ga_session_id,
     MAX(if(key = "ga_session_number", value.int_value, NULL)) as ga_session_number,
     MAX(if(key = "entrances", value.int_value, 0)) as entrances,
     MAX(if(key = "page_title", value.string_value, NULL)) as page_title,
@@ -34,7 +33,7 @@ select
     MAX(if(key = "value", value.float_value, NULL)) as value
     
 from page_view_with_params
-group by 1,2,3,4,5,6,7,8,9
+group by 1,2,3,4,5,6,7,8,9,10
 )
 
 select 

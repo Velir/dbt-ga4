@@ -6,7 +6,6 @@ with purchase_with_params as (
         and 
         (
             params.key = 'page_location' or 
-            params.key = 'ga_session_id' or 
             params.key = 'ga_session_number' or
             params.key = 'page_referrer' or
             params.key = 'currency' or
@@ -26,6 +25,7 @@ select
     traffic_source_campaign_name,
     traffic_source_source,
     traffic_source_medium,
+    session_key,
     MAX(if(key = "page_location", value.string_value, NULL)) as page_location,
     MAX(if(key = "ga_session_id", value.int_value, NULL)) as ga_session_id,
     MAX(if(key = "ga_session_number", value.int_value, NULL)) as ga_session_number,
@@ -38,7 +38,7 @@ select
     -- TODO how to handle items array?
     
 from purchase_with_params
-group by 1,2,3,4,5,6,7,8
+group by 1,2,3,4,5,6,7,8,9
 )
 
 select 

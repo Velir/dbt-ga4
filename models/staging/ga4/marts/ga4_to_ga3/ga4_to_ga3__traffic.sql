@@ -1,23 +1,5 @@
---TODO replace with bounced_sessions model
-with pageviews_per_session as (
-    select 
-        stream_id, 
-        event_date_dt,
-        ga_session_id,
-        count(page_title) as pageviews
-    from {{ref('stg_ga4__event_page_view')}}
-    group by 1,2,3
-),
-bounce_count_daily as (
-    select 
-        stream_id, 
-        event_date_dt,
-        count(ga_session_id) as bounces
-    from pageviews_per_session
-    where pageviews = 1
-    group by 1,2
-),
-metrics as (
+
+with traffic_metrics as (
     select 
         page_views.stream_id,
         page_views.event_date_dt as date,

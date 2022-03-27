@@ -6,14 +6,14 @@
 
 with session_start_dims as (
     select 
-        concat(IFNULL(client_id, ''), IFNULL(cast(ga_session_id as STRING), '')) as session_key,
-        ga_session_id,
+        session_key,
         client_id,
         user_id,
         event_date_dt as session_date,
         traffic_source_campaign_name,
         traffic_source_source,
         traffic_source_medium,
+        session_key
         ga_session_number,
         page_location as landing_page,
         {{extract_hostname_from_url('page_location')}} as landing_page_hostname,

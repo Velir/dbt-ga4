@@ -1,4 +1,4 @@
--- Additional light transformation necessary in this model because the insert_overwrite incremental strategy doesn't work when breaking out BigQuery struct data types
+-- Break out struct data types and include ga_session_id in all records
 
 with renamed as (
     select 
@@ -33,6 +33,15 @@ with renamed as (
         ecommerce,
         items 
     from {{ref('base_ga4__events')}}
+),
+include_session_id as (
+    select 
+        renamed.*,
+        params.value.int_value as ga_session_id,
+        md5(CONCAT(stream_id, client_id, cast(params.value.int_value as STRING))) as session_key -- Surrogate key to determine unique session across streams and users
+    from renamed,
+        UNNEST(event_params) as params
+    where params.key = 'ga_session_id'
 )
 
-select * from renamed
+select * from include_session_id
