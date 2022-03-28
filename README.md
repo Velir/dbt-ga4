@@ -2,6 +2,7 @@
 
 ## Local Installation
 
+- Clone this repository to a folder in the same parent directory as your project
 - Update your packages.yml to include a reference to the local files:
 
 ```
