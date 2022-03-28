@@ -1,13 +1,37 @@
+# Installation Instructions
+
+## Local Installation
+
+- Update your packages.yml to include a reference to the local files:
+
+```
+packages:
+  - local: ../dbt-ga4
+```
+
+- Add the following variables to your dbt_project.yml file denoting the source project, schema, and starting date range
+
+```
+vars:
+    ga4:
+      start_date: "20210101" base events model. 
+      project: "my-ga4-gcp-project"
+      dataset: "analytics_00000000"
+```
+- Download and initialize gcloud SDK with your Google Account. Then run the following command to provide default application OAuth access to BigQuery:
+
+```
+gcloud auth application-default login --scopes=https://www.googleapis.com/auth/bigquery,https://www.googleapis.com/auth/iam.test
+```
+
+Full instructions for connecting to BigQuery are here: https://docs.getdbt.com/reference/warehouse-profiles/bigquery-profile#local-oauth-gcloud-setup
+
+------------
+
+# Misc
+
 DBT guide to package creation: https://docs.getdbt.com/docs/guides/building-packages
 DBT project structure notes: https://discourse.getdbt.com/t/how-we-structure-our-dbt-projects/355
-
-To connect to BigQuery using OAuth, see instructions here: https://docs.getdbt.com/reference/warehouse-profiles/bigquery-profile#local-oauth-gcloud-setup
-
-# Configuration Instructions
-
-Create the following variables scoped to the ga4 package in your dbt_project.yml
-- project (defaults to "bigquery-public-data")
-- dataset (defaults to "ga4_obfuscated_sample_ecommerce")
 
 # TODO
 
