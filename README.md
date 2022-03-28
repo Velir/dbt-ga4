@@ -1,3 +1,14 @@
+# GA4 DBT Package
+
+This package connects to an exported GA4 dataset and provides useful transformations as well as report-ready models that can be used alongside exported GA3 data. 
+
+Features include:
+- Flattened models to access comment events and event parameters such as `page_view`, `scroll`, and `purchase`
+- Conversion of sharded event tables into a single partitioned table
+- Incremental loading of GA4 data into your staging tables
+- A `ga4 to ga3` data mart that implements common GA3 pre-built reports produced by Fivetran (https://fivetran.com/docs/applications/google-analytics/prebuilt-reports) 
+- Session and User dimensional models
+
 # Prerequisites
 
 - This package assumes that you have a project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded.
