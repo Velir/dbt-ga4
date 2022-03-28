@@ -10,12 +10,12 @@ packages:
   - local: ../dbt-ga4
 ```
 
-- Add the following variables to your dbt_project.yml file denoting the source project, schema, and starting date range
+- Add the following variables to your dbt_project.yml file denoting the source project, schema, and a start date to use when scanning GA4 event tables.
 
 ```
 vars:
     ga4:
-      start_date: "20210101" base events model. 
+      start_date: "20210101" 
       project: "my-ga4-gcp-project"
       dataset: "analytics_00000000"
 ```
