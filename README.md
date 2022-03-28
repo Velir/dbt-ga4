@@ -11,7 +11,6 @@ Create the following variables scoped to the ga4 package in your dbt_project.yml
 
 # TODO
 
-- Rerun everything using a new GA4 dataset
 - Create staging tables for the following events:
     - scroll
     - first_visit
@@ -22,8 +21,12 @@ Create the following variables scoped to the ga4 package in your dbt_project.yml
     - Full event reference: https://developers.google.com/analytics/devguides/collection/ga4/reference/events
 - Create stg_sessions model
 - Create stg_users model
+- Review these issues for ideas for our repo: https://github.com/coding-is-for-losers/ga4-bigquery-starter/issues
+- Investigate dupe event keys (ex: wn4MuaFqh3nq1t/JzgaB8w==)
+    Ex: select * from `velir-website-analytics.dbt_dev_aribaudo.stg_ga4__events` where TO_BASE64(event_key)  ='wn4MuaFqh3nq1t/JzgaB8w=='
+    - Example code picking first event based on window function: https://github.com/coding-is-for-losers/ga4-bigquery-starter/blob/main/models/base/dedup_events.sql
 
-
+- Test whether session keys are unique
 - Recreate common Fivetran ga3 models with ga4 data
     - https://fivetran.com/docs/applications/google-analytics/prebuilt-reports#traffic
 
@@ -33,7 +36,6 @@ Create the following variables scoped to the ga4 package in your dbt_project.yml
 
 - spec out some output reports
 - intraday support
-- bring in sample queries from Google https://support.google.com/analytics/answer/9037342?hl=en&ref_topic=9359001#zippy=%2Cin-this-article
-- better handling of streams
+- think through handling of 1 stream, multiple streams
 - Set dynamic vs. static partitioning using a variable
 - Seed file for channel grouping
