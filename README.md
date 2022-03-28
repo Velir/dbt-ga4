@@ -49,7 +49,7 @@ Full instructions for connecting to BigQuery are here: https://docs.getdbt.com/r
 
 The easiest option is using OAuth with your Google Account. Summarized instructions are as follows:
  
-1. Download and initialize gcloud SDK with your Google Account. 
+1. Download and initialize gcloud SDK with your Google Account (https://cloud.google.com/sdk/docs/install)
 2. Run the following command to provide default application OAuth access to BigQuery:
 
 ```
