@@ -11,7 +11,7 @@ Features include:
 
 # Prerequisites
 
-- This package assumes that you have a project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded.
+- This package assumes that you have an existing DBT project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded.
 
 # Installation Instructions 
 
