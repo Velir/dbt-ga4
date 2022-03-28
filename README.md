@@ -25,15 +25,15 @@ vars:
 
 ## Local Installation
 
-- Clone this repository to a folder in the same parent directory as your project
-- Update your packages.yml to include a reference to the local files:
+1. Clone this repository to a folder in the same parent directory as your project
+2. Update your packages.yml to include a reference to the local files:
 
 ```
 packages:
   - local: ../dbt-ga4
 ```
 
-- Add the following variables to your dbt_project.yml file denoting the source project, schema, and a start date to use when scanning GA4 event tables.
+3. Add the following variables to your dbt_project.yml file denoting the source project, schema, and a start date to use when scanning GA4 event tables.
 
 ```
 vars:
@@ -42,10 +42,17 @@ vars:
       project: "my-ga4-gcp-project"
       dataset: "analytics_00000000"
 ```
-- Download and initialize gcloud SDK with your Google Account. Then run the following command to provide default application OAuth access to BigQuery:
+
+# Connecting to BigQuery
+
+Full instructions for connecting to BigQuery are here: https://docs.getdbt.com/reference/warehouse-profiles/bigquery-profile
+
+The easiest option is using OAuth with your Google Account. Summarized instructions are as follows:
+ 
+1. Download and initialize gcloud SDK with your Google Account. 
+2. Run the following command to provide default application OAuth access to BigQuery:
 
 ```
 gcloud auth application-default login --scopes=https://www.googleapis.com/auth/bigquery,https://www.googleapis.com/auth/iam.test
 ```
 
-Full instructions for connecting to BigQuery are here: https://docs.getdbt.com/reference/warehouse-profiles/bigquery-profile#local-oauth-gcloud-setup
