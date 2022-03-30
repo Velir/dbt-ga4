@@ -15,6 +15,7 @@ DBT project structure notes: https://discourse.getdbt.com/t/how-we-structure-our
     - click
     - add_to_cart
     - purchase
+    - Audience entrance/exist conversion events
     - Full event reference: https://developers.google.com/analytics/devguides/collection/ga4/reference/events
 - Create stg_sessions model
 - Create stg_users model
