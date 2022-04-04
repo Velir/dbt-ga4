@@ -3,12 +3,11 @@
 This package connects to an exported GA4 dataset and provides useful transformations as well as report-ready models that can be used alongside exported GA3 data. 
 
 Features include:
-- Flattened models to access comment events and event parameters such as `page_view`, `scroll`, and `purchase`
+- Flattened models to access common events and event parameters such as `page_view`, `session_start`, and `purchase`
 - Conversion of sharded event tables into a single partitioned table
 - Incremental loading of GA4 data into your staging tables
 - A `ga4 to ga3` data mart that implements common GA3 pre-built reports produced by Fivetran (https://fivetran.com/docs/applications/google-analytics/prebuilt-reports) 
 - Session and User dimensional models
-- Defaults to the public `ga4_obfuscated_sample_ecommerce` dataset provided by Google if you want to use the package and don't have your own GA4 data
 
 # Prerequisites
 
@@ -21,11 +20,13 @@ vars:
     dataset: "ga4_obfuscated_sample_ecommerce"
 ```
 
+More info here: https://support.google.com/analytics/answer/10937659?hl=en#zippy=%2Cin-this-article
+
 # Installation Instructions 
 
 ## Local Installation
 
-1. Clone this repository to a folder in the same parent directory as your project
+1. Clone this repository to a folder in the same parent directory as your DBT project
 2. Update your packages.yml to include a reference to the local files:
 
 ```
@@ -33,7 +34,7 @@ packages:
   - local: ../dbt-ga4
 ```
 
-3. Add the following variables to your dbt_project.yml file denoting the source project, schema, and a start date to use when scanning GA4 event tables.
+3. Add the following variables to your dbt_project.yml file denoting the source GCP project, dataset, and a start date to use when scanning sharded GA4 event tables.
 
 ```
 vars:
@@ -45,7 +46,7 @@ vars:
 
 # Connecting to BigQuery
 
-Full instructions for connecting to BigQuery are here: https://docs.getdbt.com/reference/warehouse-profiles/bigquery-profile
+Full instructions for connecting DBT to BigQuery are here: https://docs.getdbt.com/reference/warehouse-profiles/bigquery-profile
 
 The easiest option is using OAuth with your Google Account. Summarized instructions are as follows:
  
