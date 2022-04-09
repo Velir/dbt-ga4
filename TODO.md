@@ -37,3 +37,4 @@ DBT project structure notes: https://discourse.getdbt.com/t/how-we-structure-our
 - think through handling of 1 stream, multiple streams
 - Set dynamic vs. static partitioning using a variable
 - Seed file for channel grouping
+- Implement dev profile considerations to limit processing: https://docs.getdbt.com/docs/guides/best-practices#limit-the-data-processed-when-in-development
