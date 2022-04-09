@@ -27,7 +27,7 @@ More info here: https://support.google.com/analytics/answer/10937659?hl=en#zippy
 ## Local Installation
 
 1. Clone this repository to a folder in the same parent directory as your DBT project
-2. Update your packages.yml to include a reference to the local files:
+2. Update your project's `packages.yml` to include a reference to this package:
 
 ```
 packages:
