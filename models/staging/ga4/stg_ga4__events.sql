@@ -32,7 +32,9 @@ with renamed as (
         --event_dimensions, -- This is present in the sample dataset, but not the GA4 BQ export spec https://support.google.com/firebase/answer/7029846?hl=en
         ecommerce,
         items,
-        (select value.int_value from unnest(event_params) where key = 'ga_session_id') as ga_session_id
+        {{ unnest_key('event_params', 'ga_session_id', 'int_value') }},
+        {{ unnest_key('event_params', 'page_location') }},
+        {{ unnest_key('event_params', 'ga_session_number',  'int_value') }}
     from {{ref('base_ga4__events')}}
 ),
 include_session_key as (
@@ -46,6 +48,16 @@ include_event_key as (
         include_session_key.*,
         md5(CONCAT(event_name, CAST(event_timestamp as STRING), CAST(TO_BASE64(session_key) as STRING))) as event_key -- Surrogate key for unique events
     from include_session_key
+),
+enrich_params as (
+    select 
+        include_event_key.*,
+        {{extract_hostname_from_url('page_location')}} as page_hostname,
+        case
+            when ga_session_number = 1 then TRUE
+            else FALSE
+        end as is_new_user
+    from include_event_key
 )
 
-select * from include_event_key
+select * from enrich_params
