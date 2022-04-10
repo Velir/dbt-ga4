@@ -11,8 +11,7 @@ DBT project structure notes: https://discourse.getdbt.com/t/how-we-structure-our
 - Create staging tables for the following events:
     - scroll
     - first_visit
-    - view_promotion
-    - click
+    - view_promotion    
     - add_to_cart
     - purchase
     - Audience entrance/exist conversion events
