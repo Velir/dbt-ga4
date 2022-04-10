@@ -3,7 +3,7 @@
         when
             {{column_to_unnest}}.key = '{{key_to_extract}}'
         then 
-            {{ merge_columns(
+            {{ merge_value_columns(
                             ['event_params.value.string_value',
                             'cast(event_params.value.int_value as string)',
                             'cast(event_params.value.float_value as string)',
