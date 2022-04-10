@@ -1,4 +1,4 @@
--- Break out struct data types and include ga_session_id in all records
+-- Break out struct data types and add unique keys for sessions and events
 
 with renamed as (
     select 
@@ -31,23 +31,21 @@ with renamed as (
         platform,
         --event_dimensions, -- This is present in the sample dataset, but not the GA4 BQ export spec https://support.google.com/firebase/answer/7029846?hl=en
         ecommerce,
-        items 
+        items,
+        (select value.int_value from unnest(event_params) where key = 'ga_session_id') as ga_session_id
     from {{ref('base_ga4__events')}}
 ),
-include_session_id as (
+include_session_key as (
     select 
         renamed.*,
-        params.value.int_value as ga_session_id,
-        md5(CONCAT(stream_id, client_id, cast(params.value.int_value as STRING))) as session_key -- Surrogate key to determine unique session across streams and users. Sessions do NOT reset after midnight in GA4
-    from renamed,
-        UNNEST(event_params) as params
-    where params.key = 'ga_session_id'
+        md5(CONCAT(stream_id, client_id, cast(ga_session_id as STRING))) as session_key -- Surrogate key to determine unique session across streams and users. Sessions do NOT reset after midnight in GA4
+    from renamed
 ),
 include_event_key as (
     select 
-        include_session_id.*,
+        include_session_key.*,
         md5(CONCAT(event_name, CAST(event_timestamp as STRING), CAST(TO_BASE64(session_key) as STRING))) as event_key -- Surrogate key for unique events
-    from include_session_id
+    from include_session_key
 )
 
 select * from include_event_key

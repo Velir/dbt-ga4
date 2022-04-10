@@ -21,7 +21,7 @@ with source as (
     select 
         parse_date('%Y%m%d',event_date) as event_date_dt,
         event_timestamp,
-        event_name,
+        lower(replace(trim(event_name), " ", "_")) as event_name, -- Clean up all event names to be snake cased
         event_params,
         event_previous_timestamp,
         event_value_in_usd,
