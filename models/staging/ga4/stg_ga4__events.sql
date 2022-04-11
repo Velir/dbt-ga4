@@ -17,16 +17,9 @@ with renamed as (
         user_first_touch_timestamp,
         user_ltv,
         device,
-        geo.continent as geo_continent,
-        geo.sub_continent as geo_sub_continent,
-        geo.country as geo_country,
-        geo.region as geo_region,
-        geo.city as geo_city,
-        geo.metro as geo_metro,
+        geo,
         app_info,
-        traffic_source.name as traffic_source_campaign_name,
-        traffic_source.source as traffic_source_source,
-        traffic_source.medium as traffic_source_medium,
+        {{ unpack_struct('traffic_source', ['name', 'source', 'medium']) }},
         stream_id,
         platform,
         --event_dimensions, -- This is present in the sample dataset, but not the GA4 BQ export spec https://support.google.com/firebase/answer/7029846?hl=en
@@ -34,7 +27,8 @@ with renamed as (
         items,
         {{ unnest_key('event_params', 'ga_session_id', 'int_value') }},
         {{ unnest_key('event_params', 'page_location') }},
-        {{ unnest_key('event_params', 'ga_session_number',  'int_value') }}
+        {{ unnest_key('event_params', 'ga_session_number',  'int_value') }},
+        {{ unnest_key('event_params', 'session_engaged', 'int_value') }}
     from {{ref('base_ga4__events')}}
 ),
 include_session_key as (
