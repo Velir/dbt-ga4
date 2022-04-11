@@ -1,8 +1,8 @@
 version: 2
 
 models:
-  - name: dim_sessions
-    description: Inventory of all sessions with accompanying information. Unique on session_key
+  - name: dim_ga4__sessions
+    description: Inventory of all sessions with accompanying dimension information. Unique on session_key
     columns:
       - name: session_key
         tests:
