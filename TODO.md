@@ -29,8 +29,6 @@ DBT project structure notes: https://discourse.getdbt.com/t/how-we-structure-our
     - Full event reference: 
         - https://developers.google.com/analytics/devguides/collection/ga4/reference/events
         - https://support.google.com/analytics/answer/9216061?hl=en&ref_topic=9756175
-- Create dim_sessions model
-- Create dim_users model
 - Review these issues for ideas for our repo: https://github.com/coding-is-for-losers/ga4-bigquery-starter/issues
 - Test whether session keys are unique
 - Recreate common Fivetran ga3 models with ga4 data
