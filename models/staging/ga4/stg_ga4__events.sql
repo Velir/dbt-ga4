@@ -28,7 +28,15 @@ with renamed as (
         {{ unnest_key('event_params', 'ga_session_id', 'int_value') }},
         {{ unnest_key('event_params', 'page_location') }},
         {{ unnest_key('event_params', 'ga_session_number',  'int_value') }},
-        {{ unnest_key('event_params', 'session_engaged', 'int_value') }}
+        {{ unnest_key('event_params', 'session_engaged', 'int_value') }},
+        CASE 
+            WHEN event_name = 'page_view' THEN 1
+            ELSE 0
+        END AS is_page_view,
+        CASE 
+            WHEN event_name = 'purchase' THEN 1
+            ELSE 0
+        END AS is_purchase
     from {{ref('base_ga4__events')}}
 ),
 include_session_key as (
