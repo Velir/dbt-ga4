@@ -10,7 +10,7 @@ with users as (
         count(distinct session_key) as num_sessions,
         sum(is_page_view) as num_page_views,
         sum(is_purchase) as num_purchases
-    from {{ref('stg_ga4__events')}}
+    from {{ref('base_ga4__events')}}
     group by 1
 
 ),

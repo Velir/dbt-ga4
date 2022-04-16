@@ -4,9 +4,7 @@
 with session_start_dims as (
     select 
         session_key,
-        traffic_source_name,
-        traffic_source_source,
-        traffic_source_medium,
+        traffic_source,
         ga_session_number,
         page_location as landing_page,
         page_hostname as landing_page_hostname,

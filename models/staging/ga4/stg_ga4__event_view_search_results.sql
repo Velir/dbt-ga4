@@ -6,7 +6,7 @@
       {{ unnest_key('event_params', 'page_title') }},
       {{ unnest_key('event_params', 'page_referrer') }},
       {{ unnest_key('event_params', 'search_term') }}
- from {{ref('stg_ga4__events')}}
+ from {{ref('base_ga4__events')}}
  where event_name = 'view_search_results'
 )
 

@@ -8,7 +8,7 @@ DBT project structure notes: https://discourse.getdbt.com/t/how-we-structure-our
 
 # TODO
 
-- move all common event params to `stg_ga4__events`
+- move all common event params to `base_ga4__events`
     - engagement_time_msec
     - ga_session_id
     - session_engaged
