@@ -17,8 +17,10 @@ events_joined as (
         events_by_client_id.*,
         events_first.geo as first_geo,
         events_first.device as first_device,
+        events_first.traffic_source as first_traffic_source,
         events_last.geo as last_geo,
-        events_last.device as last_device
+        events_last.device as last_device,
+        events_last.traffic_source as last_traffic_source
     from events_by_client_id
     left join {{ref('base_ga4__events')}} events_first
         on events_by_client_id.first_event = events_first.event_key

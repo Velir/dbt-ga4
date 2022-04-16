@@ -19,6 +19,7 @@ DBT project structure notes: https://discourse.getdbt.com/t/how-we-structure-our
     - ga_session_number
     - page_location
     - ignore_referrer
+- Handle `privacy_info` field - without analytics storage, the client ID will be null. 
 - Create staging tables for the following events:
     - scroll
     - first_visit

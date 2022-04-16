@@ -2,8 +2,14 @@ version: 2
 
 models:
   - name: dim_ga4__sessions
-    description: Inventory of all sessions with accompanying dimension information. Unique on session_key
+    description: Session dimensions. Unique on session_key
     columns:
       - name: session_key
+        tests:
+          - unique
+  - name: dim_ga4__users
+    description: User dimensions including data from the first and last event produced by the user. Unique on client_id
+    columns:
+      - name: client_id
         tests:
           - unique
