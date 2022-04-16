@@ -3,7 +3,7 @@ version: 2
 models:
   - name: base_ga4__events
     description: Base events model that pulls all fields from raw data. Resulting table is partitioned on event_date and is useful in that BQ queries can be cached against this table, but not against wildcard searches from the original tables which are sharded on date.   
-  - name: stg_ga4__events
+  - name: base_ga4__events
     description: Light transformation and renaming beyond the base events model. Adds surrogate keys for sessions and events
     columns:
       - name: event_key
