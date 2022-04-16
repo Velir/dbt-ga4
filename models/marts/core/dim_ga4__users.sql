@@ -19,8 +19,10 @@ include_first_last_events as (
         users.*,
         first_last_events.first_geo,
         first_last_events.first_device,
+        first_last_events.first_traffic_source,
         first_last_events.last_geo,
-        first_last_events.last_device
+        first_last_events.last_device,
+        first_last_events.last_traffic_source,
     from users 
     left join {{ref('stg_ga4__users_first_last_events')}} as first_last_events on
         users.client_id = first_last_events.client_id
