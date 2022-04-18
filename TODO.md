@@ -41,3 +41,5 @@ DBT project structure notes: https://discourse.getdbt.com/t/how-we-structure-our
 - Set dynamic vs. static partitioning using a variable
 - Seed file for channel grouping
 - Implement dev profile considerations to limit processing: https://docs.getdbt.com/docs/guides/best-practices#limit-the-data-processed-when-in-development
+- Example of a funnel model
+- Review LookML examples for inspiration: https://github.com/llooker/ga_four_block_dev/tree/master/views/event_data_dimensions
