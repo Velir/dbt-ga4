@@ -19,7 +19,6 @@ DBT project structure notes: https://discourse.getdbt.com/t/how-we-structure-our
     - ga_session_number
     - page_location
     - ignore_referrer
-- Set `is_exit_page` on last page_view hit of session
 - Add event timing (avg time to next page) metrics
 - Session + conversion metrics
 - Handle `privacy_info` field - without analytics storage, the client ID will be null. 
