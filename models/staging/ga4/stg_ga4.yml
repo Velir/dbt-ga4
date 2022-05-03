@@ -25,3 +25,11 @@ models:
       - name: client_id
         tests: 
           - unique
+  - name: stg_ga4__ecommerce
+    description: Captures the ecommerce data where ecommerce.transaction_id is not null and "(not set)"
+    columns:
+      - name: transaction_id
+        tests:
+          - unique
+  - name: stg_ga4__items
+    description: Captures the items data from ecommerce events to be joined on event_timestamp, event_name, and user_pseudo_id

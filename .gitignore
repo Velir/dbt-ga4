@@ -2,3 +2,6 @@
 target/
 dbt_packages/
 logs/
+dbt_project.yml
+packages.yml
+google-cloud-sdk/

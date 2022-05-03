@@ -13,10 +13,12 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
-#vars:
-#    start_date: "20210120" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model. 
-#    project: "bigquery-public-data"
-#    dataset: "ga4_obfuscated_sample_ecommerce"
+profile: obfuscated_test_db
+
+vars:
+    start_date: "20210120" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model. 
+    project: "bigquery-public-data"
+    dataset: "ga4_obfuscated_sample_ecommerce"
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
