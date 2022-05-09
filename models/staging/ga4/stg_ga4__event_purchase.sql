@@ -5,7 +5,7 @@
       {{ unnest_key('event_params', 'currency') }},
       {{ unnest_key('event_params', 'payment_type') }},
       {{ unnest_key('event_params', 'value', 'float_value') }}
- from {{ref('base_ga4__events')}}    
+ from {{ref('stg_ga4__events')}}    
  where event_name = 'purchase'
 )
 

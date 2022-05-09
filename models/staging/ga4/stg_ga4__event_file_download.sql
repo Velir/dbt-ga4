@@ -13,7 +13,7 @@
       {{ unnest_key('event_params', 'link_id') }},
       {{ unnest_key('event_params', 'link_text') }},
       {{ unnest_key('event_params', 'link_url') }}
- from {{ref('base_ga4__events')}}    
+ from {{ref('stg_ga4__events')}}    
  where event_name = 'file_download'
 )
 
