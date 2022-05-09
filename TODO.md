@@ -3,11 +3,14 @@
 
 # Misc
 
-DBT guide to package creation: https://docs.getdbt.com/docs/guides/building-packages
-DBT project structure notes: https://discourse.getdbt.com/t/how-we-structure-our-dbt-projects/355
+- DBT guide to package creation: https://docs.getdbt.com/docs/guides/building-packages
+- DBT project structure notes: https://discourse.getdbt.com/t/how-we-structure-our-dbt-projects/355
 
 # TODO
 
+- handle `debug_mode` param (filter out?)
+- parse out stem and query string from `page_location` URL
+- bring user properties into `dim_ga4__users` (variable containing a list of user properties?)
 - mechanism to take in an array variable listing custom events and output 1 model per event (is this possible?)
 - move all common event params to `base_ga4__events`
     - engagement_time_msec
@@ -26,7 +29,8 @@ DBT project structure notes: https://discourse.getdbt.com/t/how-we-structure-our
 - Create staging tables for the following events:
     - view_promotion    
     - add_to_cart
-    - Audience entrance/exist conversion events
+    - Audience trigger events. See https://support.google.com/analytics/answer/9934109?hl=en
+    - Special treatment for conversion events?
     - Full event reference: 
         - https://developers.google.com/analytics/devguides/collection/ga4/reference/events
         - https://support.google.com/analytics/answer/9216061?hl=en&ref_topic=9756175
