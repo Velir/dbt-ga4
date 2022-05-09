@@ -24,11 +24,7 @@ include_event_key as (
 enrich_params as (
     select 
         include_event_key.*,
-        {{extract_hostname_from_url('page_location')}} as page_hostname,
-        case
-            when ga_session_number = 1 then TRUE
-            else FALSE
-        end as is_new_user
+        {{extract_hostname_from_url('page_location')}} as page_hostname
     from include_event_key
 )
 

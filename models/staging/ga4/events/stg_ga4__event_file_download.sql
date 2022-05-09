@@ -3,8 +3,6 @@
  with event_with_params as (
    select *,
       {{ unnest_key('event_params', 'entrances',  'int_value') }},
-      {{ unnest_key('event_params', 'page_title') }},
-      {{ unnest_key('event_params', 'page_referrer') }},
       {{ unnest_key('event_params', 'value', 'float_value') }},
       {{ unnest_key('event_params', 'file_extension') }},
       {{ unnest_key('event_params', 'file_name') }},

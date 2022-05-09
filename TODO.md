@@ -8,6 +8,7 @@ DBT project structure notes: https://discourse.getdbt.com/t/how-we-structure-our
 
 # TODO
 
+- mechanism to take in an array variable listing custom events and output 1 model per event (is this possible?)
 - move all common event params to `base_ga4__events`
     - engagement_time_msec
     - ga_session_id
@@ -23,11 +24,8 @@ DBT project structure notes: https://discourse.getdbt.com/t/how-we-structure-our
 - Session + conversion metrics
 - Handle `privacy_info` field - without analytics storage, the client ID will be null. 
 - Create staging tables for the following events:
-    - scroll
-    - first_visit
     - view_promotion    
     - add_to_cart
-    - purchase
     - Audience entrance/exist conversion events
     - Full event reference: 
         - https://developers.google.com/analytics/devguides/collection/ga4/reference/events

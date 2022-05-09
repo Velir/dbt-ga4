@@ -3,7 +3,6 @@ version: 2
 models:  
   - name: base_ga4__events
     description: Base events model that pulls all fields from raw data. Resulting table is partitioned on event_date and is useful in that BQ queries can be cached against this table, but not against wildcard searches from the original tables which are sharded on date. Some light transformation and renaming beyond the base events model. Adds surrogate keys for sessions and events
-
   - name: stg_ga4__event_page_view
     description: GA4 events filtered to only show 'page_view' events. Pivots common event parameters into separate columns. Identifies the first and last pageview in the 'is_entrance' and 'is_exit' columns. 
   - name: stg_ga4__event_session_start
@@ -28,3 +27,5 @@ models:
       - name: event_key
         tests:
           - unique
+  - name: stg_ga4__event_scroll
+    description: Staging model containing only 'scroll' events. Includes the 'percent_scrolled' parameter.
