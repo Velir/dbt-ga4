@@ -16,7 +16,7 @@
       {{ unnest_key('event_params', 'click_tag_name') }},
       {{ unnest_key('event_params', 'click_url') }},
       {{ unnest_key('event_params', 'file_name') }}
- from {{ref('base_ga4__events')}}
+ from {{ref('stg_ga4__events')}}
  where event_name = 'click'
 )
 

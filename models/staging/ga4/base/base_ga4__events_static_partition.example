@@ -1,3 +1,10 @@
+-- If jobs are running daily, it may make sense to avoid the scanning necessary to determine the max partition date. Instead, a static incremental range can be set and this data will be overwritten/inserted at every incremental run.
+
+{% set partitions_to_replace = [
+  'current_date()',
+  'date_sub(current_date(), interval 1 day)'
+] %}
+
 --BigQuery does not cache wildcard queries that scan across sharded tables which means it's best to materialize the raw event data as a partitioned table so that future queries benefit from caching
 {{
     config(
@@ -38,9 +45,8 @@ with source as (
     where _table_suffix not like '%intraday%' and -- TODO: support blending intraday events as well
         cast(_table_suffix as int64) >= {{var('start_date')}}
     {% if is_incremental() %}
-        -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
-        -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
-        and parse_date('%Y%m%d',_TABLE_SUFFIX) >= _dbt_max_partition 
+        -- recalculate yesterday + today
+        and parse_date('%Y%m%d',_TABLE_SUFFIX) in ({{ partitions_to_replace | join(',') }})
     {% endif %}
 ),
 renamed as (
