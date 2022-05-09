@@ -71,6 +71,8 @@ renamed as (
         {{ unnest_key('event_params', 'page_location') }},
         {{ unnest_key('event_params', 'ga_session_number',  'int_value') }},
         {{ unnest_key('event_params', 'session_engaged', 'int_value') }},
+        {{ unnest_key('event_params', 'page_title') }},
+        {{ unnest_key('event_params', 'page_referrer') }},
         CASE 
             WHEN event_name = 'page_view' THEN 1
             ELSE 0
