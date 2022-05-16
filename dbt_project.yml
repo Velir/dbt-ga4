@@ -19,6 +19,9 @@ vars:
     start_date: "20210120" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model. 
     project: "bigquery-public-data"
     dataset: "ga4_obfuscated_sample_ecommerce"
+    page_view:
+      - name: "clean_event"
+        value_type: "string_value"  
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models

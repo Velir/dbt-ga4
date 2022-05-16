@@ -4,6 +4,9 @@
       {{ unnest_key('event_params', 'page_title') }},
       {{ unnest_key('event_params', 'page_referrer') }},
       {{ unnest_key('event_params', 'value', 'float_value') }}
+      {% if var("page_view") %}
+        {{ stage_custom_parameters( var("page_view") )}}
+      {% endif %}
  from {{ref('base_ga4__events')}}    
  where event_name = 'page_view'
 ),
