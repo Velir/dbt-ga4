@@ -73,6 +73,7 @@ renamed as (
         {{ unnest_key('event_params', 'session_engaged', 'int_value') }},
         {{ unnest_key('event_params', 'page_title') }},
         {{ unnest_key('event_params', 'page_referrer') }},
+        {{ unnest_key('event_params', 'debug_mode') }},
         CASE 
             WHEN event_name = 'page_view' THEN 1
             ELSE 0
