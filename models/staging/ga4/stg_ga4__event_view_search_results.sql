@@ -6,6 +6,9 @@
       {{ unnest_key('event_params', 'page_title') }},
       {{ unnest_key('event_params', 'page_referrer') }},
       {{ unnest_key('event_params', 'search_term') }}
+      {% if var("view_search_result") %}
+        {{ stage_custom_parameters( var("view_search_result") )}}
+      {% endif %}
  from {{ref('base_ga4__events')}}
  where event_name = 'view_search_results'
 )

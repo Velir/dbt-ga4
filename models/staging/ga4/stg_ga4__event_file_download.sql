@@ -13,6 +13,9 @@
       {{ unnest_key('event_params', 'link_id') }},
       {{ unnest_key('event_params', 'link_text') }},
       {{ unnest_key('event_params', 'link_url') }}
+      {% if var("file_download") %}
+        {{ stage_custom_parameters( var("file_download") )}}
+      {% endif %}
  from {{ref('base_ga4__events')}}    
  where event_name = 'file_download'
 )

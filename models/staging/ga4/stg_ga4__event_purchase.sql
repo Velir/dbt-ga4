@@ -5,6 +5,9 @@
       {{ unnest_key('event_params', 'currency') }},
       {{ unnest_key('event_params', 'payment_type') }},
       {{ unnest_key('event_params', 'value', 'float_value') }}
+      {% if var("purchase") %}
+        {{ stage_custom_parameters( var("purchase") )}}
+      {% endif %}
  from {{ref('base_ga4__events')}}    
  where event_name = 'purchase'
 )

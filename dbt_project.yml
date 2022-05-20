@@ -19,9 +19,13 @@ vars:
     start_date: "20210120" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model. 
     project: "bigquery-public-data"
     dataset: "ga4_obfuscated_sample_ecommerce"
-    page_view:
-      - name: "clean_event"
-        value_type: "string_value"  
+# custom parameters are registered by creating a var matching the event name where the custom parameter occurs
+# and providing the name, matching the parameters name
+# and matching the value_type to the type of column in BigQuery (string_value, int_value, float_value, double_value)
+# the below example shows a page_view enhanced with the clean_event event parameter from the ga4_obfuscated_sample_ecommerce project
+#    page_view:
+#      - name: "clean_event"
+#        value_type: "string_value"  
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
