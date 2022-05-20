@@ -1,6 +1,4 @@
 
-------------
-
 # Misc
 
 - DBT guide to package creation: https://docs.getdbt.com/docs/guides/building-packages
@@ -9,7 +7,6 @@
 # TODO
 
 - add variable to filter out events with `debug_mode = true` - Don't see any in BQ, are they exported? 
-- parse out stem and query string from `page_location` URL. Break up query parameters? 
 - bring user properties into `dim_ga4__users` (variable containing a list of user properties?)
 - mechanism to take in an array variable listing custom events and output 1 model per event (is this possible?)
 - move common event params to `base_ga4__events`
