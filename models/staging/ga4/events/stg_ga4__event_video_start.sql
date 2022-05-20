@@ -10,6 +10,9 @@
       {{ unnest_key('event_params', 'video_provider') }},
       {{ unnest_key('event_params', 'vide_title') }},
       {{ unnest_key('event_params', 'visible') }}
+      {% if var("video_start") %}
+        {{ stage_custom_parameters( var("video_start") )}}
+      {% endif %}
  from {{ref('stg_ga4__events')}}    
  where event_name = 'video_start'
 )

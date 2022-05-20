@@ -4,6 +4,9 @@ with first_visit_with_params as (
  select 
     *,
     {{ unnest_key('event_params', 'page_location', 'string_value', 'landing_page') }} 
+      {% if var("first_visit") %}
+        {{ stage_custom_parameters( var("first_visit") )}}
+      {% endif %}
  from {{ref('stg_ga4__events')}}    
  where event_name = 'first_visit'
 )
