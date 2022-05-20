@@ -9,7 +9,7 @@ select
     ecommerce.tax_value as tax_value,
     ecommerce.unique_items as unique_items,
     trim(ecommerce.transaction_id) as transaction_id
-from {{ref('base_ga4__events')}}
+from {{ref('stg_ga4__events')}}
 where 
     ecommerce.transaction_id is not null and
     ecommerce.transaction_id != "(not set)"
