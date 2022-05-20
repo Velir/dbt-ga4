@@ -24,7 +24,8 @@ include_event_key as (
 enrich_params as (
     select 
         include_event_key.*,
-        {{extract_hostname_from_url('page_location')}} as page_hostname
+        {{extract_hostname_from_url('page_location')}} as page_hostname,
+        {{extract_query_string_from_url('page_location')}} as page_query_string,
     from include_event_key
 )
 

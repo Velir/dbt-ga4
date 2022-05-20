@@ -9,7 +9,6 @@
 # TODO
 
 - handle `debug_mode` param (filter out?)
-- parse out stem and query string from `page_location` URL
 - bring user properties into `dim_ga4__users` (variable containing a list of user properties?)
 - mechanism to take in an array variable listing custom events and output 1 model per event (is this possible?)
 - move all common event params to `base_ga4__events`
