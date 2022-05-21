@@ -13,12 +13,15 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
-profile: obfuscated_test_db
 
-vars:
-    start_date: "20210120" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model. 
-    project: "bigquery-public-data"
-    dataset: "ga4_obfuscated_sample_ecommerce"
+#vars:
+#    start_date: "20210120" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model. 
+#    project: "bigquery-public-data"
+#    dataset: "ga4_obfuscated_sample_ecommerce"
+#    page_view_custom_parameters:
+#      - name: my_custom_param
+#        value_type: string_value
+        
 # custom parameters are registered by creating a var matching the event name where the custom parameter occurs
 # and providing the name, matching the parameters name
 # and matching the value_type to the type of column in BigQuery (string_value, int_value, float_value, double_value)
