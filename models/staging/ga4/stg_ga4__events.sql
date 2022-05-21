@@ -2,7 +2,7 @@
 
 with base_events as (
     select * from {{ ref('base_ga4__events')}}
-    {% if var('include_intraday_events', 'true') == 'true' %}
+    {% if var('include_intraday_events', false) %}
     union all
     select * from {{ref('base_ga4__events_intraday')}}
     {% endif %}

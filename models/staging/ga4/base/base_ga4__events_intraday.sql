@@ -1,5 +1,5 @@
 {{ config(
-  enabled= var('include_intraday_events', 'true') 
+  enabled= var('include_intraday_events', false) 
 ) }}
 
 
