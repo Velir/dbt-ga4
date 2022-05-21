@@ -33,9 +33,6 @@
         - https://support.google.com/analytics/answer/9216061?hl=en&ref_topic=9756175
 - Review these issues for ideas for our repo: https://github.com/coding-is-for-losers/ga4-bigquery-starter/issues
 - Test whether session keys are unique
-- Recreate common Fivetran ga3 models with ga4 data
-    - https://fivetran.com/docs/applications/google-analytics/prebuilt-reports#traffic
-
 - Add integration tests - Need to think about how to handle nested data as the source. CSV won't reproduce nested data. 
     - Look into using https://github.com/EqualExperts/dbt-unit-testing and generating mock data using SQL statements. 
 - intraday support
