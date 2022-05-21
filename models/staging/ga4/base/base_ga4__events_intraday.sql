@@ -2,6 +2,7 @@
   enabled= var('include_intraday_events', false) 
 ) }}
 
+-- This model will be unioned with `base_ga4__events` which means that their columns must match
 
 with source as (
     select 

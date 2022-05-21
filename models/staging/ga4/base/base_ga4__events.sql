@@ -35,7 +35,7 @@ with source as (
         ecommerce,
         items
     from {{ source('ga4', 'events') }}
-    where _table_suffix not like '%intraday%' and -- TODO: support blending intraday events as well
+    where _table_suffix not like '%intraday%' and -- intraday events are supported through the project variable: include_intraday_events
         cast(_table_suffix as int64) >= {{var('start_date')}}
     {% if is_incremental() %}
         -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
