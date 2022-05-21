@@ -7,4 +7,5 @@ sources:
     tables:
       - name: events
         identifier: events_* # Scan across all sharded event tables. Use the 'start_date' variable to limit this scan
-
+      - name: events_intraday
+        identifier: events_intraday_*
