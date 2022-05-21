@@ -49,9 +49,9 @@ vars:
 One important feature of GA4 is that you can add custom parameters to any event. These custom parameters will be picked up by this package if they are defined as variables within your `dbt_project.yml` file using the following syntax:
 
 ```
-[event name]_custom_parmaters
+[event name]_custom_parameters
   - name: "[name of custom parameter]"
-    value_type: "[one of string_value|int_value|float_value|double_value]"
+    value_type: "[string_value|int_value|float_value|double_value]"
 ```
 
 For example: 
