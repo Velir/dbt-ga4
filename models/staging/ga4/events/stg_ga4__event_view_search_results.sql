@@ -5,6 +5,9 @@
       {{ unnest_key('event_params', 'entrances',  'int_value') }},
       {{ unnest_key('event_params', 'search_term') }},
       {{ unnest_key('event_params', 'unique_search_term') }}
+      {% if var("view_search_results_custom_parameters", "none") != "none" %}
+        {{ stage_custom_parameters( var("view_search_results_custom_parameters") )}}
+      {% endif %}
  from {{ref('stg_ga4__events')}}
  where event_name = 'view_search_results'
 )

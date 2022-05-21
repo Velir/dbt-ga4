@@ -45,3 +45,24 @@
 - Implement dev profile considerations to limit processing: https://docs.getdbt.com/docs/guides/best-practices#limit-the-data-processed-when-in-development
 - Example of a funnel model
 - Review LookML examples for inspiration: https://github.com/llooker/ga_four_block_dev/tree/master/views/event_data_dimensions
+- Configuration flag to turn off ecommerce tables
+- Configuration and dynamic templates to create custom event tables and dimensions
+- Configuration to create custom dimensions (session, user, event_*) from event parameters
+
+## Discussion: Set dynamic vs. static partitioning using a variable
+Damon:
+GA4 SLA: https://support.google.com/analytics/answer/11198161?hl=en
+
+When I've done dynamic partitioning, I usually use two days worth of data: yesterday and the day before. This gives time to for systems to recover from errors without the data engineer needing to do anything to fix the data. However, given the longest processing time listed in the document above is Daily, 24+ hours late, the freshest, processed data on Premium XLarge properties can be two days old. 
+
+Currently, base_ga4__events_dynamic_partition.example, picks up where the previous operation left off.
+
+It may be better to get the last x days and reprocess and replace some data in order to allow for bugs and reprocessing on Google's side.
+
+I don't think this is worth discussing now, but we should keep it in mind as a possible alternate solution that reduces maintenance work.
+
+## Discussion: Configuration to create custom dimensions
+
+Product-scope (or item-scope in GA4) custom dimensions are a much missed feature.
+
+We can implement them, with some difficulty, mapping event properties to the custom dimension. However, it is possible that Google, presuming they add item-scoped CDs, will just add the dimension to the items array which could result in stg_ga4__items.sql automatically picking up item-scoped CDs the way that it is currently written.
