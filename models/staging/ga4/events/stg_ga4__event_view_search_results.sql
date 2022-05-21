@@ -3,12 +3,10 @@
  with event_with_params as (
    select *,
       {{ unnest_key('event_params', 'entrances',  'int_value') }},
-      {{ unnest_key('event_params', 'page_title') }},
-      {{ unnest_key('event_params', 'page_referrer') }},
-      {{ unnest_key('event_params', 'search_term') }}
+      {{ unnest_key('event_params', 'search_term') }},
       {{ unnest_key('event_params', 'unique_search_term') }}
-      {% if var("view_search_result") %}
-        {{ stage_custom_parameters( var("view_search_result") )}}
+      {% if var("view_search_results_custom_parameters", "none") != "none" %}
+        {{ stage_custom_parameters( var("view_search_results_custom_parameters") )}}
       {% endif %}
  from {{ref('stg_ga4__events')}}
  where event_name = 'view_search_results'

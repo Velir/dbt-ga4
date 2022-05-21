@@ -13,8 +13,8 @@
       {{ unnest_key('event_params', 'click_tag_name') }},
       {{ unnest_key('event_params', 'click_url') }},
       {{ unnest_key('event_params', 'file_name') }}
-      {% if var("click") %}
-        {{ stage_custom_parameters( var("click") )}}
+      {% if var("click_custom_parameters", "none") != "none" %}
+        {{ stage_custom_parameters( var("click_custom_parameters") )}}
       {% endif %}
  from {{ref('stg_ga4__events')}}
  where event_name = 'click'

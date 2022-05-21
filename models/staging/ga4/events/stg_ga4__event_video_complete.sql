@@ -10,8 +10,8 @@
       {{ unnest_key('event_params', 'video_provider') }},
       {{ unnest_key('event_params', 'vide_title') }},
       {{ unnest_key('event_params', 'visible') }}
-      {% if var("video_complete") %}
-        {{ stage_custom_parameters( var("video_complete") )}}
+      {% if var("video_complete_custom_parameters", "none") != "none" %}
+        {{ stage_custom_parameters( var("video_complete_custom_parameters") )}}
       {% endif %}
  from {{ ref('stg_ga4__events') }}    
  where event_name = 'video_complete'
