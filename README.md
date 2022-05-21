@@ -44,6 +44,28 @@ vars:
       dataset: "analytics_00000000"
 ```
 
+# Handling Custom Parameters
+
+One important feature of GA4 is that you can add custom parameters to any event. These custom parameters will be picked up by this package if they are defined as variables within your `dbt_project.yml` file using the following syntax:
+
+```
+[event name]_custom_parmaters
+  - name: "[name of custom parameter]"
+    value_type: "[one of string_value|int_value|float_value|double_value]"
+```
+
+For example: 
+
+```
+vars:
+  ga4:
+    page_view_custom_parameters:
+          - name: "clean_event"
+            value_type: "string_value"
+          - name: "country_code"
+            value_type: "int_value"
+```
+
 # Connecting to BigQuery
 
 Full instructions for connecting DBT to BigQuery are here: https://docs.getdbt.com/reference/warehouse-profiles/bigquery-profile
