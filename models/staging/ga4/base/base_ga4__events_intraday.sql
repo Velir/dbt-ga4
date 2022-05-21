@@ -1,5 +1,8 @@
+{{ config(
+  enabled= var('include_intraday_events', 'true') 
+) }}
 
-{% if var('include_intraday_events', 'true') == 'true' %}
+
 with source as (
     select 
         parse_date('%Y%m%d',event_date) as event_date_dt,
@@ -68,4 +71,3 @@ renamed as (
 )
 
 select * from renamed
-{% endif %}
