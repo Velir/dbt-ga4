@@ -1,8 +1,0 @@
-version: 2
-
-# This mart contains models that transform GA4 data into the predefined GA3 reports provided by Fivetran
-# Fivetran GA3 predefined reports are listed here: https://fivetran.com/docs/applications/google-analytics/prebuilt-reports
-
-models:
-  - name: ga4_to_ga3__traffic
-    description: This models shows the traffic metrics based on each page of your website. https://fivetran.com/docs/applications/google-analytics/prebuilt-reports#traffic
