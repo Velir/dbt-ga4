@@ -1,14 +1,8 @@
---BigQuery does not cache wildcard queries that scan across sharded tables which means it's best to materialize the raw event data as a partitioned table so that future queries benefit from caching
-{{
-    config(
-        materialized = 'incremental',
-        incremental_strategy = 'insert_overwrite',
-        partition_by={
-        "field": "event_date_dt",
-        "data_type": "date",
-        }
-    )
-}}
+{{ config(
+  enabled= var('include_intraday_events', false) 
+) }}
+
+-- This model will be unioned with `base_ga4__events` which means that their columns must match
 
 with source as (
     select 
@@ -34,14 +28,7 @@ with source as (
         platform,
         ecommerce,
         items
-    from {{ source('ga4', 'events') }}
-    where _table_suffix not like '%intraday%' and -- intraday events are supported through the project variable: include_intraday_events
-        cast(_table_suffix as int64) >= {{var('start_date')}}
-    {% if is_incremental() %}
-        -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
-        -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
-        and parse_date('%Y%m%d',_TABLE_SUFFIX) >= _dbt_max_partition 
-    {% endif %}
+    from {{ source('ga4', 'events_intraday') }}
 ),
 renamed as (
     select 

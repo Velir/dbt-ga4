@@ -2,6 +2,10 @@
 
 with base_events as (
     select * from {{ ref('base_ga4__events')}}
+    {% if var('include_intraday_events', false) %}
+    union all
+    select * from {{ref('base_ga4__events_intraday')}}
+    {% endif %}
 ),
 -- Add unique keys for sessions and events
 include_session_key as (
