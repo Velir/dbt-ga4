@@ -1,5 +1,4 @@
--- Dimension table for sessions
--- TODO - convert traffic source to channel grouping
+-- Dimension table for sessions based on the session_start event.
 
 with session_start_dims as (
     select 
