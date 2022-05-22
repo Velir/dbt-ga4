@@ -9,6 +9,17 @@ Features include:
 - Session and User dimensional models
 - Support for custom event parameters
 
+# Model Overview
+
+| model | description |
+|-------|-------------|
+| stg_ga4__events | Contains cleaned event data that is deduped and enhanced with useful event and session keys. |
+| stg_ga4__event_* | 1 model per event (ex: page_view, purchase) which flattens event parameters specific to that event |
+| stg_ga4__event_to_query_string_params | Mapping between each event and any query parameters & values that were contained in the event's `page_location` field |
+| dim_ga4__users | Dimension table for users whcih contains attributes such as first and last page viewed. | 
+| dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and campaign data |
+
+
 # Prerequisites
 
 - This package assumes that you have an existing DBT project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded. If you don't have any GA4 data of your own, you can connect to Google's public data set with the following settings:
