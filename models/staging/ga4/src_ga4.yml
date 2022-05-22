@@ -2,10 +2,12 @@ version: 2
 
 sources:
   - name: ga4
-    database: "{{var('project','bigquery-public-data')}}" # Default to bigquery-public-data
-    schema: "{{var('dataset', 'ga4_obfuscated_sample_ecommerce')}}" # Default to ga4_obfuscated_sample_ecommerce
+    database: "{{var('project')}}" 
+    schema: "{{var('dataset')}}" 
     tables:
       - name: events
         identifier: events_* # Scan across all sharded event tables. Use the 'start_date' variable to limit this scan
+        description: Main events table exported by GA4. Sharded by date. 
       - name: events_intraday
         identifier: events_intraday_*
+        description: Intraday events table which is optionally exported by GA4. Always contains events from the current day.

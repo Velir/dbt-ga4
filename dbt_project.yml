@@ -16,9 +16,9 @@ clean-targets:         # directories to be removed by `dbt clean`
 
 vars:
     include_intraday_events: false # true|false indicates whether intraday events should be unioned into the event model
-#    start_date: "20210120" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model. 
-#    project: "bigquery-public-data"
-#    dataset: "ga4_obfuscated_sample_ecommerce"
+    project: "bigquery-public-data"
+    dataset: "ga4_obfuscated_sample_ecommerce"
+    start_date: "20210120" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model. This is a reasonable default for the GA4 obfuscated dataset
 
 
 # custom parameters are registered by creating a var matching the event name where the custom parameter occurs

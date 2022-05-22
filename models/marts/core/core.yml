@@ -2,14 +2,20 @@ version: 2
 
 models:
   - name: dim_ga4__sessions
-    description: Session dimensions. Unique on session_key
+    description: Dimension table for sessions containing context useful for filtering. Each row represents a session. Unique on session_key
     columns:
       - name: session_key
         tests:
           - unique
   - name: dim_ga4__users
-    description: User dimensions including data from the first and last event produced by the user. Unique on client_id
+    description: Dimension table for users (specifically, client_id's) which includes data from the first and last event produced by the user. Unique on client_id
     columns:
       - name: client_id
+        tests:
+          - unique
+  - name: fct_ga4__sessions
+    description: Metrics related to sessions such as number of pageviews and event value accrued. Each row represents a single session.
+    columns:
+      - name: session_key
         tests:
           - unique
