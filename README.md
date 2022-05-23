@@ -20,7 +20,17 @@ Features include:
 | dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and campaign data |
 
 # Installation & Configuration
-## Local Package Installation
+## Install From GitHub
+
+Add the following to your `packages.yml` file:
+
+```
+packages:
+  - git: "https://github.com/adamribaudo-velir/dbt-ga4.git"
+    revision: 0.1.0
+```
+
+## Install From Local Director
 
 1. Clone this repository to a folder in the same parent directory as your DBT project
 2. Update your project's `packages.yml` to include a reference to this package:
