@@ -30,7 +30,7 @@ packages:
     revision: 0.1.0
 ```
 
-## Install From Local Director
+## Install From Local Directory
 
 1. Clone this repository to a folder in the same parent directory as your DBT project
 2. Update your project's `packages.yml` to include a reference to this package:
