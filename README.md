@@ -26,7 +26,7 @@ Add the following to your `packages.yml` file:
 
 ```
 packages:
-  - git: "https://github.com/adamribaudo-velir/dbt-ga4.git"
+  - git: "https://github.com/Velir/dbt-ga4.git"
     revision: 0.1.0
 ```
 
