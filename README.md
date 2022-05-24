@@ -4,7 +4,7 @@ This package connects to an exported GA4 dataset and provides useful transformat
 
 Features include:
 - Flattened models to access common events and event parameters such as `page_view`, `session_start`, and `purchase`
-- Conversion of sharded event tables into a single, incrementally loaded partitioned table
+- Conversion of sharded event tables into a single partitioned table
 - Incremental loading of GA4 data into your staging tables 
 - Session and User dimensional models
 - Support for custom event parameters
