@@ -1,8 +1,8 @@
 -- If jobs are running daily, it may make sense to avoid the scanning necessary to determine the max partition date. Instead, a static incremental range can be set and this data will be overwritten/inserted at every incremental run.
 
 {% set partitions_to_replace = [
-  'current_date()',
-  'date_sub(current_date(), interval 1 day)'
+  'date_sub(current_date(), interval 1 day)',
+  'date_sub(current_date(), interval {{var("static_lookback", "2")}} day)'
 ] %}
 
 --BigQuery does not cache wildcard queries that scan across sharded tables which means it's best to materialize the raw event data as a partitioned table so that future queries benefit from caching
@@ -40,7 +40,7 @@ with source as (
         stream_id,
         platform,
         ecommerce,
-        items
+        items,
     from {{ source('ga4', 'events') }}
     where _table_suffix not like '%intraday%' and -- TODO: support blending intraday events as well
         cast(_table_suffix as int64) >= {{var('start_date')}}

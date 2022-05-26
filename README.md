@@ -84,6 +84,25 @@ vars:
             value_type: "int_value"
 ```
 
+# Staging Configuration
+
+There are several configurations for the base staging model from which all other staging tables are built that are controlled by variables in your `dbt_project.yml` file:
+
+- include_intraday_events (boolean; default: false): if set to true, intraday events will be unioned to the event model
+- use_static_partition (boolean; default: false): if set to true, this package will reprocess the last *static_partition_lower_bound* days of data
+- static_partition_lower_bound (int; default: 2): if using a static partition, this setting controls the lower end of the lookback which will be today - the value of *static_partition_lower_bound*
+
+The static partition options allow you to account for delays in processing and reprocessing of data by Google without having to manually reprocess the data. Extra large properties can take [24 or more hours to process](https://support.google.com/analytics/answer/11198161?hl=en).
+
+For example:
+```
+vars:
+  ga4:
+    include_intraday_events: true
+    use_static_partition: true 
+    static_partition_lower_bound: 3
+```
+
 # Connecting to BigQuery
 
 This package assumes that BigQuery is the source of your GA4 data. Full instructions for connecting DBT to BigQuery are here: https://docs.getdbt.com/reference/warehouse-profiles/bigquery-profile

@@ -33,14 +33,18 @@ with source as (
         stream_id,
         platform,
         ecommerce,
-        items
+        items,
     from {{ source('ga4', 'events') }}
     where _table_suffix not like '%intraday%' and -- intraday events are supported through the project variable: include_intraday_events
         cast(_table_suffix as int64) >= {{var('start_date')}}
     {% if is_incremental() %}
-        -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
-        -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
-        and parse_date('%Y%m%d',_TABLE_SUFFIX) >= _dbt_max_partition 
+        {% if var('use_static_partition', false ) ==  true %}
+            and parse_date('%Y%m%d',_TABLE_SUFFIX) between current_date() and date_sub(current_date(),  interval {{var('static_partition_lower_bound', 2)}} day)
+        {% else %}
+            -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
+            -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
+            and parse_date('%Y%m%d',_TABLE_SUFFIX) >= _dbt_max_partition
+        {% endif %} 
     {% endif %}
 ),
 renamed as (
@@ -80,8 +84,10 @@ renamed as (
         CASE 
             WHEN event_name = 'purchase' THEN 1
             ELSE 0
-        END AS is_purchase
+        END AS is_purchase,
     from source
 )
 
-select * from renamed
+select
+    *
+from renamed

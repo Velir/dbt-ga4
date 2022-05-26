@@ -27,7 +27,7 @@ with source as (
         stream_id,
         platform,
         ecommerce,
-        items
+        items,
     from {{ source('ga4', 'events_intraday') }}
 ),
 renamed as (
