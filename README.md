@@ -90,7 +90,7 @@ There are several configurations for the base staging model from which all other
 
 - include_intraday_events (boolean; default: false): if set to true, intraday events will be unioned to the event model
 - use_static_partition (boolean; default: false): if set to true, this package will reprocess the last *static_partition_lower_bound* days of data
-- static_partition_lower_bound (int; default: 2): if using a static partition, this setting controls the lower end of the lookback which will be today - the value of *static_partition_lower_bound*
+- static_partition_lower_bound (int; default: 2): if using a static partition, this setting controls the lower end of the lookback which will be today minus the value of *static_partition_lower_bound*
 
 The static partition options allow you to account for delays in processing and reprocessing of data by Google without having to manually reprocess the data. Extra large properties can take [24 or more hours to process](https://support.google.com/analytics/answer/11198161?hl=en).
 
