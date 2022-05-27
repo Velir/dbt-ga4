@@ -48,9 +48,9 @@ packages:
 packages:
   - local: ../dbt-ga4
 ```
-## Source Data
+## Variables (Required)
 
-This package assumes that you have an existing DBT project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded. Source data can be pulled using the following variables.
+This package assumes that you have an existing DBT project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded. Source data is located using the following variables which must be set in your `dbt_project.yml` file.
 
 ```
 vars:
@@ -72,7 +72,7 @@ vars:
 
 More info about the GA4 obfuscated dataset here: https://support.google.com/analytics/answer/10937659?hl=en#zippy=%2Cin-this-article
 
-# Using Custom Parameters
+### Using Custom Parameters (Optional)
 
 One important feature of GA4 is that you can add custom parameters to any event. These custom parameters will be picked up by this package if they are defined as variables within your `dbt_project.yml` file using the following syntax:
 
