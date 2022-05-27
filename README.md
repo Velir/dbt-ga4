@@ -7,13 +7,14 @@ Features include:
 - Conversion of sharded event tables into a single partitioned table
 - Incremental loading of GA4 data into your staging tables 
 - Session and User dimensional models
+- Easy access to query parameters such as GCLID and UTM params
 - Support for custom event parameters
 
 # Models
 
 | model | description |
 |-------|-------------|
-| stg_ga4__events | Contains cleaned event data that is deduped and enhanced with useful event and session keys. |
+| stg_ga4__events | Contains cleaned event data that is enhanced with useful event and session keys. |
 | stg_ga4__event_* | 1 model per event (ex: page_view, purchase) which flattens event parameters specific to that event |
 | stg_ga4__event_to_query_string_params | Mapping between each event and any query parameters & values that were contained in the event's `page_location` field |
 | dim_ga4__users | Dimension table for users which contains attributes such as first and last page viewed. | 
