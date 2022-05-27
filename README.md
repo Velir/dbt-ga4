@@ -20,6 +20,15 @@ Features include:
 | dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and campaign data |
 
 # Installation & Configuration
+## Install from DBT Package Hub
+Add the following to your `packages.yml` file:
+
+```
+packages:
+  - package: Velir/ga4
+    version: [">=0.1.0", "<0.2.0"]
+```
+
 ## Install From GitHub
 
 Add the following to your `packages.yml` file:
@@ -27,7 +36,7 @@ Add the following to your `packages.yml` file:
 ```
 packages:
   - git: "https://github.com/Velir/dbt-ga4.git"
-    revision: 0.1.0
+    revision: 0.1.3
 ```
 
 ## Install From Local Directory
@@ -49,6 +58,7 @@ vars:
         project: "your_gcp_project"
         dataset: "your_ga4_dataset"
         start_date: "YYYYMMDD" # Earliest date to load
+        include_intraday_events: true # false|true depending on whether an intraday event table exists
 ```
 
 If you don't have any GA4 data of your own, you can connect to Google's public data set with the following settings:
