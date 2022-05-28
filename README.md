@@ -94,6 +94,20 @@ vars:
           - name: "country_code"
             value_type: "int_value"
 ```
+### Using User Properties
+
+User-scoped event properties can be assigned using the following variable configuration in your `dbt_project.yml`. The `dim_ga4__users` dimension table will be updated to include the last value seen for each user.
+```
+vars:
+  ga4:
+      user_properties:
+        - event_parameter: "page_location"
+          user_property_name: "most_recent_page_location"  
+          value_type: "string_value"
+        - event_parameter: "another_event_param"
+          user_property_name: "most_recent_param"  
+          value_type: "string_value"
+```
 
 # Connecting to BigQuery
 

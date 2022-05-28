@@ -21,11 +21,14 @@ clean-targets:         # directories to be removed by `dbt clean`
 #    start_date: "20210120" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model. This is a reasonable default for the GA4 obfuscated dataset
 
 # User Properties
-# User properties can be assigned using the following variable configuration in your dbt_project.yml
+# User-scoped event properties can be assigned using the following variable configuration in your dbt_project.yml
+# The dim_ga4__users dimension table will be updated to include the last value seen for each user
 #      user_properties:
-#        - name: "my_event_param_1"
+#        - event_parameter: "page_location"
+#          user_property_name: "most_recent_page_location"  
 #          value_type: "string_value"
-#        - name: "my_event_param_2"
+#        - event_parameter: "another_event_param"
+#          user_property_name: "most_recent_param"  
 #          value_type: "string_value"
 
 # Custom parameters
