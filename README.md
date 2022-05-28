@@ -94,9 +94,19 @@ vars:
           - name: "country_code"
             value_type: "int_value"
 ```
-### Using User Properties
+### Using User Properties (Optional)
 
 User-scoped event properties can be assigned using the following variable configuration in your `dbt_project.yml`. The `dim_ga4__users` dimension table will be updated to include the last value seen for each user.
+
+```
+user_properties:
+  - event_parameter: "[your event parameter]"
+    user_propertyname: "[a unique name for the user property]"
+    value_type: "[one of string_value|int_value|float_value|double_value]"
+```
+
+For example: 
+
 ```
 vars:
   ga4:
