@@ -20,6 +20,15 @@ clean-targets:         # directories to be removed by `dbt clean`
 #    dataset: "your_dataset"
 #    start_date: "20210120" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model. This is a reasonable default for the GA4 obfuscated dataset
 
+# User Properties
+# User properties can be assigned using the following variable configuration in your dbt_project.yml
+#      user_properties:
+#        - name: "my_event_param_1"
+#          value_type: "string_value"
+#        - name: "my_event_param_2"
+#          value_type: "string_value"
+
+# Custom parameters
 # custom parameters are registered by creating a var matching the event name where the custom parameter occurs
 # and providing the name, matching the parameters name
 # and matching the value_type to the type of column in BigQuery (string_value, int_value, float_value, double_value)

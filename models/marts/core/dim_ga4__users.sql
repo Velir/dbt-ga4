@@ -42,3 +42,6 @@ include_first_last_page_views as (
 )
 
 select * from include_first_last_page_views
+{% if var('user_properties', false) %}
+left join {{ref('stg_ga4__user_properties')}} using (client_id)
+{% endif %}

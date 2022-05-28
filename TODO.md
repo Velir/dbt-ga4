@@ -7,7 +7,7 @@
 # TODO
 
 - add variable to filter out events with `debug_mode = true` - Don't see any in BQ, are they exported? 
-- bring user properties into `dim_ga4__users` (variable containing a list of user properties?)
+- allow project user to define which event parameter are user propertes and bring them into `dim_ga4__users` (variable containing a list of user properties?)
 - mechanism to take in an array variable listing custom events and output 1 model per event (is this possible?)
 - How to handle user_id vs. client_id?
 - move common event params to `base_ga4__events`
