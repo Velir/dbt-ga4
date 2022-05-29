@@ -35,6 +35,7 @@
 - Review these issues for ideas for our repo: https://github.com/coding-is-for-losers/ga4-bigquery-starter/issues
 - Test whether session keys are unique
 - Add integration tests - Need to think about how to handle nested data as the source. CSV won't reproduce nested data. 
+    - look into https://github.com/dbt-labs/dbt-core/discussions/4455#discussioncomment-2766503
     - Look into using https://github.com/EqualExperts/dbt-unit-testing and generating mock data using SQL statements. 
 - Any special considerations for handling >1 data stream? 
 - Set dynamic vs. static partitioning using a variable
