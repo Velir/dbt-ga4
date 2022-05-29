@@ -1,3 +1,5 @@
+# from https://docs.getdbt.com/docs/contributing/testing-a-new-adapter
+
 # seeds/my_seed.csv
 my_seed_csv = """
 id,name,some_date
