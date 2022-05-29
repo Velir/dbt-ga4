@@ -2,6 +2,7 @@
 
 import pytest
 from dbt.tests.util import run_dbt, check_relations_equal
+from dbt.tests.util import read_file
 
 # This is pretty tricky Jinja, but the idea is just to "override" ref/source by repointing
 # to the mocked seeds/models defined in the test case. The mapping is handled by
@@ -22,13 +23,12 @@ mock_ref_source = """
 {{% endmacro %}}
 """
 
+# TODO, make this cleaner by reading all macros and joining the strings together into 1 virtual file
+
+
 # this isn't a test itself, it's just the "base case" for actual tests to inherit
 class BaseUnitTestModel:
-    def actual(self):
-        return "actual"
-    
-    def expected(self):
-        return "expected"
+
     
     def mock_ref(self):
         return {}
@@ -36,11 +36,7 @@ class BaseUnitTestModel:
     def mock_source(self):
         return {}
     
-    @pytest.fixture(scope="class")
-    def macros(self):
-        return {
-            "overrides.sql": mock_ref_source.format(str(self.mock_ref()), str(self.mock_source()))
-        }
+    
 
     # The actual sequence of dbt commands and assertions
     # pytest will take care of all "setup" + "teardown"
