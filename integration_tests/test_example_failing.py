@@ -2,7 +2,7 @@ import pytest
 from dbt.tests.util import run_dbt
 
 # our file contents
-from integration_tests.fixtures import (
+from fixtures import (
     my_seed_csv,
     my_model_sql,
     my_model_yml,
@@ -41,4 +41,30 @@ class TestExample:
             "my_model.yml": my_model_yml,
         }
         
-    # continues below
+        # continued from above
+
+    # The actual sequence of dbt commands and assertions
+    # pytest will take care of all "setup" + "teardown"
+    def test_run_seed_test(self, project):
+        """
+        Seed, then run, then test. We expect one of the tests to fail
+        An alternative pattern is to use pytest "xfail" (see below)
+        """
+        # seed seeds
+        results = run_dbt(["seed"])
+        assert len(results) == 1
+        # run models
+        results = run_dbt(["run"])
+        assert len(results) == 1
+        # test tests
+        results = run_dbt(["test"], expect_pass = False) # expect failing test
+        assert len(results) == 2
+        # validate that the results include one pass and one failure
+        result_statuses = sorted(r.status for r in results)
+        assert result_statuses == ["fail", "pass"]
+
+    @pytest.mark.xfail
+    def test_build(self, project):
+        """Expect a failing test"""
+        # do it all
+        results = run_dbt(["build"])
