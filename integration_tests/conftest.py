@@ -1,4 +1,5 @@
 import pytest
+import os
 
 # Import the standard functional fixtures as a plugin
 pytest_plugins = ["dbt.tests.fixtures.project"]
@@ -10,6 +11,6 @@ def dbt_profile_target():
         'type': 'bigquery',
         'method': 'oauth',
         'threads': 1,
-        'project': 'velir-website-analytics'
+        'project':  os.environ.get("BQ_PROJECT")
         # project isn't needed if you configure a default, via 'gcloud config set project'
     }

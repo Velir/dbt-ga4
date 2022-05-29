@@ -3,3 +3,4 @@ target/
 dbt_packages/
 logs/
 google-cloud-sdk/
+integration_tests/.env
