@@ -2,6 +2,7 @@
   enabled = true if var('user_properties', false) != false else false
 ) }}
 
+-- TODO update this to create 1 CTE per user property that pulls only events with non-null values for that event parameters. Join them at the end. 
 
 with unnest_user_properties as
 (

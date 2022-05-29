@@ -6,6 +6,7 @@
 
 # TODO
 
+- Add a lookback window variable for user dimensions. it may be overly expensive to scan ALL events looking for first/last occurances of event parameters. 
 - add variable to filter out events with `debug_mode = true` - Don't see any in BQ, are they exported? 
 - mechanism to take in an array variable listing custom events and output 1 model per event (is this possible?)
 - How to handle user_id vs. client_id?
