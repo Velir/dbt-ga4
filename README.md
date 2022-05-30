@@ -7,19 +7,29 @@ Features include:
 - Conversion of sharded event tables into a single partitioned table
 - Incremental loading of GA4 data into your staging tables 
 - Session and User dimensional models
+- Easy access to query parameters such as GCLID and UTM params
 - Support for custom event parameters
 
 # Models
 
 | model | description |
 |-------|-------------|
-| stg_ga4__events | Contains cleaned event data that is deduped and enhanced with useful event and session keys. |
+| stg_ga4__events | Contains cleaned event data that is enhanced with useful event and session keys. |
 | stg_ga4__event_* | 1 model per event (ex: page_view, purchase) which flattens event parameters specific to that event |
 | stg_ga4__event_to_query_string_params | Mapping between each event and any query parameters & values that were contained in the event's `page_location` field |
 | dim_ga4__users | Dimension table for users which contains attributes such as first and last page viewed. | 
 | dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and campaign data |
 
 # Installation & Configuration
+## Install from DBT Package Hub
+Add the following to your `packages.yml` file:
+
+```
+packages:
+  - package: Velir/ga4
+    version: [">=0.1.0", "<0.2.0"]
+```
+
 ## Install From GitHub
 
 Add the following to your `packages.yml` file:
@@ -27,7 +37,7 @@ Add the following to your `packages.yml` file:
 ```
 packages:
   - git: "https://github.com/Velir/dbt-ga4.git"
-    revision: 0.1.0
+    revision: 0.1.3
 ```
 
 ## Install From Local Directory
@@ -39,9 +49,9 @@ packages:
 packages:
   - local: ../dbt-ga4
 ```
-## Source Data
+## Variables (Required)
 
-This package assumes that you have an existing DBT project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded. Source data can be pulled using the following variables.
+This package assumes that you have an existing DBT project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded. Source data is located using the following variables which must be set in your `dbt_project.yml` file.
 
 ```
 vars:
@@ -49,6 +59,7 @@ vars:
         project: "your_gcp_project"
         dataset: "your_ga4_dataset"
         start_date: "YYYYMMDD" # Earliest date to load
+        include_intraday_events: true # false|true depending on whether an intraday event table exists
 ```
 
 If you don't have any GA4 data of your own, you can connect to Google's public data set with the following settings:
@@ -62,7 +73,7 @@ vars:
 
 More info about the GA4 obfuscated dataset here: https://support.google.com/analytics/answer/10937659?hl=en#zippy=%2Cin-this-article
 
-# Using Custom Parameters
+### Using Custom Parameters (Optional)
 
 One important feature of GA4 is that you can add custom parameters to any event. These custom parameters will be picked up by this package if they are defined as variables within your `dbt_project.yml` file using the following syntax:
 

@@ -1,5 +1,5 @@
 name: 'ga4'
-version: '0.1.2'
+version: '0.1.3'
 config-version: 2
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -13,17 +13,16 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
-
-vars:
-    include_intraday_events: false # true|false indicates whether intraday events should be unioned into the event model
-    project: "bigquery-public-data"
-    dataset: "ga4_obfuscated_sample_ecommerce"
-    start_date: "20210120" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model. This is a reasonable default for the GA4 obfuscated dataset
-    use_static_partition: false
-    static_partition_lower_bound: 2 # When use_static_partition is true, control the lower bound of the days back from today of the lookback window
+# The following variables should be set in the project that loads this package. 
+#vars:
+#    include_intraday_events: false # true|false indicates whether intraday events should be unioned into the event model
+#    project: "your_project"
+#    dataset: "your_dataset"
+#    start_date: "20210120" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model. This is a reasonable default for the GA4 obfuscated dataset
+#    use_static_partition: false
+#    static_partition_lower_bound: 2 # When use_static_partition is true, control the lower bound of the days back from today of the lookback window
                                     # The upper bound is yesterday or "1"
                                     # Must be at least 2
-
 
 # custom parameters are registered by creating a var matching the event name where the custom parameter occurs
 # and providing the name, matching the parameters name
