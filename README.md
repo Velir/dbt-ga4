@@ -107,4 +107,6 @@ The easiest option is using OAuth with your Google Account. Summarized instructi
 ```
 gcloud auth application-default login --scopes=https://www.googleapis.com/auth/bigquery,https://www.googleapis.com/auth/iam.test
 ```
+# Integration Testing
 
+This package uses `pytest` as a method of unit testing individual models. More details can be found in the [integration_tests/README.md](integration_tests) folder.
