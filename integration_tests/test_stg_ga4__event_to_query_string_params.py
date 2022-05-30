@@ -3,12 +3,16 @@ from dbt.tests.util import read_file,check_relations_equal,run_dbt
 from base_unit_test import BaseUnitTestModel
 
 SOURCE_JSON = """
-{  "event_key": "aD8bvMcixjJbYvx61zWbEw\u003d\u003d", "page_query_string": "param1=value1&param2=value2"}
+{  "event_key": "aaa", "page_query_string": "param1=value1&param2=value2"}
+{  "event_key": "bbb", "page_query_string": "param1"}
+{  "event_key": "ccc", "page_query_string": "param1="}
 """.lstrip()
 
 EXPECTED_CSV = """event_key,param,value
-aD8bvMcixjJbYvx61zWbEw\u003d\u003d,param1,value1
-aD8bvMcixjJbYvx61zWbEw\u003d\u003d,param2,value2
+aaa,param1,value1
+aaa,param2,value2
+bbb,param1,
+ccc,param1,
 """.lstrip()
 
 actual = read_file('../models/staging/ga4/stg_ga4__event_to_query_string_params.sql').replace(
@@ -44,4 +48,5 @@ class TestEventToQueryStringParams(BaseUnitTestModel):
     def test_mock_run_and_check(self, project):
         self.upload_json_fixture(project, "source.json", SOURCE_JSON, "SOURCE_JSON" )
         run_dbt(["build"])
+        breakpoint()
         check_relations_equal(project.adapter, ["actual", "expected"])
