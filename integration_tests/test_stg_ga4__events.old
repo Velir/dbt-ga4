@@ -1,5 +1,5 @@
-### tests/test_random.py
 import pytest
+from base_unit_test import BaseUnitTestModel
 from dbt.tests.util import read_file,check_relations_equal,run_dbt
 
 SOURCE_JSON = """
@@ -18,52 +18,25 @@ sources:
       - name: SOURCE_JSON
       - name: EXPECTED_OUTPUT
 """
-macros = read_file('../macros/url_parsing.sql')
+
 actual = read_file('../models/staging/ga4/stg_ga4__events.sql').replace(
     "ref('base_ga4__events')",
     "source('fixture', 'SOURCE_JSON')"
 )
 
-class TestStgGa4Events():
-    def actual(self):
-        return "actual"
-    
-    def expected(self):
-        return "expected"
-
-    def upload_json_fixture(self, project, file_name, json, table_name):
-        local_file_path = file_name
-        with open(local_file_path, "w") as outfile:
-            outfile.write(json)
-        project.adapter.upload_file(
-            local_file_path = local_file_path,
-            database = project.database,
-            table_schema = project.test_schema,
-            table_name = table_name,
-            kwargs = {
-                "source_format": "NEWLINE_DELIMITED_JSON",
-                "autodetect":"true"
-            }
-        )
-
+class TestStgGa4Events(BaseUnitTestModel):
     # everything that goes in the "models" directory (= SQL)
     @pytest.fixture(scope="class")
     def models(self):
         return {
-            #"source_population_persons.sql": mock_source_population_persons,
             "config.yml": models__config_yml,
             "actual.sql": actual,
             "expected.sql": "select * from {{ source('fixture', 'EXPECTED_OUTPUT') }}"
-        }
-
-    @pytest.fixture(scope="class")
-    def macros(self):
-        return {
-            "url_parsing.sql" : macros
         }
 
     def test_mock_run_and_check(self, project):
         self.upload_json_fixture(project, "source.json", SOURCE_JSON, "SOURCE_JSON" )
         self.upload_json_fixture(project, "expected.json", EXPECTED_JSON, "EXPECTED_OUTPUT" )
         run_dbt(["run"])
-        check_relations_equal(project.adapter, [self.actual(), self.expected()])
+        breakpoint()
+        check_relations_equal(project.adapter, ["actual", "expected"])

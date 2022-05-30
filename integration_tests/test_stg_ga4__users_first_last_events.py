@@ -1,6 +1,5 @@
 import pytest
-from dbt.tests.util import read_file
-from base_unit import BaseUnitTestModel
+from dbt.tests.util import read_file,check_relations_equal,run_dbt
 
 # Define mocks via CSV (seeds) or SQL (models)
 mock_stg_ga4__events_csv = """client_id,event_key,event_timestamp,geo,device,traffic_source
@@ -14,8 +13,7 @@ expected_csv = """client_id,first_event,last_event,first_geo,first_device,first_
 
 actual = read_file('../models/staging/ga4/stg_ga4__users_first_last_events.sql')
 
-class TestUnitTestComplexModel(BaseUnitTestModel):
-
+class TestUnitTestComplexModel():
     # everything that goes in the "seeds" directory (= CSV format)
     @pytest.fixture(scope="class")
     def seeds(self):
@@ -28,18 +26,9 @@ class TestUnitTestComplexModel(BaseUnitTestModel):
     @pytest.fixture(scope="class")
     def models(self):
         return {
-            #"source_population_persons.sql": mock_source_population_persons,
             "actual.sql": actual,
         }
-
-    # repoint 'source()' calls to mocks (seeds or models)
-    #def mock_source(self):
-    #    return {
-    #        "population__persons": "source_population_persons",
-    #    }
-
-    # not necessary, since the mocked model has the same name, but here for illustration
-    def mock_ref(self):
-        return {
-            "stg_ga4__events": "stg_ga4__events",
-        }
+    
+    def test_mock_run_and_check(self, project):
+        run_dbt(["build"])
+        check_relations_equal(project.adapter, ["actual", "expected"])
