@@ -48,5 +48,4 @@ class TestEventToQueryStringParams(BaseUnitTestModel):
     def test_mock_run_and_check(self, project):
         self.upload_json_fixture(project, "source.json", SOURCE_JSON, "SOURCE_JSON" )
         run_dbt(["build"])
-        breakpoint()
         check_relations_equal(project.adapter, ["actual", "expected"])
