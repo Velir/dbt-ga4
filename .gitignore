@@ -4,3 +4,5 @@ dbt_packages/
 logs/
 google-cloud-sdk/
 integration_tests/.env
+integration_tests/__pycache__
+integration_tests/.pytest_cache
