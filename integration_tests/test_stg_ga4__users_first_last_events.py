@@ -13,7 +13,7 @@ expected_csv = """client_id,first_event,last_event,first_geo,first_device,first_
 
 actual = read_file('../models/staging/ga4/stg_ga4__users_first_last_events.sql')
 
-class TestUnitTestComplexModel():
+class TestUsersFirstLastEvents():
     # everything that goes in the "seeds" directory (= CSV format)
     @pytest.fixture(scope="class")
     def seeds(self):

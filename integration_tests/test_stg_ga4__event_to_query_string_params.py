@@ -25,7 +25,7 @@ sources:
       - name: SOURCE_JSON
 """
 
-class TestUnitTestComplexModel(BaseUnitTestModel):
+class TestEventToQueryStringParams(BaseUnitTestModel):
     # everything that goes in the "seeds" directory (= CSV format)
     @pytest.fixture(scope="class")
     def seeds(self):
