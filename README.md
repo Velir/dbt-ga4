@@ -8,7 +8,7 @@ Features include:
 - Incremental loading of GA4 data into your staging tables 
 - Session and User dimensional models
 - Easy access to query parameters such as GCLID and UTM params
-- Support for custom event parameters
+- Support for custom event parameters & custom user properties
 
 # Models
 
@@ -17,6 +17,7 @@ Features include:
 | stg_ga4__events | Contains cleaned event data that is enhanced with useful event and session keys. |
 | stg_ga4__event_* | 1 model per event (ex: page_view, purchase) which flattens event parameters specific to that event |
 | stg_ga4__event_to_query_string_params | Mapping between each event and any query parameters & values that were contained in the event's `page_location` field |
+| stg_ga4__user_properties | Finds the most recent occurance of specific event_params and assigns them to a user's client_id. Event params are specified as variables (see documentation below) |
 | dim_ga4__users | Dimension table for users which contains attributes such as first and last page viewed. | 
 | dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and campaign data |
 
@@ -73,7 +74,7 @@ vars:
 
 More info about the GA4 obfuscated dataset here: https://support.google.com/analytics/answer/10937659?hl=en#zippy=%2Cin-this-article
 
-### Using Custom Parameters (Optional)
+### Using Custom Event Parameters (Optional)
 
 One important feature of GA4 is that you can add custom parameters to any event. These custom parameters will be picked up by this package if they are defined as variables within your `dbt_project.yml` file using the following syntax:
 
@@ -94,7 +95,7 @@ vars:
           - name: "country_code"
             value_type: "int_value"
 ```
-### Using User Properties (Optional)
+### Using Custom User Properties (Optional)
 
 User-scoped event properties can be assigned using the following variable configuration in your `dbt_project.yml`. The `dim_ga4__users` dimension table will be updated to include the last value seen for each user.
 
