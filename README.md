@@ -120,24 +120,18 @@ vars:
           value_type: "string_value"
 ```
 
-# Staging Configuration
+# Incremental Loading of Event Data
 
-There are several configurations for the base staging model from which all other staging tables are built that are controlled by variables in your `dbt_project.yml` file:
+By default, GA4 exports data into sharded event tables that use the event date as the table suffix in the format of `YYYYMMDD`. This package incrementally loads data from these source tables into a `base` table that is partitioned on date. There are two incremental load strategies available:
 
-- include_intraday_events (boolean; default: false): if set to true, intraday events will be unioned to the event model
-- use_static_partition (boolean; default: false): if set to true, this package will reprocess the last *static_partition_lower_bound* days of data
-- static_partition_lower_bound (int; default: 2): if using a static partition, this setting controls the lower end of the lookback which will be today minus the value of *static_partition_lower_bound*
+- Dynamic partitions - Queries the destination table to find the latest date available. Data beyond that date range is loaded in incrementally on each run.
+- Static partitions - Incrementally loads the last X days worth of data, regardless of what data is availabe. Enabled when variable `use_static_partition: true` and defaults to loading in the last 2 days' worth of data. Number of days is configured with `static_partition_lower_bound` which controls the lower end of the lookback which will be today minus the value of *static_partition_lower_bound*
 
-The static partition options allow you to account for delays in processing and reprocessing of data by Google without having to manually reprocess the data. Extra large properties can take [24 or more hours to process](https://support.google.com/analytics/answer/11198161?hl=en).
+## Intraday Events
 
-For example:
-```
-vars:
-  ga4:
-    include_intraday_events: true
-    use_static_partition: true 
-    static_partition_lower_bound: 3
-```
+Users can enable the inclusion of intraday data by setting `include_intraday_events: true`. 
+
+Intraday events are not included in incremental loads, but are instead unioned with the incremental data after the incremental data has been loaded.
 
 # Connecting to BigQuery
 
