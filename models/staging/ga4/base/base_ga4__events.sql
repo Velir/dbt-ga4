@@ -1,3 +1,9 @@
+{% if var('use_static_partition', false ) ==  true %}
+   {% set partitions_to_replace = [
+    'current_date',
+    'date_sub(current_date, interval ' + var('static_partition_lower_bound')|string + ' day)'
+    ] %}
+{% endif %}
 --BigQuery does not cache wildcard queries that scan across sharded tables which means it's best to materialize the raw event data as a partitioned table so that future queries benefit from caching
 {{
     config(
@@ -39,12 +45,11 @@ with source as (
         cast(_table_suffix as int64) >= {{var('start_date')}}
     {% if is_incremental() %}
         {% if var('use_static_partition', false ) ==  true %}
-            and parse_date('%Y%m%d',_TABLE_SUFFIX) between current_date() and date_sub(current_date(),  interval {{var('static_partition_lower_bound', 2)}} day)
-        {% else %}
-            -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
-            -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
-            and parse_date('%Y%m%d',_TABLE_SUFFIX) >= _dbt_max_partition
+            and date(event_date) in ({{ partitions_to_replace | join(',') }})
         {% endif %} 
+        -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
+        -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
+        and parse_date('%Y%m%d',_TABLE_SUFFIX) >= _dbt_max_partition
     {% endif %}
 ),
 renamed as (
