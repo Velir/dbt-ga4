@@ -40,7 +40,7 @@
 - Set dynamic vs. static partitioning using a variable
 - Seed file for channel group mapping
 - Implement dev profile considerations to limit processing: https://docs.getdbt.com/docs/guides/best-practices#limit-the-data-processed-when-in-development
-- Example of a funnel model
+- Example of a funnel model https://github.com/teej/sf-funnels
 - Review LookML examples for inspiration: https://github.com/llooker/ga_four_block_dev/tree/master/views/event_data_dimensions
 - Configuration flag to turn off ecommerce tables
 - Configuration and dynamic templates to create custom event tables and dimensions
