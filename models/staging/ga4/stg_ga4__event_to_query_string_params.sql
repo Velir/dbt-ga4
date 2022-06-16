@@ -17,7 +17,7 @@ split_param_value as
     select 
         event_key, 
         split(params,'=')[SAFE_OFFSET(0)] as param, 
-        split(params,'=')[SAFE_OFFSET(1)] as value 
+        NULLIF(split(params,'=')[SAFE_OFFSET(1)], '') as value 
     from flattened_qs
 )
 
