@@ -26,22 +26,25 @@ include_event_key as (
     from include_event_number
 ),
 -- Remove specific query strings from page_location field
-url_manipulation as (
+remove_query_params as (
 
     select 
         include_event_key.* EXCEPT (page_location),
         include_event_key.page_location as original_page_location,
-        {{remove_query_parameters('page_location')}} as page_location
-
+        -- If there are query parameters to exclude, exclude them using regex
+        {% if var('query_parameter_exclusions', false) != false %}
+        {{remove_query_parameters('page_location',var('query_parameter_exclusions'))}} as page_location
+        {% else %}
+        page_location
+        {% endif %}
     from include_event_key
-
 ),
 enrich_params as (
     select 
-        url_manipulation.*,
+        *,
         {{extract_hostname_from_url('page_location')}} as page_hostname,
         {{extract_query_string_from_url('page_location')}} as page_query_string,
-    from url_manipulation
+    from remove_query_params
 )
 
 select * from enrich_params
