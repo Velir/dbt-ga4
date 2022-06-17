@@ -46,7 +46,6 @@
 - Configuration flag to turn off ecommerce tables
 - Configuration and dynamic templates to create custom event tables and dimensions
 - Configuration to create custom dimensions (session, user, event_*) from event parameters
-- Query parameter exclusion (similar to what existed in GA3)
 
 ## Discussion: Set dynamic vs. static partitioning using a variable
 Damon:
