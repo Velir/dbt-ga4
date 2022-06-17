@@ -1,0 +1,31 @@
+-- This works, just seems cumbersome to execute for N query params
+
+with test_data as (
+
+  select 'www.website.com?fbclid=foo' as url
+  UNION ALL
+  select 'www.website.com?fbclid=foo&' as url
+  UNION ALL
+  select 'www.website.com?other=one&fbclid=foo' as url
+  UNION ALL 
+  select 'www.website.com?other=one&fbclid=foo&another=two' as url
+  UNION ALL
+  select 'www.website.com?other=one&fbclid=' as url
+  UNION ALL
+  select 'www.website.com?other=one&fbclid=&a=b' as url
+),
+remove_param as 
+(
+  select url, REGEXP_REPLACE(url, '(\\?|&)fbclid=[^&]*', '\\1') url_edited from test_data
+),
+remove_q_amp as (
+  select url, REGEXP_REPLACE(url_edited, '\\?&', '?') as url_edited from remove_param
+),
+replace_mult_amp as (
+  select url, REGEXP_REPLACE(url_edited, '&+', '&') as url_edited from remove_q_amp
+),
+remove_trailing_chars as (
+  select url, REGEXP_REPLACE(url_edited, '\\?$|&$', '') as url_edited from replace_mult_amp
+)
+
+select * from remove_trailing_chars
