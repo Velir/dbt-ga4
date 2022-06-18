@@ -6,10 +6,14 @@ mock_stg_ga4__events_csv = """session_key,event_name
 AAAA,page_view
 AAAA,my_conversion
 AAAA,my_conversion
+BBBB,my_conversion
+CCCC,some_other_event
 """.lstrip()
 
 expected_csv = """session_key,my_conversion_count
 AAAA,2
+BBBB,1
+CCCC,
 """.lstrip()
 
 # TODO, need to set the conversion_events variable somehow
@@ -32,5 +36,5 @@ class TestUsersFirstLastEvents():
         }
     
     def test_mock_run_and_check(self, project):
-        run_dbt(["build"])
+        run_dbt(["build", "--vars", "conversion_events: ['my_conversion']"])
         check_relations_equal(project.adapter, ["actual", "expected"])
