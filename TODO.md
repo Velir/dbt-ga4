@@ -48,7 +48,6 @@
 - Query parameter exclusion (similar to what existed in GA3)
 - Refactor 'user properties' functionality to pull from the `user_properties` field
 - Support for large intraday tables (100+ sharts). Currently they are unioned in as a view on top of partitioned base table. We could load in data up until yesterday into the partitioned table and then union in today's data.
-- Allow users to configure certain event names as conversions. provide additional metrics around conversion events (conversion count per session, per user).  
 
 ## Discussion: Set dynamic vs. static partitioning using a variable
 Damon:
