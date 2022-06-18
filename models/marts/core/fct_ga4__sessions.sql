@@ -13,15 +13,11 @@ with session_metrics as
     from {{ref('stg_ga4__events')}}
     group by 1,2
 ),
-session_conversions as (
-    select * from {{ref('stg_ga4__session_conversions')}}
-),
 join_conversions as (
     select 
         *
     from session_metrics
-    inner join session_conversions using (session_key)
+    left join {{ref('stg_ga4__session_conversions')}} using (session_key)
 )
-
 
 select * from join_conversions
