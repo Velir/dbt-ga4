@@ -38,7 +38,6 @@
     - look into https://github.com/dbt-labs/dbt-core/discussions/4455#discussioncomment-2766503
     - Look into using https://github.com/EqualExperts/dbt-unit-testing and generating mock data using SQL statements. 
 - Any special considerations for handling >1 data stream? 
-- Set dynamic vs. static partitioning using a variable
 - Seed file for channel group mapping
 - Implement dev profile considerations to limit processing: https://docs.getdbt.com/docs/guides/best-practices#limit-the-data-processed-when-in-development
 - Example of a funnel model https://github.com/teej/sf-funnels
@@ -47,6 +46,8 @@
 - Configuration and dynamic templates to create custom event tables and dimensions
 - Configuration to create custom dimensions (session, user, event_*) from event parameters
 - Query parameter exclusion (similar to what existed in GA3)
+- Refactor 'user properties' functionality to pull from the `user_properties` field
+- Support for large intraday tables (100+ sharts). Currently they are unioned in as a view on top of partitioned base table. We could load in data up until yesterday into the partitioned table and then union in today's data. 
 
 ## Discussion: Set dynamic vs. static partitioning using a variable
 Damon:
