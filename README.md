@@ -120,6 +120,15 @@ vars:
           user_property_name: "most_recent_param"  
           value_type: "string_value"
 ```
+### Setting Conversion Events (Optional)
+
+Specific event names can be specified as conversions by setting the `conversion_events` variable in your `dbt_project.yml` file. These events will be counted against each session and included in the `fct_sessions.sql` dimensional model. Ex:
+
+```
+vars:
+  ga4:
+      conversion_events:['purchase','download']
+```
 
 # Connecting to BigQuery
 
