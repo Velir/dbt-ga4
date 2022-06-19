@@ -1,4 +1,5 @@
--- Pulled from https://github.com/llooker/ga_four_block_dev/blob/master/views/sessions.view.lkml
+-- Inspired by https://github.com/llooker/ga_four_block_dev/blob/master/views/sessions.view.lkml
+-- Google's documentation is here: https://support.google.com/analytics/answer/9756891?hl=en
 
 {% macro default_channel_grouping(source, medium) %}
 
@@ -29,6 +30,12 @@ case
     then 'Display'
   when REGEXP_CONTAINS({{medium}}, r"^(cpv|cpa|cpp|content-text)$")
     then 'Other Advertising'
+  when REGEXP_CONTAINS({{medium}}, r"^(.*video.*)$")
+    then 'Organic Video'
+  when {{medium}} = 'audio'
+    then 'Audio'
+  when {{medium}} = 'sms'
+    then 'SMS'
   else '(Other)' 
 end 
 

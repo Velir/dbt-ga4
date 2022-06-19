@@ -6,6 +6,7 @@ with session_events as (
         medium,
         event_default_channel_grouping
     from {{ref('stg_ga4__events')}}
+    -- default channel grouping is only null if both soure and medium are null
     where event_default_channel_grouping is not null
 ),
 session_source as (

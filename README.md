@@ -9,6 +9,7 @@ Features include:
 - Session and User dimensional models
 - Easy access to query parameters such as GCLID and UTM params
 - Support for custom event parameters & custom user properties
+- Implementation of default channel grouping from source/medium information
 
 # Models
 
