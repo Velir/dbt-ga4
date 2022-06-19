@@ -25,12 +25,19 @@ include_event_key as (
         md5(CONCAT(CAST(TO_BASE64(session_key) as STRING), CAST(session_event_number as STRING))) as event_key -- Surrogate key for unique events
     from include_event_number
 ),
-enrich_params as (
+url_enrichment as (
     select 
         include_event_key.*,
         {{extract_hostname_from_url('page_location')}} as page_hostname,
         {{extract_query_string_from_url('page_location')}} as page_query_string,
     from include_event_key
+),
+add_channel_grouping as (
+    select
+        *,
+        {{default_channel_grouping('source','medium')}} as event_default_channel_grouping
+    from url_enrichment
 )
 
-select * from enrich_params
+
+select * from add_channel_grouping

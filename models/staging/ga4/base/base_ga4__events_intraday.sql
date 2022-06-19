@@ -24,6 +24,8 @@ with source as (
         geo,
         app_info,
         traffic_source,
+        traffic_source.medium as traffic_source_medium,
+        traffic_source.source as traffic_source_source,
         stream_id,
         platform,
         ecommerce,
@@ -50,6 +52,8 @@ renamed as (
         geo,
         app_info,
         traffic_source,
+        traffic_source_medium,
+        traffic_source_source,
         stream_id,
         platform,
         ecommerce,
@@ -60,6 +64,8 @@ renamed as (
         {{ unnest_key('event_params', 'session_engaged', 'int_value') }},
         {{ unnest_key('event_params', 'page_title') }},
         {{ unnest_key('event_params', 'page_referrer') }},
+        {{ unnest_key('event_params', 'source') }},
+        {{ unnest_key('event_params', 'medium') }},
         CASE 
             WHEN event_name = 'page_view' THEN 1
             ELSE 0
