@@ -31,13 +31,7 @@ url_enrichment as (
         {{extract_hostname_from_url('page_location')}} as page_hostname,
         {{extract_query_string_from_url('page_location')}} as page_query_string,
     from include_event_key
-),
-add_channel_grouping as (
-    select
-        *,
-        {{default_channel_grouping('source','medium')}} as event_default_channel_grouping
-    from url_enrichment
 )
 
 
-select * from add_channel_grouping
+select * from url_enrichment
