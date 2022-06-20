@@ -33,7 +33,6 @@
         - https://support.google.com/analytics/answer/9216061?hl=en&ref_topic=9756175
 - Review these issues for ideas for our repo: https://github.com/coding-is-for-losers/ga4-bigquery-starter/issues
 - Any special considerations for handling >1 data stream? 
-- Seed file for channel group mapping + business logic necessary (https://support.google.com/analytics/answer/9756891?hl=en)
 - Implement dev profile considerations to limit processing: https://docs.getdbt.com/docs/guides/best-practices#limit-the-data-processed-when-in-development
 - Example of a funnel model https://github.com/teej/sf-funnels
 - Review LookML examples for inspiration: https://github.com/llooker/ga_four_block_dev/tree/master/views/event_data_dimensions
