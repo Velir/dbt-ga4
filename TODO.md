@@ -7,7 +7,6 @@
 # TODO
 
 - Add a lookback window variable for user dimensions. it may be overly expensive to scan ALL events looking for first/last occurances of event parameters. 
-- add variable to filter out events with `debug_mode = true` - Don't see any in BQ, are they exported? 
 - mechanism to take in an array variable listing custom events and output 1 model per event (is this possible?)
 - How to handle user_id vs. client_id?
 - move common event params to `base_ga4__events`
@@ -33,19 +32,19 @@
         - https://developers.google.com/analytics/devguides/collection/ga4/reference/events
         - https://support.google.com/analytics/answer/9216061?hl=en&ref_topic=9756175
 - Review these issues for ideas for our repo: https://github.com/coding-is-for-losers/ga4-bigquery-starter/issues
-- Test whether session keys are unique
-- Add integration tests - Need to think about how to handle nested data as the source. CSV won't reproduce nested data. 
-    - look into https://github.com/dbt-labs/dbt-core/discussions/4455#discussioncomment-2766503
-    - Look into using https://github.com/EqualExperts/dbt-unit-testing and generating mock data using SQL statements. 
 - Any special considerations for handling >1 data stream? 
-- Set dynamic vs. static partitioning using a variable
-- Seed file for channel group mapping
+- Seed file for channel group mapping + business logic necessary (https://support.google.com/analytics/answer/9756891?hl=en)
 - Implement dev profile considerations to limit processing: https://docs.getdbt.com/docs/guides/best-practices#limit-the-data-processed-when-in-development
 - Example of a funnel model https://github.com/teej/sf-funnels
 - Review LookML examples for inspiration: https://github.com/llooker/ga_four_block_dev/tree/master/views/event_data_dimensions
+    - Add landing page / exit page, session start/end time, session duration, is bounce, campaign source to `dim_sessions` model
 - Configuration flag to turn off ecommerce tables
 - Configuration and dynamic templates to create custom event tables and dimensions
 - Configuration to create custom dimensions (session, user, event_*) from event parameters
+- Refactor 'user properties' functionality to pull from the `user_properties` field
+- Support for large intraday tables (100+ shards). Currently they are unioned in as a view on top of partitioned base table. We could load in data up until yesterday into the partitioned table and then union in today's data.
+- Allow users to configure certain event names as conversions. provide additional metrics around conversion events (conversion count per session, per user).  
+- Merge and clean up dim_sessions & fct_sessions. Just consider it ga4__sessions and ga4__users.
 
 ## Discussion: Set dynamic vs. static partitioning using a variable
 Damon:
