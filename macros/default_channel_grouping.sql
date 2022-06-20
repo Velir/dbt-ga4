@@ -10,8 +10,7 @@ case
   when {{source}} = '(direct)'
     and ({{medium}} = '(none)' or {{medium}} = '(not set)')
     then 'Direct'
-  when {{medium}} = 'organic' or {{source_category}} = 'SOURCE_CATEGORY_SEARCH'
-    then 'Organic Search'
+
   when REGEXP_CONTAINS({{source}}, r"^(facebook|instagram|pinterest|reddit|twitter|linkedin)") = true
     and REGEXP_CONTAINS({{medium}}, r"^(cpc|ppc|paid)") = true
     then 'Paid Social'
@@ -34,6 +33,8 @@ case
     then 'Display'
   when REGEXP_CONTAINS({{medium}}, r"^(cpv|cpa|cpp|content-text)$")
     then 'Other Advertising'
+  when {{medium}} = 'organic' or {{source_category}} = 'SOURCE_CATEGORY_SEARCH'
+    then 'Organic Search'
   when REGEXP_CONTAINS({{medium}}, r"^(.*video.*)$") or {{source_category}} = 'SOURCE_CATEGORY_VIDEO'
     then 'Organic Video'
   when {{source_category}} = 'SOURCE_CATEGORY_SHOPPING'
