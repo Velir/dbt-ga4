@@ -46,6 +46,7 @@
 - Support for large intraday tables (100+ shards). Currently they are unioned in as a view on top of partitioned base table. We could load in data up until yesterday into the partitioned table and then union in today's data.
 - Allow users to configure certain event names as conversions. provide additional metrics around conversion events (conversion count per session, per user).  
 - Merge and clean up dim_sessions & fct_sessions. Just consider it ga4__sessions and ga4__users.
+- Use Fivetran's `union_data` method (or something similar) to handle multiple, unioned GA4 exports. https://github.com/fivetran/dbt_xero_source/blob/main/models/tmp/stg_xero__account_tmp.sql
 
 ## Discussion: Set dynamic vs. static partitioning using a variable
 Damon:
