@@ -26,10 +26,19 @@
         )
     }}
 {% endif %}
---BigQuery does not cache wildcard queries that scan across sharded tables which means it's best to materialize the raw event data as a partitioned table so that future queries benefit from caching
 
+with unioned_datasets as (
 
-with source as (
+{% for dataset in var('datasets') %}
+    select *,_TABLE_SUFFIX as event_table_suffix, '{{dataset}}' as ga4_dataset from `{{dataset}}.events_*`
+    {% if not loop.last %}
+        UNION ALL
+    {% endif %}
+{% endfor %}
+
+),
+
+source as (
     select 
         parse_date('%Y%m%d',event_date) as event_date_dt,
         event_timestamp,
@@ -53,16 +62,17 @@ with source as (
         platform,
         ecommerce,
         items,
-    from {{ source('ga4', 'events') }}
-    where _table_suffix not like '%intraday%' -- intraday events are supported through the project variable: include_intraday_events
-    and cast(_table_suffix as int64) >= {{var('start_date')}}
+        ga4_dataset
+    from unioned_datasets
+    where event_table_suffix not like '%intraday%' -- intraday events are supported through the project variable: include_intraday_events
+    and cast(event_table_suffix as int64) >= {{var('start_date')}}
     {% if is_incremental() %}
         {% if var('use_static_partition', false ) ==  true %}
             and parse_date('%Y%m%d', event_date) in ({{ partitions_to_replace | join(',') }})
         {% else %}
             -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
             -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
-            and parse_date('%Y%m%d',_TABLE_SUFFIX) >= _dbt_max_partition
+            and parse_date('%Y%m%d',event_table_suffix) >= _dbt_max_partition
         {% endif %} 
     {% endif %}
 ),
@@ -90,6 +100,7 @@ renamed as (
         platform,
         ecommerce,
         items,
+        ga4_dataset,
         {{ unnest_key('event_params', 'ga_session_id', 'int_value') }},
         {{ unnest_key('event_params', 'page_location') }},
         {{ unnest_key('event_params', 'ga_session_number',  'int_value') }},
