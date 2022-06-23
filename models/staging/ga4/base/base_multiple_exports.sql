@@ -1,10 +1,20 @@
-{{
-    fivetran_utils.union_data(
-        table_identifier='account', 
-        database_variable='xero_database', 
-        schema_variable='xero_schema', 
-        default_database=target.database,
-        default_schema='xero',
-        default_variable='account'
-    )
-}} 
+{% set relations = [] %}
+{% for schema in var('union_schemas') %}
+
+    {% set relation=adapter.get_relation(
+        database=target.database,
+        schema=schema,
+        identifier='events_*'
+    ) -%}
+
+    {% set relation_exists=relation is not none %}
+
+    {% if relation_exists %}
+
+        {% do relations.append(relation) %}
+
+    {% endif %}
+
+{% endfor %}
+
+{{ dbt_utils.union_relations(relations) }}
