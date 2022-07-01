@@ -6,7 +6,7 @@
 
 case 
   when {{source}} is null and {{medium}} is null 
-    then null
+    then 'Direct'
   when {{source}} = '(direct)'
     and ({{medium}} = '(none)' or {{medium}} = '(not set)')
     then 'Direct'

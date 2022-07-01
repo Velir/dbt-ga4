@@ -9,7 +9,6 @@ with session_events as (
         source_category
     from {{ref('stg_ga4__events')}}
     left join {{ref('ga4_source_categories')}} using (source)
-    where source is not null and medium is not null
    ),
 set_default_channel_grouping as (
     select
