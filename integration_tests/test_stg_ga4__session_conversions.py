@@ -13,7 +13,7 @@ CCCC,some_other_event
 expected_csv = """session_key,my_conversion_count
 AAAA,2
 BBBB,1
-CCCC,
+CCCC,0
 """.lstrip()
 
 # TODO, need to set the conversion_events variable somehow
