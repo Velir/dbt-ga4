@@ -41,7 +41,6 @@
 - Configuration flag to turn off ecommerce tables
 - Configuration and dynamic templates to create custom event tables and dimensions
 - Configuration to create custom dimensions (session, user, event_*) from event parameters
-- Query parameter exclusion (similar to what existed in GA3)
 - Refactor 'user properties' functionality to pull from the `user_properties` field
 - Support for large intraday tables (100+ shards). Currently they are unioned in as a view on top of partitioned base table. We could load in data up until yesterday into the partitioned table and then union in today's data.
 - Allow users to configure certain event names as conversions. provide additional metrics around conversion events (conversion count per session, per user).  
