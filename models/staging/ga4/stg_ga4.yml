@@ -39,3 +39,5 @@ models:
       - name: client_id
         tests:
           - unique  
+  - name: stg_ga4__session_conversions
+    description: Optional model that counts the number of events listed in the 'conversion_events' var. Aggregated by session_key.
