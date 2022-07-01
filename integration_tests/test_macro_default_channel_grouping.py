@@ -14,6 +14,7 @@ cn.bing.com,
 43things.com,
 alibaba,
 alibaba,cpc
+,
 """.lstrip()
 
 expected_csv = """default_channel_grouping
@@ -28,6 +29,7 @@ Organic Search
 Organic Social
 Organic Shopping
 Paid Shopping
+Direct
 """.lstrip()
 
 actual = """
