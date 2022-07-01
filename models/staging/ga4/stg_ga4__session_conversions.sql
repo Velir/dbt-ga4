@@ -15,7 +15,7 @@ sessions as (
     from events
 )
 -- For loop that creates 1 cte per conversions, grouped by session key
-{% for ce in var('conversion_events') %}
+{% for ce in var('conversion_events',[]) %}
 ,
 conversion_{{ce}} as (
     select
@@ -33,11 +33,11 @@ conversion_{{ce}} as (
 final_pivot as (
     select 
         session_key
-        {% for ce in var('conversion_events') %}
-        , conversion_{{ce}}.conversion_count as {{ce}}_count
+        {% for ce in var('conversion_events',[]) %}
+        , ifnull(conversion_{{ce}}.conversion_count,0) as {{ce}}_count
         {% endfor %}
     from sessions
-    {% for ce in var('conversion_events') %}
+    {% for ce in var('conversion_events',[]) %}
     left join conversion_{{ce}} using (session_key)
     {% endfor %}
 )
