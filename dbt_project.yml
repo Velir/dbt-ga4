@@ -20,6 +20,10 @@ clean-targets:         # directories to be removed by `dbt clean`
 #    dataset: "your_dataset"
 #    start_date: "20210120" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model. This is a reasonable default for the GA4 obfuscated dataset
 
+# Query parameter exclusions
+# You can remove specific query parameters from the page_location by listing them here
+#    query_parameter_exclusions: ["gclid","fbclid","_ga"]
+
 # User Properties
 # User-scoped event properties can be assigned using the following variable configuration in your dbt_project.yml
 # The dim_ga4__users dimension table will be updated to include the last value seen for each user

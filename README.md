@@ -10,6 +10,7 @@ Features include:
 - Easy access to query parameters such as GCLID and UTM params
 - Support for custom event parameters & custom user properties
 - Implementation of default channel grouping from source/medium information
+- Exclude query parameters from page_location to clean up URL-related metrics
 
 # Models
 
@@ -52,7 +53,7 @@ packages:
 packages:
   - local: ../dbt-ga4
 ```
-## Variables (Required)
+## Required Variables
 
 This package assumes that you have an existing DBT project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded. Source data is located using the following variables which must be set in your `dbt_project.yml` file.
 
@@ -76,7 +77,18 @@ vars:
 
 More info about the GA4 obfuscated dataset here: https://support.google.com/analytics/answer/10937659?hl=en#zippy=%2Cin-this-article
 
-### Using Custom Event Parameters (Optional)
+## Optional Variables
+
+### Query Parameter Exclusions
+
+Setting `query_parameter_exclusions` will remove query string parameters from the `page_location` field for all downstream processing. Original parameters are captured in a new `original_page_location` field. Ex:
+
+```
+vars:
+  ga4: 
+    query_parameter_exclusions: ["gclid","fbclid","_ga"] 
+```
+### Custom Events
 
 One important feature of GA4 is that you can add custom parameters to any event. These custom parameters will be picked up by this package if they are defined as variables within your `dbt_project.yml` file using the following syntax:
 
@@ -97,7 +109,7 @@ vars:
           - name: "country_code"
             value_type: "int_value"
 ```
-### Using Custom User Properties (Optional)
+### Custom User Properties
 
 User-scoped event properties can be assigned using the following variable configuration in your `dbt_project.yml`. The `dim_ga4__users` dimension table will be updated to include the last value seen for each user.
 

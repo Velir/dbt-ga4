@@ -40,11 +40,12 @@
 - Configuration flag to turn off ecommerce tables
 - Configuration and dynamic templates to create custom event tables and dimensions
 - Configuration to create custom dimensions (session, user, event_*) from event parameters
-- Query parameter exclusion (similar to what existed in GA3)
 - Refactor 'user properties' functionality to pull from the `user_properties` field
-- Support for large intraday tables (100+ sharts). Currently they are unioned in as a view on top of partitioned base table. We could load in data up until yesterday into the partitioned table and then union in today's data.
+- Support for large intraday tables (100+ shards). Currently they are unioned in as a view on top of partitioned base table. We could load in data up until yesterday into the partitioned table and then union in today's data.
 - Allow users to configure certain event names as conversions. provide additional metrics around conversion events (conversion count per session, per user).  
 - Update `dim_sessions` to pull based on session key rather than session_start event
+- Merge and clean up dim_sessions & fct_sessions. Just consider it ga4__sessions and ga4__users.
+- Use Fivetran's `union_data` method (or something similar) to handle multiple, unioned GA4 exports. https://github.com/fivetran/dbt_xero_source/blob/main/models/tmp/stg_xero__account_tmp.sql
 
 ## Discussion: Set dynamic vs. static partitioning using a variable
 Damon:
