@@ -1,5 +1,3 @@
--- TODO this isn't quite right because sessions are appearing with null source/medium/dfc when they should be direct
-
 with session_events as (
     select 
         session_key,
