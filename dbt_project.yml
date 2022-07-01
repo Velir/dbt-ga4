@@ -23,6 +23,10 @@ clean-targets:         # directories to be removed by `dbt clean`
 #    static_partition_lower_bound: 2 # When use_static_partition is true, control the lower bound of the days back from today of the lookback window
 
 
+# Query parameter exclusions
+# You can remove specific query parameters from the page_location by listing them here
+#    query_parameter_exclusions: ["gclid","fbclid","_ga"]
+
 # User Properties
 # User-scoped event properties can be assigned using the following variable configuration in your dbt_project.yml
 # The dim_ga4__users dimension table will be updated to include the last value seen for each user

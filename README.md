@@ -6,9 +6,11 @@ Features include:
 - Flattened models to access common events and event parameters such as `page_view`, `session_start`, and `purchase`
 - Conversion of sharded event tables into a single partitioned table
 - Incremental loading of GA4 data into your staging tables 
-- Session and User dimensional models
+- Session and User dimensional models that may include a configurable list of conversions
 - Easy access to query parameters such as GCLID and UTM params
 - Support for custom event parameters & custom user properties
+- Convert source/medium to default channel grouping
+- Exclude query parameters from page_location to clean up URL-related metrics
 
 # Models
 
@@ -18,6 +20,8 @@ Features include:
 | stg_ga4__event_* | 1 model per event (ex: page_view, purchase) which flattens event parameters specific to that event |
 | stg_ga4__event_to_query_string_params | Mapping between each event and any query parameters & values that were contained in the event's `page_location` field |
 | stg_ga4__user_properties | Finds the most recent occurance of specific event_params and assigns them to a user's client_id. Event params are specified as variables (see documentation below) |
+| stg_ga4__session_conversions | Produces session-grouped event counts for a configurable list of event names |
+| stg_ga4__sessions_traffic_sources | Finds the source, medium, and default channel grouping for each session |
 | dim_ga4__users | Dimension table for users which contains attributes such as first and last page viewed. | 
 | dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and campaign data |
 
@@ -50,7 +54,7 @@ packages:
 packages:
   - local: ../dbt-ga4
 ```
-## Variables (Required)
+## Required Variables
 
 This package assumes that you have an existing DBT project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded. Source data is located using the following variables which must be set in your `dbt_project.yml` file.
 
@@ -74,7 +78,18 @@ vars:
 
 More info about the GA4 obfuscated dataset here: https://support.google.com/analytics/answer/10937659?hl=en#zippy=%2Cin-this-article
 
-### Using Custom Event Parameters (Optional)
+## Optional Variables
+
+### Query Parameter Exclusions
+
+Setting `query_parameter_exclusions` will remove query string parameters from the `page_location` field for all downstream processing. Original parameters are captured in a new `original_page_location` field. Ex:
+
+```
+vars:
+  ga4: 
+    query_parameter_exclusions: ["gclid","fbclid","_ga"] 
+```
+### Custom Events
 
 One important feature of GA4 is that you can add custom parameters to any event. These custom parameters will be picked up by this package if they are defined as variables within your `dbt_project.yml` file using the following syntax:
 
@@ -95,7 +110,7 @@ vars:
           - name: "country_code"
             value_type: "int_value"
 ```
-### Using Custom User Properties (Optional)
+### Custom User Properties
 
 User-scoped event properties can be assigned using the following variable configuration in your `dbt_project.yml`. The `dim_ga4__users` dimension table will be updated to include the last value seen for each user.
 
@@ -118,6 +133,15 @@ vars:
         - event_parameter: "another_event_param"
           user_property_name: "most_recent_param"  
           value_type: "string_value"
+```
+### Setting Conversion Events (Optional)
+
+Specific event names can be specified as conversions by setting the `conversion_events` variable in your `dbt_project.yml` file. These events will be counted against each session and included in the `fct_sessions.sql` dimensional model. Ex:
+
+```
+vars:
+  ga4:
+      conversion_events:['purchase','download']
 ```
 
 # Incremental Loading of Event Data
@@ -145,4 +169,6 @@ The easiest option is using OAuth with your Google Account. Summarized instructi
 ```
 gcloud auth application-default login --scopes=https://www.googleapis.com/auth/bigquery,https://www.googleapis.com/auth/iam.test
 ```
+# Integration Testing
 
+This package uses `pytest` as a method of unit testing individual models. More details can be found in the [integration_tests/README.md](integration_tests) folder.

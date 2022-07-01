@@ -25,12 +25,27 @@ include_event_key as (
         md5(CONCAT(CAST(TO_BASE64(session_key) as STRING), CAST(session_event_number as STRING))) as event_key -- Surrogate key for unique events
     from include_event_number
 ),
+-- Remove specific query strings from page_location field
+remove_query_params as (
+
+    select 
+        * EXCEPT (page_location),
+        page_location as original_page_location,
+        -- If there are query parameters to exclude, exclude them using regex
+        {% if var('query_parameter_exclusions',none) is not none %}
+        {{remove_query_parameters('page_location',var('query_parameter_exclusions'))}} as page_location
+        {% else %}
+        page_location
+        {% endif %}
+    from include_event_key
+),
 enrich_params as (
     select 
-        include_event_key.*,
+        *,
         {{extract_hostname_from_url('page_location')}} as page_hostname,
         {{extract_query_string_from_url('page_location')}} as page_query_string,
-    from include_event_key
+    from remove_query_params
 )
+
 
 select * from enrich_params

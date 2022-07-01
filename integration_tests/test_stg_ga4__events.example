@@ -1,0 +1,45 @@
+# This test doesn't quite work because the key columns are of type BYTE, but the JSON uploads the data as STRING. 
+# Keeping this file for now as an example of using JSON for both the input and expected output
+
+import pytest
+from base_unit_test import BaseUnitTestModel
+from dbt.tests.util import read_file,check_relations_equal,run_dbt
+
+SOURCE_JSON = """
+{  "event_date_dt": "2021-04-06",  "event_timestamp": "1617691790431476",  "event_name": "first_visit",  "event_params": [{    "key": "ga_session_number",    "value": {      "string_value": null,      "int_value": "1",      "float_value": null,      "double_value": null    }  }, {    "key": "engaged_session_event",    "value": {      "string_value": null,      "int_value": "1",      "float_value": null,      "double_value": null    }  }, {    "key": "ga_session_id",    "value": {      "string_value": null,      "int_value": "1617691775",      "float_value": null,      "double_value": null    }  }, {    "key": "page_title",    "value": {      "string_value": "Velir | Behavior-Driven Testing in Drupal 8",      "int_value": null,      "float_value": null,      "double_value": null    }  }, {    "key": "page_location",    "value": {      "string_value": "https://www.velir.com/blog/2016/08/25/behavior-driven-testing-drupal-8",      "int_value": null,      "float_value": null,      "double_value": null    }  }, {    "key": "session_engaged",    "value": {      "string_value": null,      "int_value": "1",      "float_value": null,      "double_value": null    }  }],  "event_previous_timestamp": null,  "event_value_in_usd": null,  "event_bundle_sequence_id": "948327668",  "event_server_timestamp_offset": null,  "user_id": null,  "client_id": "1166526666.1617691776",  "privacy_info": null,  "user_properties": [],  "user_first_touch_timestamp": "1617691790431476",  "user_ltv": {    "revenue": "0.0",    "currency": "USD"  },  "device": {    "category": "desktop",    "mobile_brand_name": null,    "mobile_model_name": null,    "mobile_marketing_name": null,    "mobile_os_hardware_model": null,    "operating_system": "Windows",    "operating_system_version": "Windows 10",    "vendor_id": null,    "advertising_id": null,    "language": "en-us",    "is_limited_ad_tracking": "No",    "time_zone_offset_seconds": null,    "browser": null,    "browser_version": null,    "web_info": {      "browser": "Chrome",      "browser_version": "89.0.4389.114",      "hostname": "www.velir.com"    }  },  "geo": {    "continent": "Asia",    "country": "Vietnam",    "region": "Ho Chi Minh City",    "city": "Ho Chi Minh City",    "sub_continent": "Southeast Asia",    "metro": "(not set)"  },  "app_info": null,  "traffic_source": {    "name": "(direct)",    "medium": "(none)",    "source": "(direct)"  },  "stream_id": "1966637064",  "platform": "WEB",  "ecommerce": null,  "items": [],  "ga_session_id": "1617691775",  "page_location": "https://www.velir.com/blog/2016/08/25/behavior-driven-testing-drupal-8",  "ga_session_number": "1",  "session_engaged": "1",  "page_title": "Velir | Behavior-Driven Testing in Drupal 8",  "page_referrer": null,  "is_page_view": "0",  "is_purchase": "0"}
+""".lstrip()
+EXPECTED_JSON = """
+{  "event_date_dt": "2021-04-06",  "event_timestamp": "1617691790431476",  "event_name": "first_visit",  "event_params": [{    "key": "ga_session_number",    "value": {      "string_value": null,      "int_value": "1",      "float_value": null,      "double_value": null    }  }, {    "key": "engaged_session_event",    "value": {      "string_value": null,      "int_value": "1",      "float_value": null,      "double_value": null    }  }, {    "key": "ga_session_id",    "value": {      "string_value": null,      "int_value": "1617691775",      "float_value": null,      "double_value": null    }  }, {    "key": "page_title",    "value": {      "string_value": "Velir | Behavior-Driven Testing in Drupal 8",      "int_value": null,      "float_value": null,      "double_value": null    }  }, {    "key": "page_location",    "value": {      "string_value": "https://www.velir.com/blog/2016/08/25/behavior-driven-testing-drupal-8",      "int_value": null,      "float_value": null,      "double_value": null    }  }, {    "key": "session_engaged",    "value": {      "string_value": null,      "int_value": "1",      "float_value": null,      "double_value": null    }  }],  "event_previous_timestamp": null,  "event_value_in_usd": null,  "event_bundle_sequence_id": "948327668",  "event_server_timestamp_offset": null,  "user_id": null,  "client_id": "1166526666.1617691776",  "privacy_info": null,  "user_properties": [],  "user_first_touch_timestamp": "1617691790431476",  "user_ltv": {    "revenue": "0.0",    "currency": "USD"  },  "device": {    "category": "desktop",    "mobile_brand_name": null,    "mobile_model_name": null,    "mobile_marketing_name": null,    "mobile_os_hardware_model": null,    "operating_system": "Windows",    "operating_system_version": "Windows 10",    "vendor_id": null,    "advertising_id": null,    "language": "en-us",    "is_limited_ad_tracking": "No",    "time_zone_offset_seconds": null,    "browser": null,    "browser_version": null,    "web_info": {      "browser": "Chrome",      "browser_version": "89.0.4389.114",      "hostname": "www.velir.com"    }  },  "geo": {    "continent": "Asia",    "country": "Vietnam",    "region": "Ho Chi Minh City",    "city": "Ho Chi Minh City",    "sub_continent": "Southeast Asia",    "metro": "(not set)"  },  "app_info": null,  "traffic_source": {    "name": "(direct)",    "medium": "(none)",    "source": "(direct)"  },  "stream_id": "1966637064",  "platform": "WEB",  "ecommerce": null,  "items": [],  "ga_session_id": "1617691775",  "page_location": "https://www.velir.com/blog/2016/08/25/behavior-driven-testing-drupal-8",  "ga_session_number": "1",  "session_engaged": "1",  "page_title": "Velir | Behavior-Driven Testing in Drupal 8",  "page_referrer": null,  "is_page_view": "0",  "is_purchase": "0",  "session_key": "TAp7hHaymXXA/Way5byPBw\u003d\u003d",  "session_event_number": "1",  "event_key": "DGb378zSx/aIZs76gM4aTQ\u003d\u003d",  "page_hostname": "velir.com",  "page_query_string": null}
+""".lstrip()
+
+models__config_yml = """
+version: 2
+sources:
+  - name: fixture
+    schema: "{{ target.schema }}"
+    tables:
+      - name: SOURCE_JSON
+      - name: EXPECTED_OUTPUT
+"""
+
+actual = read_file('../models/staging/ga4/stg_ga4__events.sql').replace(
+    "ref('base_ga4__events')",
+    "source('fixture', 'SOURCE_JSON')"
+)
+
+class TestStgGa4Events(BaseUnitTestModel):
+    # everything that goes in the "models" directory (= SQL)
+    @pytest.fixture(scope="class")
+    def models(self):
+        return {
+            "config.yml": models__config_yml,
+            "actual.sql": actual,
+            "expected.sql": "select * from {{ source('fixture', 'EXPECTED_OUTPUT') }}"
+        }
+
+    def test_mock_run_and_check(self, project):
+        self.upload_json_fixture(project, "source.json", SOURCE_JSON, "SOURCE_JSON" )
+        self.upload_json_fixture(project, "expected.json", EXPECTED_JSON, "EXPECTED_OUTPUT" )
+        run_dbt(["run"])
+        breakpoint()
+        check_relations_equal(project.adapter, ["actual", "expected"])

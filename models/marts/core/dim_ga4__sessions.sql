@@ -17,6 +17,15 @@ remove_dupes as
 (
     select * from session_start_dims
     where row_num = 1
+),
+join_traffic_source as (
+    select 
+        remove_dupes.*,
+        session_source as source,
+        session_medium as medium,
+        session_default_channel_grouping as default_channel_grouping
+    from remove_dupes
+    left join {{ref('stg_ga4__sessions_traffic_sources')}} using (session_key)
 )
 
-select * from remove_dupes
+select * from join_traffic_source
