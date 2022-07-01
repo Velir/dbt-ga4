@@ -77,6 +77,8 @@ More info about the GA4 obfuscated dataset here: https://support.google.com/anal
 
 ## Optional Variables
 
+### Query Parameter Exclusions
+
 Setting `query_parameter_exclusions` will remove query string parameters from the `page_location` field for all downstream processing. Original parameters are captured in a new `original_page_location` field. Ex:
 
 ```

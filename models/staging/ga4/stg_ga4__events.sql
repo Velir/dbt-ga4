@@ -32,7 +32,7 @@ remove_query_params as (
         include_event_key.* EXCEPT (page_location),
         include_event_key.page_location as original_page_location,
         -- If there are query parameters to exclude, exclude them using regex
-        {% if var('query_parameter_exclusions', false) != false %}
+        {% if var('query_parameter_exclusions',none) is not none %}
         {{remove_query_parameters('page_location',var('query_parameter_exclusions'))}} as page_location
         {% else %}
         page_location
