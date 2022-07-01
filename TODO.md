@@ -33,7 +33,6 @@
         - https://support.google.com/analytics/answer/9216061?hl=en&ref_topic=9756175
 - Review these issues for ideas for our repo: https://github.com/coding-is-for-losers/ga4-bigquery-starter/issues
 - Any special considerations for handling >1 data stream? 
-- Seed file for channel group mapping + business logic necessary (https://support.google.com/analytics/answer/9756891?hl=en)
 - Implement dev profile considerations to limit processing: https://docs.getdbt.com/docs/guides/best-practices#limit-the-data-processed-when-in-development
 - Example of a funnel model https://github.com/teej/sf-funnels
 - Review LookML examples for inspiration: https://github.com/llooker/ga_four_block_dev/tree/master/views/event_data_dimensions
@@ -44,6 +43,7 @@
 - Refactor 'user properties' functionality to pull from the `user_properties` field
 - Support for large intraday tables (100+ shards). Currently they are unioned in as a view on top of partitioned base table. We could load in data up until yesterday into the partitioned table and then union in today's data.
 - Allow users to configure certain event names as conversions. provide additional metrics around conversion events (conversion count per session, per user).  
+- Update `dim_sessions` to pull based on session key rather than session_start event
 - Merge and clean up dim_sessions & fct_sessions. Just consider it ga4__sessions and ga4__users.
 - Use Fivetran's `union_data` method (or something similar) to handle multiple, unioned GA4 exports. https://github.com/fivetran/dbt_xero_source/blob/main/models/tmp/stg_xero__account_tmp.sql
 

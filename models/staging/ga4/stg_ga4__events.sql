@@ -29,8 +29,8 @@ include_event_key as (
 remove_query_params as (
 
     select 
-        include_event_key.* EXCEPT (page_location),
-        include_event_key.page_location as original_page_location,
+        * EXCEPT (page_location),
+        page_location as original_page_location,
         -- If there are query parameters to exclude, exclude them using regex
         {% if var('query_parameter_exclusions',none) is not none %}
         {{remove_query_parameters('page_location',var('query_parameter_exclusions'))}} as page_location
@@ -46,5 +46,6 @@ enrich_params as (
         {{extract_query_string_from_url('page_location')}} as page_query_string,
     from remove_query_params
 )
+
 
 select * from enrich_params
