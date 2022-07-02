@@ -1,8 +1,8 @@
-{% if var('use_static_partition', false ) ==  true %}
-   {% set partitions_to_replace = [
-    'current_date',
-    'date_sub(current_date, interval ' + var('static_partition_lower_bound')|string + ' day)'
-    ] %}
+{% if var('static_incremental_days', false ) ==  true %}
+    {% set partitions_to_replace = [] %}
+    {% for i in range(var('static_incremental_days')) %}
+        {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
+    {% endfor %}
     {{
         config(
             materialized = 'incremental',
@@ -27,8 +27,6 @@
     }}
 {% endif %}
 --BigQuery does not cache wildcard queries that scan across sharded tables which means it's best to materialize the raw event data as a partitioned table so that future queries benefit from caching
-
-
 with source as (
     select 
         parse_date('%Y%m%d',event_date) as event_date_dt,
@@ -57,7 +55,7 @@ with source as (
     where _table_suffix not like '%intraday%' -- intraday events are supported through the project variable: include_intraday_events
     and cast(_table_suffix as int64) >= {{var('start_date')}}
     {% if is_incremental() %}
-        {% if var('use_static_partition', false ) ==  true %}
+        {% if var('static_incremental_days', false ) ==  true %}
             and parse_date('%Y%m%d', event_date) in ({{ partitions_to_replace | join(',') }})
         {% else %}
             -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
