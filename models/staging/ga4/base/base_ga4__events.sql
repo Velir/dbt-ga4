@@ -1,15 +1,32 @@
+{% if var('static_incremental_days', false ) ==  true %}
+    {% set partitions_to_replace = [] %}
+    {% for i in range(var('static_incremental_days')) %}
+        {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
+    {% endfor %}
+    {{
+        config(
+            materialized = 'incremental',
+            incremental_strategy = 'insert_overwrite',
+            partition_by={
+            "field": "event_date_dt",
+            "data_type": "date",
+            },
+            partitions = partitions_to_replace
+        )
+    }}
+{% else %}
+    {{
+        config(
+            materialized = 'incremental',
+            incremental_strategy = 'insert_overwrite',
+            partition_by={
+            "field": "event_date_dt",
+            "data_type": "date",
+            }
+        )
+    }}
+{% endif %}
 --BigQuery does not cache wildcard queries that scan across sharded tables which means it's best to materialize the raw event data as a partitioned table so that future queries benefit from caching
-{{
-    config(
-        materialized = 'incremental',
-        incremental_strategy = 'insert_overwrite',
-        partition_by={
-        "field": "event_date_dt",
-        "data_type": "date",
-        }
-    )
-}}
-
 with source as (
     select 
         parse_date('%Y%m%d',event_date) as event_date_dt,
@@ -33,14 +50,18 @@ with source as (
         stream_id,
         platform,
         ecommerce,
-        items
+        items,
     from {{ source('ga4', 'events') }}
-    where _table_suffix not like '%intraday%' and -- intraday events are supported through the project variable: include_intraday_events
-        cast(_table_suffix as int64) >= {{var('start_date')}}
+    where _table_suffix not like '%intraday%' -- intraday events are supported through the project variable: include_intraday_events
+    and cast(_table_suffix as int64) >= {{var('start_date')}}
     {% if is_incremental() %}
-        -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
-        -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
-        and parse_date('%Y%m%d',_TABLE_SUFFIX) >= _dbt_max_partition 
+        {% if var('static_incremental_days', false ) ==  true %}
+            and parse_date('%Y%m%d', event_date) in ({{ partitions_to_replace | join(',') }})
+        {% else %}
+            -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
+            -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
+            and parse_date('%Y%m%d',_TABLE_SUFFIX) >= _dbt_max_partition
+        {% endif %} 
     {% endif %}
 ),
 renamed as (
@@ -82,8 +103,10 @@ renamed as (
         CASE 
             WHEN event_name = 'purchase' THEN 1
             ELSE 0
-        END AS is_purchase
+        END AS is_purchase,
     from source
 )
 
-select * from renamed
+select
+    *
+from renamed

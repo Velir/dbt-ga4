@@ -144,6 +144,18 @@ vars:
       conversion_events:['purchase','download']
 ```
 
+# Incremental Loading of Event Data
+
+By default, GA4 exports data into sharded event tables that use the event date as the table suffix in the format of `events_YYYYMMDD`. This package incrementally loads data from these tables (and not the `intraday` tables) into `base_ga4__events` which is partitioned on date. There are two incremental loading strategies available:
+
+- Dynamic incremental partitions (Default) - This strategy queries the destination table to find the latest date available. Data beyond that date range is loaded in incrementally on each run.
+
+- Static incremental partitions - This strategy incrementally loads in the last X days worth of data regardless of what data is availabe. In certain cases, this improves performance because the `max(event_date)` does not need to be calculated dynamically. This is enabled when the `static_incremental_days` variable is set to an integers. A setting of `3` would load data from `current_date - 1` `current_date - 2` and `current_date - 3`. Note that `current_date` uses UTC as the timezone.
+
+## Intraday Events
+
+Users can enable the inclusion of intraday data by setting `include_intraday_events: true`. Intraday events are not included in incremental loads, but are instead unioned with historical events.
+
 # Connecting to BigQuery
 
 This package assumes that BigQuery is the source of your GA4 data. Full instructions for connecting DBT to BigQuery are here: https://docs.getdbt.com/reference/warehouse-profiles/bigquery-profile

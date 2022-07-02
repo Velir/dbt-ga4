@@ -19,6 +19,9 @@ clean-targets:         # directories to be removed by `dbt clean`
 #    project: "your_project"
 #    dataset: "your_dataset"
 #    start_date: "20210120" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model. This is a reasonable default for the GA4 obfuscated dataset
+#    use_static_partition: false
+#    static_partition_lower_bound: 2 # When use_static_partition is true, control the lower bound of the days back from today of the lookback window
+
 
 # Query parameter exclusions
 # You can remove specific query parameters from the page_location by listing them here
