@@ -1,7 +1,7 @@
  with page_view_with_params as (
    select *,
-      {{ unnest_key('event_params', 'entrances',  'int_value') }},
-      {{ unnest_key('event_params', 'value', 'float_value') }}
+      {{ ga4.unnest_key('event_params', 'entrances',  'int_value') }},
+      {{ ga4.unnest_key('event_params', 'value', 'float_value') }}
       {% if var("page_view_custom_parameters", "none") != "none" %}
         {{ stage_custom_parameters( var("page_view_custom_parameters") )}}
       {% endif %}

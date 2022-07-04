@@ -54,14 +54,14 @@ renamed as (
         platform,
         ecommerce,
         items,
-        {{ unnest_key('event_params', 'ga_session_id', 'int_value') }},
-        {{ unnest_key('event_params', 'page_location') }},
-        {{ unnest_key('event_params', 'ga_session_number',  'int_value') }},
-        {{ unnest_key('event_params', 'session_engaged', 'int_value') }},
-        {{ unnest_key('event_params', 'page_title') }},
-        {{ unnest_key('event_params', 'page_referrer') }},
-        {{ unnest_key('event_params', 'source') }},
-        {{ unnest_key('event_params', 'medium') }},
+        {{ ga4.unnest_key('event_params', 'ga_session_id', 'int_value') }},
+        {{ ga4.unnest_key('event_params', 'page_location') }},
+        {{ ga4.unnest_key('event_params', 'ga_session_number',  'int_value') }},
+        {{ ga4.unnest_key('event_params', 'session_engaged', 'int_value') }},
+        {{ ga4.unnest_key('event_params', 'page_title') }},
+        {{ ga4.unnest_key('event_params', 'page_referrer') }},
+        {{ ga4.unnest_key('event_params', 'source') }},
+        {{ ga4.unnest_key('event_params', 'medium') }},
         CASE 
             WHEN event_name = 'page_view' THEN 1
             ELSE 0

@@ -2,7 +2,7 @@
  
  with user_engagement_with_params as (
    select *,
-      {{ unnest_key('event_params', 'engagement_time_msec', 'int_value') }}
+      {{ ga4.unnest_key('event_params', 'engagement_time_msec', 'int_value') }}
       {% if var("user_engagement_custom_parameters", "none") != "none" %}
         {{ stage_custom_parameters( var("user_engagement_custom_parameters") )}}
       {% endif %}

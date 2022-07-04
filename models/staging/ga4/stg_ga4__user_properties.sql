@@ -9,7 +9,7 @@ with unnest_user_properties as
         client_id,
         event_timestamp
         {% for up in var('user_properties', []) %}
-            ,{{ unnest_key('event_params',  up.event_parameter ,  up.value_type ) }}
+            ,{{ ga4.unnest_key('event_params',  up.event_parameter ,  up.value_type ) }}
         {% endfor %}
     from {{ref('stg_ga4__events')}}
 )
