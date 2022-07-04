@@ -6,11 +6,11 @@ Features include:
 - Flattened models to access common events and event parameters such as `page_view`, `session_start`, and `purchase`
 - Conversion of sharded event tables into a single partitioned table
 - Incremental loading of GA4 data into your staging tables 
-- Session and User dimensional models that may include a configurable list of conversions
+- Session and user dimensional models with conversion counts
 - Easy access to query parameters such as GCLID and UTM params
 - Support for custom event parameters & custom user properties
-- Convert source/medium to default channel grouping
-- Exclude query parameters from page_location to clean up URL-related metrics
+- Mapping from source/medium to default channel grouping
+- Ability to exclude query parameters (like `fbclid`) from page paths
 
 # Models
 
@@ -19,8 +19,8 @@ Features include:
 | stg_ga4__events | Contains cleaned event data that is enhanced with useful event and session keys. |
 | stg_ga4__event_* | 1 model per event (ex: page_view, purchase) which flattens event parameters specific to that event |
 | stg_ga4__event_to_query_string_params | Mapping between each event and any query parameters & values that were contained in the event's `page_location` field |
-| stg_ga4__user_properties | Finds the most recent occurance of specific event_params and assigns them to a user's client_id. Event params are specified as variables (see documentation below) |
-| stg_ga4__session_conversions | Produces session-grouped event counts for a configurable list of event names |
+| stg_ga4__user_properties | Finds the most recent occurance of specific event_params and assigns them to a user's client_id. User properties are specified as variables (see documentation below) |
+| stg_ga4__session_conversions | Produces session-grouped event counts for a configurable list of event names (see documentation below) |
 | stg_ga4__sessions_traffic_sources | Finds the source, medium, and default channel grouping for each session |
 | dim_ga4__users | Dimension table for users which contains attributes such as first and last page viewed. | 
 | dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and campaign data |
@@ -42,7 +42,7 @@ Add the following to your `packages.yml` file:
 ```
 packages:
   - git: "https://github.com/Velir/dbt-ga4.git"
-    revision: 0.1.3
+    revision: 0.1.4
 ```
 
 ## Install From Local Directory
