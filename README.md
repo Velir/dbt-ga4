@@ -117,7 +117,7 @@ User-scoped event properties can be assigned using the following variable config
 ```
 user_properties:
   - event_parameter: "[your event parameter]"
-    user_propertyname: "[a unique name for the user property]"
+    user_property_name: "[a unique name for the user property]"
     value_type: "[one of string_value|int_value|float_value|double_value]"
 ```
 
@@ -134,7 +134,7 @@ vars:
           user_property_name: "most_recent_param"  
           value_type: "string_value"
 ```
-### Setting Conversion Events (Optional)
+### Conversion Events
 
 Specific event names can be specified as conversions by setting the `conversion_events` variable in your `dbt_project.yml` file. These events will be counted against each session and included in the `fct_sessions.sql` dimensional model. Ex:
 
