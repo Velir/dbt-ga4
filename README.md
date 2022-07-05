@@ -25,6 +25,14 @@ Features include:
 | dim_ga4__users | Dimension table for users which contains attributes such as first and last page viewed. | 
 | dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and campaign data |
 
+# Seeds
+
+| seed file | description |
+|-----------|-------------|
+| ga4_source_categories.csv| Google's mapping between `source` and `source_category`. Downloaded from https://support.google.com/analytics/answer/9756891?hl=en |
+
+Be sure to run `dbt seed` before you run `dbt run`.
+
 # Installation & Configuration
 ## Install from DBT Package Hub
 Add the following to your `packages.yml` file:
