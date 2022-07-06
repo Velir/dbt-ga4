@@ -9,6 +9,7 @@
 - Add 'previous page' to the pageviews model. (See https://www.ga4bigquery.com/page-tracking-dimensions-metrics-ga4/)
 - Add 'page path level 1, 2, 3 etc' to the pageviews model (See https://www.ga4bigquery.com/page-tracking-dimensions-metrics-ga4/)
 - Add a lookback window variable for user dimensions. it may be overly expensive to scan ALL events looking for first/last occurances of event parameters. 
+- Add common date dimension transformations (See https://www.ga4bigquery.com/date-and-time-dimensions-metrics-ga4/)
 - mechanism to take in an array variable listing custom events and output 1 model per event (is this possible?)
 - How to handle user_id vs. client_id?
 - move common event params to `base_ga4__events`
