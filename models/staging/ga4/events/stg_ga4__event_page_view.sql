@@ -3,7 +3,7 @@
       {{ ga4.unnest_key('event_params', 'entrances',  'int_value') }},
       {{ ga4.unnest_key('event_params', 'value', 'float_value') }}
       {% if var("page_view_custom_parameters", "none") != "none" %}
-        {{ stage_custom_parameters( var("page_view_custom_parameters") )}}
+        {{ ga4.stage_custom_parameters( var("page_view_custom_parameters") )}}
       {% endif %}
  from {{ref('stg_ga4__events')}}    
  where event_name = 'page_view'

@@ -152,6 +152,17 @@ vars:
       conversion_events:['purchase','download']
 ```
 
+### Custom Item Properties
+
+Custom item properties can be enabled against all ecommerce events by setting the `custom_item_parameters` variable in your `dbt_project.yml` file. These properties will be included in the ecommerce event's staging model where that event expects just a single item (like `select_item`) and in a stand-alone `stg_ga4__items.sql` table for events with one-to-many relationships to their items. Ex:
+
+```
+vars:
+  ga4:
+      custom_item_parameters:['size','color']
+```
+The columns will be prefixed with "item_" so the example "size" and "color" parameters would find the "items.size" and "items.color" fields in the source data and be saved as "item_size" and "item_color" in the relevant staging tables.
+
 # Incremental Loading of Event Data
 
 By default, GA4 exports data into sharded event tables that use the event date as the table suffix in the format of `events_YYYYMMDD`. This package incrementally loads data from these tables (and not the `intraday` tables) into `base_ga4__events` which is partitioned on date. There are two incremental loading strategies available:
