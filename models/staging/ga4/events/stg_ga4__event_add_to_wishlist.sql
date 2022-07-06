@@ -7,7 +7,7 @@
 {% endif %}
  with add_to_wishlist_with_params as (
    select * except (items),
-   (select items FROM UNNEST(items) items LIMIT 1) as items,
+   (select items FROM unnest(items) items LIMIT 1) as items,
       {{ ga4.unnest_key('event_params', 'currency') }},
       {{ ga4.unnest_key('event_params', 'value', 'float_value') }}
       {% if var("add_to_wishlist_custom_parameters", "none") != "none" %}

@@ -14,7 +14,7 @@
       {% if var("add_payment_info_custom_parameters", "none") != "none" %}
         {{ ga4.stage_custom_parameters( var("add_payment_info_custom_parameters") )}}
       {% endif %}
- from {{ref('stg_ga4__events')}}    
+ from {{ref('stg_ga4__events')}}
  where event_name = 'add_payment_info'
 )
 

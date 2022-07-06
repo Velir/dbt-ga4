@@ -12,7 +12,7 @@ with view_cart_with_params as (
     {% if var("view_cart_custom_parameters", "none") != "none" %}
       {{ ga4.stage_custom_parameters( var("view_cart_custom_parameters") )}}
     {% endif %}
- from {{ref('stg_ga4__events')}}    
+ from {{ref('stg_ga4__events')}}
  where event_name = 'view_cart'
 )
 
