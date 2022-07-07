@@ -1,10 +1,8 @@
-{% if var('ecommerce', false ) ==  false %}
-  {{
-    config(
-        enabled = false,
-    )
-  }}
-{% endif %}
+{{
+  config(
+      enabled = false,
+  )
+}}
  with begin_checkout_with_params as (
    select *
     {% if var("begin_checkout_custom_parameters", "none") != "none" %}

@@ -142,6 +142,10 @@ vars:
           user_property_name: "most_recent_param"  
           value_type: "string_value"
 ```
+### GA4 Recommended Events
+
+See the README file at /dbt_packages/models/staging/ga4/recommended_events for instructions on enabling [Google's recommended events](https://support.google.com/analytics/answer/9267735?hl=en).
+
 ### Conversion Events
 
 Specific event names can be specified as conversions by setting the `conversion_events` variable in your `dbt_project.yml` file. These events will be counted against each session and included in the `fct_sessions.sql` dimensional model. Ex:
@@ -151,17 +155,6 @@ vars:
   ga4:
       conversion_events:['purchase','download']
 ```
-
-### Custom Item Properties
-
-Custom item properties can be enabled against all ecommerce events by setting the `custom_item_parameters` variable in your `dbt_project.yml` file. These properties will be included in the ecommerce event's staging model where that event expects just a single item (like `select_item`) and in a stand-alone `stg_ga4__items.sql` table for events with one-to-many relationships to their items. Ex:
-
-```
-vars:
-  ga4:
-      custom_item_parameters:['size','color']
-```
-The columns will be prefixed with "item_" so the example "size" and "color" parameters would find the "items.size" and "items.color" fields in the source data and be saved as "item_size" and "item_color" in the relevant staging tables.
 
 # Incremental Loading of Event Data
 

@@ -1,10 +1,8 @@
-{% if var('ecommerce', false ) ==  false %}
-    {{
-      config(
-          enabled = false,
-      )
-  }}
-{% endif %}
+{{
+  config(
+      enabled = false,
+  )
+}}
  with add_to_wishlist_with_params as (
    select * except (items),
    (select items FROM unnest(items) items LIMIT 1) as items,

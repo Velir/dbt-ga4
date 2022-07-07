@@ -1,10 +1,8 @@
-{% if var('ecommerce', false ) ==  false %}
-    {{
-      config(
-          enabled = false,
-      )
-  }}
-{% endif %}
+{{
+  config(
+      enabled = false,
+  )
+}}
 with purchase_with_params as (
   select * except (ecommerce),
     ecommerce.total_item_quantity,

@@ -1,10 +1,9 @@
- {% if var('ecommerce', false ) ==  false %}
-     {{
-        config(
-            enabled = false,
-        )
-    }}
- {% endif %}
+{{
+    config(
+        enabled = false,
+    )
+}}
+
  with items_with_params as (
     select
         event_key,

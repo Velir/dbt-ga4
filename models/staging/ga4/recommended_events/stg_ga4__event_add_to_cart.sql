@@ -1,10 +1,8 @@
-  {% if var('ecommerce', false ) ==  false %}
-     {{
-        config(
-            enabled = false,
-        )
-    }}
- {% endif %}
+{{
+  config(
+      enabled = false,
+  )
+}}
  with add_to_cart_with_params as (
    select *except (items),
    (select items FROM UNNEST(items) items LIMIT 1) as items

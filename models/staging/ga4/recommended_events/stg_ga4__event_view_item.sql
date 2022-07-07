@@ -1,10 +1,8 @@
-{% if var('ecommerce', false ) ==  false %}
-    {{
-      config(
-          enabled = false,
-      )
-  }}
-{% endif %}
+{{
+  config(
+      enabled = false,
+  )
+}}
 with view_item_with_params as (
   select * except (items),
   (select items from unnest(items) items limit 1) as items

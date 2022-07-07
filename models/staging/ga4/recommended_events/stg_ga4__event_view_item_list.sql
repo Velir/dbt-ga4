@@ -1,10 +1,8 @@
-{% if var('ecommerce', false ) ==  false %}
-    {{
-      config(
-          enabled = false,
-      )
-  }}
-{% endif %}
+{{
+  config(
+      enabled = false,
+  )
+}}
 with view_item_list_with_params as (
   select *
   {% if var("view_item_list_custom_parameters", "none") != "none" %}

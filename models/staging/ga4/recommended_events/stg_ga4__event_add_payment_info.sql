@@ -1,10 +1,9 @@
-  {% if var('ecommerce', false ) ==  false %}
-     {{
-        config(
-            enabled = false,
-        )
-    }}
- {% endif %}
+{{
+  config(
+      enabled = false,
+  )
+}}
+
  with add_payment_info_with_params as (
    select *,
       {{ ga4.unnest_key('event_params', 'coupon') }},

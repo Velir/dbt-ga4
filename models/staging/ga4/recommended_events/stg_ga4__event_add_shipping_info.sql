@@ -1,12 +1,10 @@
-  {% if var('ecommerce', false ) ==  false %}
-     {{
-        config(
-            enabled = false,
-        )
-    }}
- {% endif %}
+{{
+  config(
+      enabled = false,
+  )
+}}
  with add_shipping_info_with_params as (
-   select * except(ecommerce),
+   select *,
       {{ ga4.unnest_key('event_params', 'coupon') }},
       {{ ga4.unnest_key('event_params', 'currency') }},
       {{ ga4.unnest_key('event_params', 'shipping_tier') }},

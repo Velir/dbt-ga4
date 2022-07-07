@@ -1,10 +1,8 @@
-{% if var('ecommerce', false ) ==  false %}
-    {{
-      config(
-          enabled = false,
-      )
-  }}
-{% endif %}
+{{
+  config(
+      enabled = false,
+  )
+}}
 with view_cart_with_params as (
   select *,
     {{ ga4.unnest_key('event_params', 'currency') }},
