@@ -1,3 +1,7 @@
+{{
+    config(materialized = "table")
+}}
+
 with page_views_first_last as (
     select
         client_id,
