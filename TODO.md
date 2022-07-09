@@ -11,7 +11,7 @@
 - Add a lookback window variable for user dimensions. it may be overly expensive to scan ALL events looking for first/last occurances of event parameters. 
 - Add common date dimension transformations (See https://www.ga4bigquery.com/date-and-time-dimensions-metrics-ga4/)
 - mechanism to take in an array variable listing custom events and output 1 model per event (is this possible?)
-- How to handle user_id vs. client_id?
+- Handle user_id and client_id: If User_id exists, set it as the `user_key` otherwise use `client_id`. If `client_id` doesn't exist and privacy settings are enabled, set `user_key` to key off the `session_key`. This strategy should ensure that there is always a `user_key` available and that it joins multiple devices when possible.
 - move common event params to `base_ga4__events`
     - engagement_time_msec
     - ga_session_id
