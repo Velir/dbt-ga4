@@ -2,8 +2,12 @@
   enabled = true if var('user_properties', false) != false else false
 ) }}
 
-
-with unnest_user_properties as
+-- Remove null user_keys (users with privacy enabled)
+with events_from_valid_users as (
+    select * from {{ref('stg_ga4__events')}}
+    where user_key is not null
+),
+unnest_user_properties as
 (
     select 
         user_key,
@@ -11,7 +15,7 @@ with unnest_user_properties as
         {% for up in var('user_properties', []) %}
             ,{{ ga4.unnest_key('event_params',  up.event_parameter ,  up.value_type ) }}
         {% endfor %}
-    from {{ref('stg_ga4__events')}}
+    from events_from_valid_users
 )
 -- create 1 CTE per user property that pulls only events with non-null values for that event parameters. 
 -- Find the most recent property for that user and join later

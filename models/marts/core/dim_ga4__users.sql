@@ -11,6 +11,7 @@ with users as (
         sum(is_page_view) as num_page_views,
         sum(is_purchase) as num_purchases
     from {{ref('stg_ga4__events')}}
+    where user_key is not null -- Remove users with privacy settings enabled
     group by 1
 
 ),

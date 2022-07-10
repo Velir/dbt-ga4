@@ -4,6 +4,7 @@ with page_views_first_last as (
         FIRST_VALUE(event_key) OVER (PARTITION BY user_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS first_page_view_event_key,
         LAST_VALUE(event_key) OVER (PARTITION BY user_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS last_page_view_event_key
     from {{ref('stg_ga4__event_page_view')}}
+    where user_key is not null -- Remove users with privacy settings enabled
 ),
 page_views_by_user_key as (
     select distinct
