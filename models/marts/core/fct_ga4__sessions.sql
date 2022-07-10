@@ -4,7 +4,7 @@ with session_metrics as
 (
     select 
         session_key,
-        client_id,
+        user_key,
         min(event_date_dt) as session_start_date,
         min(event_timestamp) as session_start_timestamp,
         countif(event_name = 'page_view') as count_page_views,

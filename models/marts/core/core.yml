@@ -8,9 +8,9 @@ models:
         tests:
           - unique
   - name: dim_ga4__users
-    description: Dimension table for users (specifically, client_id's) which includes data from the first and last event produced by the user. Unique on client_id
+    description: Dimension table for users which includes data from the first and last event produced by the user. Unique on user_key
     columns:
-      - name: client_id
+      - name: user_key
         tests:
           - unique
   - name: fct_ga4__sessions

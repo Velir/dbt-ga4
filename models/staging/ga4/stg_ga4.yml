@@ -14,15 +14,15 @@ models:
   - name: stg_ga4__event_purchase
     description: GA4 events filtered to only show 'purchase' events. Pivots common event parameters into separate columns. 
   - name: stg_ga4__users_first_last_pageviews
-    description: Captures data related to the first and last page view that each user has completed (by client_id).
+    description: Captures data related to the first and last page view that each user has completed (by user_key).
     columns:
-      - name: client_id
+      - name: user_key
         tests:
           - unique
   - name: stg_ga4__users_first_last_events
     description: Captures the first and last event completed by the user in order to pull in the first and last geo, device, and traffic source seen from the user
     columns:
-      - name: client_id
+      - name: user_key
         tests: 
           - unique
   - name: stg_ga4__events
@@ -34,9 +34,9 @@ models:
   - name: stg_ga4__event_scroll
     description: Staging model containing only 'scroll' events. Includes the 'percent_scrolled' parameter.
   - name: stg_ga4__user_properties
-    description: Optional model that will pull out the most recent instance of a particular event parameter for each client_id. Later used in the dim_ga4__users dimension table.
+    description: Optional model that will pull out the most recent instance of a particular event parameter for each user_key. Later used in the dim_ga4__users dimension table.
     columns:
-      - name: client_id
+      - name: user_key
         tests:
           - unique  
   - name: stg_ga4__session_conversions

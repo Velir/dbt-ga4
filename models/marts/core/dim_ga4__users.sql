@@ -2,7 +2,7 @@
 
 with users as (
     select 
-        client_id,
+        user_key,
         min(event_timestamp) as first_seen_timestamp,
         min(event_date_dt) as first_seen_dt,
         max(event_timestamp) as last_seen_timestamp,
@@ -25,7 +25,7 @@ include_first_last_events as (
         first_last_events.last_traffic_source,
     from users 
     left join {{ref('stg_ga4__users_first_last_events')}} as first_last_events on
-        users.client_id = first_last_events.client_id
+        users.user_key = first_last_events.user_key
 ),
 include_first_last_page_views as (
     select 
@@ -38,11 +38,11 @@ include_first_last_page_views as (
         first_last_page_views.last_page_referrer
     from include_first_last_events 
     left join {{ref('stg_ga4__users_first_last_pageviews')}} as first_last_page_views on
-        include_first_last_events.client_id = first_last_page_views.client_id
+        include_first_last_events.user_key = first_last_page_views.user_key
 )
 
 select * from include_first_last_page_views
 {% if var('user_properties', false) %}
 -- If custom user properties have been assigned as variables, join them on the client ID
-left join {{ref('stg_ga4__user_properties')}} using (client_id)
+left join {{ref('stg_ga4__user_properties')}} using (user_key)
 {% endif %}
