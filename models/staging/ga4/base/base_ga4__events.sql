@@ -52,7 +52,11 @@ with source as (
         ecommerce,
         items,
     from {{ source('ga4', 'events') }}
-    where _table_suffix not like '%intraday%' -- intraday events are supported through the project variable: include_intraday_events
+    {%  if var('frequency', 'daily') == 'daily' %}
+        where _table_suffix not like '%intraday%' -- intraday events are supported through the project variable: include_intraday_events
+    {% elseif var('frequency', 'daily') == 'streaming' %}
+        where _table_suffix like '%intraday%'  -- for sites that don't use batch export
+    {% endif %}
     and cast(_table_suffix as int64) >= {{var('start_date')}}
     {% if is_incremental() %}
         {% if var('static_incremental_days', false ) ==  true %}

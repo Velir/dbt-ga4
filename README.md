@@ -73,6 +73,7 @@ vars:
         dataset: "your_ga4_dataset"
         start_date: "YYYYMMDD" # Earliest date to load
         include_intraday_events: true # false|true depending on whether an intraday event table exists
+        frequency: "daily" # daily|streaming use this to only get streaming data; disables include_intraday_events when set to "streaming"
 ```
 
 If you don't have any GA4 data of your own, you can connect to Google's public data set with the following settings:
