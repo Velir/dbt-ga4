@@ -45,3 +45,21 @@ models:
           - unique  
   - name: stg_ga4__session_conversions
     description: Optional model that counts the number of events listed in the 'conversion_events' var. Aggregated by session_key.
+  - name: stg_ga4__sessions_traffic_sources
+    description: Finds the first session source, medium and campaign and adds the default channel grouping information. Aggregated by session_key.
+    columns:
+      - name: session_key
+        tests:
+          - unique
+      - name: session_source
+        description: source value of the first event of the session after session_start and first_visit
+        tests:
+          - not_null
+      - name: session_medium
+        description: medium value of the first event of the session after session_start and first_visit
+        tests:
+          - not_null
+      - name: session_campaign
+        description: campaign value of the first event of the session after session_start and first_visit
+        tests:
+          - not_null
