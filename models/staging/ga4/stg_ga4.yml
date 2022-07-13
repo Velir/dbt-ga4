@@ -53,7 +53,13 @@ models:
           - unique
       - name: session_source
         description: source value of the first event of the session after session_start and first_visit
+        tests:
+          - not_null
       - name: session_medium
         description: medium value of the first event of the session after session_start and first_visit
+        tests:
+          - not_null
       - name: session_campaign
         description: campaign value of the first event of the session after session_start and first_visit
+        tests:
+          - not_null
