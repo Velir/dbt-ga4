@@ -1,5 +1,6 @@
 {{ config(
-  enabled = true if var('user_properties', false) != false else false
+  enabled = true if var('user_properties', false) != false else false,
+  materialized = "table"
 ) }}
 
 
