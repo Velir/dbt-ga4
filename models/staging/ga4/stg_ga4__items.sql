@@ -7,6 +7,7 @@
  with items_with_params as (
     select
         event_key,
+        event_name,
         i.item_id,
         i.item_name,
         i.item_brand,
