@@ -22,6 +22,7 @@ Features include:
 | stg_ga4__user_properties | Finds the most recent occurance of specific event_params and assigns them to a user's client_id. User properties are specified as variables (see documentation below) |
 | stg_ga4__session_conversions | Produces session-grouped event counts for a configurable list of event names (see documentation below) |
 | stg_ga4__sessions_traffic_sources | Finds the source, medium, and default channel grouping for each session |
+| stg_ga4__items | Extracts the items array to simplify querying.
 | dim_ga4__users | Dimension table for users which contains attributes such as first and last page viewed. | 
 | dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and campaign data |
 
@@ -72,8 +73,7 @@ vars:
         project: "your_gcp_project"
         dataset: "your_ga4_dataset"
         start_date: "YYYYMMDD" # Earliest date to load
-        include_intraday_events: true # false|true depending on whether an intraday event table exists
-        frequency: "daily" # daily|streaming use this to only get streaming data; disables include_intraday_events when set to "streaming"
+        frequency: "daily" # daily|streaming|daily+streaming Match to the type of export configured in GA4; daily+streaming appends today's intraday data to daily data
 ```
 
 If you don't have any GA4 data of your own, you can connect to Google's public data set with the following settings:
@@ -161,9 +161,19 @@ By default, GA4 exports data into sharded event tables that use the event date a
 
 - Static incremental partitions - This strategy incrementally loads in the last X days worth of data regardless of what data is availabe. In certain cases, this improves performance because the `max(event_date)` does not need to be calculated dynamically. This is enabled when the `static_incremental_days` variable is set to an integers. A setting of `3` would load data from `current_date - 1` `current_date - 2` and `current_date - 3`. Note that `current_date` uses UTC as the timezone.
 
-## Intraday Events
+## Frequency
 
-Users can enable the inclusion of intraday data by setting `include_intraday_events: true`. Intraday events are not included in incremental loads, but are instead unioned with historical events.
+The value of the "frequency" variable should match the "Frequency" setting on GA4's BigQuery Linking Admin page.
+
+| GA4 | dbt_project.yml |
+|-----|-----------------|
+| Daily | "daily" |
+| Streaming | "streaming" |
+| both Daily and Streaming | "daily+streaming" |
+
+The daily option is for sites that use just the daily, batch export. It can also be used as a substitute for the "daily+streaming" option where you don't care about including today's data so it doesn't strictly need to match the GA4 "Frequency" setting.
+The streaming option is for sites that only use the streaming export. The streaming export is not constrained by Google's one million event daily limit and so is the best option for sites that may exceed that limit. Selecting both "Daily" and "Streaming" in GA4 causes the streaming, intraday BigQuery tables to be deleted when the daily, batch tables are updated.
+The "daily+streaming" option uses the daily batch export and unions the streaming intraday tables. It is intended to append today's data from the streaming intraday to the batch tables.
 
 # Connecting to BigQuery
 

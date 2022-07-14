@@ -51,13 +51,17 @@ with source as (
         platform,
         ecommerce,
         items,
-    from {{ source('ga4', 'events') }}
-    {%  if var('frequency', 'daily') == 'daily' %}
-        where _table_suffix not like '%intraday%' -- intraday events are supported through the project variable: include_intraday_events
-    {% elseif var('frequency', 'daily') == 'streaming' %}
-        where _table_suffix like '%intraday%'  -- for sites that don't use batch export
+    {%  if var('frequency', 'daily') == 'streaming' %}
+        from {{ source('ga4', 'events_intraday') }}
+        where _table_suffix like '%intraday%'  -- for sites that don't use batch/daily export
+        --and cast( regexp_extract(_table_suffix, r'[0-9]+' ) as int64) >= {{var('start_date')}}
+        and cast( _table_suffix as int64) >= {{var('start_date')}}
+    {% else %}
+        from {{ source('ga4', 'events') }}
+        where _table_suffix not like '%intraday%'
+        and cast( _table_suffix as int64) >= {{var('start_date')}}
     {% endif %}
-    and cast(_table_suffix as int64) >= {{var('start_date')}}
+    
     {% if is_incremental() %}
         {% if var('static_incremental_days', false ) ==  true %}
             and parse_date('%Y%m%d', event_date) in ({{ partitions_to_replace | join(',') }})
