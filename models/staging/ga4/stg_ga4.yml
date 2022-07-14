@@ -26,7 +26,11 @@ models:
         tests: 
           - unique
   - name: stg_ga4__items
-    description: Captures the items data from ecommerce events to be joined on event_timestamp, event_name, and user_pseudo_id
+    description: Captures the items data from ecommerce events.
+    columns:
+      - name: event_key
+        tests:
+          - unique
   - name: stg_ga4__events
     description: Staging model that contains window functions used to generate unique keys
     columns:
