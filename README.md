@@ -159,7 +159,7 @@ By default, GA4 exports data into sharded event tables that use the event date a
 
 - Dynamic incremental partitions (Default) - This strategy queries the destination table to find the latest date available. Data beyond that date range is loaded in incrementally on each run.
 
-- Static incremental partitions - This strategy incrementally loads in the last X days worth of data regardless of what data is availabe. In certain cases, this improves performance because the `max(event_date)` does not need to be calculated dynamically. This is enabled when the `static_incremental_days` variable is set to an integers. A setting of `3` would load data from `current_date - 1` `current_date - 2` and `current_date - 3`. Note that `current_date` uses UTC as the timezone.
+- Static incremental partitions - This strategy incrementally loads in the last X days worth of data regardless of what data is availabe. In certain cases, this improves performance because the `max(event_date)` does not need to be calculated dynamically. This is enabled when the `static_incremental_days` variable is set to an integer. A setting of `3` would load data from `current_date - 1` `current_date - 2` and `current_date - 3`. Note that `current_date` uses UTC as the timezone.
 
 ## Frequency
 

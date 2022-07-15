@@ -1,5 +1,7 @@
-{% if var('static_incremental_days', false ) ==  true %}
-    {% set partitions_to_replace = [] %}
+{% if var('static_incremental_days')|int != 0 %}
+    {% set partitions_to_replace = [
+        'current_date'
+    ] %}
     {% for i in range(var('static_incremental_days')) %}
         {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
     {% endfor %}
@@ -53,9 +55,7 @@ with source as (
         items,
     {%  if var('frequency', 'daily') == 'streaming' %}
         from {{ source('ga4', 'events_intraday') }}
-        where _table_suffix like '%intraday%'  -- for sites that don't use batch/daily export
-        --and cast( regexp_extract(_table_suffix, r'[0-9]+' ) as int64) >= {{var('start_date')}}
-        and cast( _table_suffix as int64) >= {{var('start_date')}}
+        where cast( _table_suffix as int64) >= {{var('start_date')}}
     {% else %}
         from {{ source('ga4', 'events') }}
         where _table_suffix not like '%intraday%'
@@ -63,8 +63,9 @@ with source as (
     {% endif %}
     
     {% if is_incremental() %}
-        {% if var('static_incremental_days', false ) ==  true %}
-            and parse_date('%Y%m%d', event_date) in ({{ partitions_to_replace | join(',') }})
+        {% if var('static_incremental_days')|int != 0 %}
+            --and parse_date('%Y%m%d', event_date) in ({{ partitions_to_replace | join(',') }})
+            and parse_date('%Y%m%d', _TABLE_SUFFIX) in ({{ partitions_to_replace | join(',') }})
         {% else %}
             -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
             -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
