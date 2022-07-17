@@ -6,14 +6,11 @@
 
 # TODO
 
-- Add 'previous page' to the pageviews model. (See https://www.ga4bigquery.com/page-tracking-dimensions-metrics-ga4/)
-- Add 'page path level 1, 2, 3 etc' to the pageviews model (See https://www.ga4bigquery.com/page-tracking-dimensions-metrics-ga4/)
 - Add a lookback window variable for user dimensions. it may be overly expensive to scan ALL events looking for first/last occurances of event parameters. 
 - Add common date dimension transformations (See https://www.ga4bigquery.com/date-and-time-dimensions-metrics-ga4/)
 - mechanism to take in an array variable listing custom events and output 1 model per event (is this possible?)
-- How to handle user_id vs. client_id?
+- Handle user_id and client_id: If User_id exists, set it as the `user_key` otherwise use `client_id`. If `client_id` doesn't exist and privacy settings are enabled, set `user_key` to key off the `session_key`. This strategy should ensure that there is always a `user_key` available and that it joins multiple devices when possible.
 - move common event params to `base_ga4__events`
-    - engagement_time_msec
     - ga_session_id
     - session_engaged
     - page_title
@@ -49,18 +46,6 @@
 - Update `dim_sessions` to pull based on session key rather than session_start event
 - Merge and clean up dim_sessions & fct_sessions. Just consider it ga4__sessions and ga4__users.
 - Use Fivetran's `union_data` method (or something similar) to handle multiple, unioned GA4 exports. https://github.com/fivetran/dbt_xero_source/blob/main/models/tmp/stg_xero__account_tmp.sql
-
-## Discussion: Set dynamic vs. static partitioning using a variable
-Damon:
-GA4 SLA: https://support.google.com/analytics/answer/11198161?hl=en
-
-When I've done dynamic partitioning, I usually use two days worth of data: yesterday and the day before. This gives time to for systems to recover from errors without the data engineer needing to do anything to fix the data. However, given the longest processing time listed in the document above is Daily, 24+ hours late, the freshest, processed data on Premium XLarge properties can be two days old. 
-
-Currently, base_ga4__events_dynamic_partition.example, picks up where the previous operation left off.
-
-It may be better to get the last x days and reprocess and replace some data in order to allow for bugs and reprocessing on Google's side.
-
-I don't think this is worth discussing now, but we should keep it in mind as a possible alternate solution that reduces maintenance work.
 
 ## Discussion: Configuration to create custom dimensions
 
