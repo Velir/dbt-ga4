@@ -1,10 +1,4 @@
-{{
-    config(
-        enabled = false,
-    )
-}}
-
- with items_with_params as (
+with items_with_params as (
     select
         event_key,
         event_name,
