@@ -29,6 +29,12 @@ models:
       - name: client_id
         tests: 
           - unique
+  - name: stg_ga4__items
+    description: Captures the items data from ecommerce events.
+    columns:
+      - name: event_key
+        tests:
+          - unique
   - name: stg_ga4__events
     description: Staging model that contains window functions used to generate unique keys
     columns:
@@ -45,6 +51,8 @@ models:
           - unique  
   - name: stg_ga4__session_conversions
     description: Optional model that counts the number of events listed in the 'conversion_events' var. Aggregated by session_key.
+  - name: stg_ga4__event_items
+    description: Flattens out the 'items' field for e-commerce events such as purchase and add_to_cart
   - name: stg_ga4__sessions_traffic_sources
     description: Finds the first session source, medium and campaign and adds the default channel grouping information. Aggregated by session_key.
     columns:

@@ -8,7 +8,7 @@
       case when split(split(page_location,'/')[safe_ordinal(6)],'?')[safe_ordinal(1)] = '' then null else concat('/',split(split(page_location,'/')[safe_ordinal(6)],'?')[safe_ordinal(1)]) end as pagepath_level_3,
       case when split(split(page_location,'/')[safe_ordinal(7)],'?')[safe_ordinal(1)] = '' then null else concat('/',split(split(page_location,'/')[safe_ordinal(7)],'?')[safe_ordinal(1)]) end as pagepath_level_4,
       {% if var("page_view_custom_parameters", "none") != "none" %}
-        {{ stage_custom_parameters( var("page_view_custom_parameters") )}}
+        {{ ga4.stage_custom_parameters( var("page_view_custom_parameters") )}}
       {% endif %}
  from {{ref('stg_ga4__events')}}    
  where event_name = 'page_view'
