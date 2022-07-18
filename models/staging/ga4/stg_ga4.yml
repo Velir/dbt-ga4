@@ -9,6 +9,10 @@ models:
     description: This model pivots the query string parameters contained within the event's page_location field to become rows. Each row is a single parameter/value combination contained in a single event's query string.
   - name: stg_ga4__event_page_view
     description: GA4 events filtered to only show 'page_view' events. Pivots common event parameters into separate columns. Identifies the first and last pageview in the 'is_entrance' and 'is_exit' columns. 
+    columns: 
+      - name: page_location
+        tests:
+          - not_null
   - name: stg_ga4__event_session_start
     description: GA4 events filtered to only show 'session_start' events. Pivots common event parameters into separate columns. 
   - name: stg_ga4__event_purchase
@@ -24,6 +28,12 @@ models:
     columns:
       - name: user_key
         tests: 
+          - unique
+  - name: stg_ga4__items
+    description: Captures the items data from ecommerce events.
+    columns:
+      - name: event_key
+        tests:
           - unique
   - name: stg_ga4__events
     description: Staging model that contains window functions used to generate unique keys
@@ -41,3 +51,23 @@ models:
           - unique  
   - name: stg_ga4__session_conversions
     description: Optional model that counts the number of events listed in the 'conversion_events' var. Aggregated by session_key.
+  - name: stg_ga4__event_items
+    description: Flattens out the 'items' field for e-commerce events such as purchase and add_to_cart
+  - name: stg_ga4__sessions_traffic_sources
+    description: Finds the first session source, medium and campaign and adds the default channel grouping information. Aggregated by session_key.
+    columns:
+      - name: session_key
+        tests:
+          - unique
+      - name: session_source
+        description: source value of the first event of the session after session_start and first_visit
+        tests:
+          - not_null
+      - name: session_medium
+        description: medium value of the first event of the session after session_start and first_visit
+        tests:
+          - not_null
+      - name: session_campaign
+        description: campaign value of the first event of the session after session_start and first_visit
+        tests:
+          - not_null

@@ -1,3 +1,7 @@
+{{
+    config(materialized = "table")
+}}
+
 with first_last_event as (
     select
         user_key,
