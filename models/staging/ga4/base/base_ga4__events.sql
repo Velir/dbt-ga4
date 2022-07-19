@@ -12,7 +12,6 @@
                 "data_type": "date",
             },
             partitions = partitions_to_replace,
-            labels = {'static_incremental_days': 'is_set'}
         )
     }}
 {% else %}
@@ -24,7 +23,6 @@
                 "field": "event_date_dt",
                 "data_type": "date",
             },
-            labels = {'static_incremental_days': 'not_set'}
         )
     }}
 {% endif %}
@@ -59,12 +57,10 @@ with source as (
     {% if is_incremental() %}
         {% if var('static_incremental_days', false ) %}
             and parse_date('%Y%m%d', event_date) in ({{ partitions_to_replace | join(',') }})
-            and platform not in ("static_incremental_days is set")
         {% else %}
             -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
             -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
             and parse_date('%Y%m%d',_TABLE_SUFFIX) >= _dbt_max_partition
-            and platform not in ("static_incremental_days is not set")
         {% endif %}
     {% endif %}
 ),
