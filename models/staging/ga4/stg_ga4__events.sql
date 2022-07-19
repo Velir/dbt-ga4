@@ -7,12 +7,23 @@ with base_events as (
     select * from {{ref('base_ga4__events_intraday')}}
     {% endif %}
 ),
+-- Add a unique key for the user that checks for user_id and then pseudo_user_id
+add_user_key as (
+    select 
+        *,
+        case
+            when user_id is not null then md5(user_id)
+            when user_pseudo_id is not null then md5(user_pseudo_id)
+            else null -- this case is reached when privacy settings are enabled
+        end as user_key
+    from base_events
+), 
 -- Add unique keys for sessions and events
 include_session_key as (
     select 
-        base_events.*,
-        md5(CONCAT(stream_id, client_id, cast(ga_session_id as STRING))) as session_key -- Surrogate key to determine unique session across streams and users. Sessions do NOT reset after midnight in GA4
-    from base_events
+        *,
+        md5(CONCAT(stream_id, CAST(TO_BASE64(user_key) as STRING), cast(ga_session_id as STRING))) as session_key -- Surrogate key to determine unique session across streams and users. Sessions do NOT reset after midnight in GA4
+    from add_user_key
 ),
 include_event_number as (
     select include_session_key.*,

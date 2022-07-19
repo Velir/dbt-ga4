@@ -3,16 +3,20 @@
   materialized = "table"
 ) }}
 
-
-with unnest_user_properties as
+-- Remove null user_keys (users with privacy enabled)
+with events_from_valid_users as (
+    select * from {{ref('stg_ga4__events')}}
+    where user_key is not null
+),
+unnest_user_properties as
 (
     select 
-        client_id,
+        user_key,
         event_timestamp
         {% for up in var('user_properties', []) %}
             ,{{ ga4.unnest_key('event_params',  up.event_parameter ,  up.value_type ) }}
         {% endfor %}
-    from {{ref('stg_ga4__events')}}
+    from events_from_valid_users
 )
 -- create 1 CTE per user property that pulls only events with non-null values for that event parameters. 
 -- Find the most recent property for that user and join later
@@ -20,7 +24,7 @@ with unnest_user_properties as
 ,non_null_{{up.event_parameter}} as
 (
     select
-        client_id,
+        user_key,
         event_timestamp,
         {{up.event_parameter}}
     from unnest_user_properties
@@ -30,36 +34,36 @@ with unnest_user_properties as
 last_value_{{up.event_parameter}} as 
 (
     select
-        client_id,
-        LAST_VALUE({{ up.event_parameter }}) OVER (PARTITION BY client_id ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS {{up.user_property_name}}
+        user_key,
+        LAST_VALUE({{ up.event_parameter }}) OVER (PARTITION BY user_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS {{up.user_property_name}}
     from non_null_{{up.event_parameter}}
 ),
 last_value_{{up.event_parameter}}_grouped as 
 (
     select
-        client_id,
+        user_key,
         {{up.user_property_name}}
     from last_value_{{up.event_parameter}}
-    group by client_id, {{up.user_property_name}}
+    group by user_key, {{up.user_property_name}}
 )
 {% endfor %}
 ,
-client_ids as 
+user_keys as 
 (
     select distinct
-        client_id
+        user_key
     from unnest_user_properties
 ),
 join_properties as 
 (
     select
-        client_id
+        user_key
         {% for up in var('user_properties', []) %}
         ,last_value_{{up.event_parameter}}_grouped.{{up.user_property_name}}
         {% endfor %}
-    from client_ids
+    from user_keys
     {% for up in var('user_properties', []) %}
-    left join last_value_{{up.event_parameter}}_grouped using (client_id)
+    left join last_value_{{up.event_parameter}}_grouped using (user_key)
     {% endfor %}
 )
 
