@@ -38,7 +38,7 @@ with source as (
         event_bundle_sequence_id,
         event_server_timestamp_offset,
         user_id,
-        user_pseudo_id as client_id,
+        user_pseudo_id,
         privacy_info,
         user_properties,
         user_first_touch_timestamp,
@@ -57,6 +57,7 @@ with source as (
     {% if is_incremental() %}
         {% if var('static_incremental_days', false ) %}
             and parse_date('%Y%m%d', event_date) in ({{ partitions_to_replace | join(',') }})
+            and platform not in ("static_incremental_days is set")
         {% else %}
             -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
             -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
@@ -75,7 +76,7 @@ renamed as (
         event_bundle_sequence_id,
         event_server_timestamp_offset,
         user_id,
-        client_id,
+        user_pseudo_id,
         privacy_info,
         user_properties,
         user_first_touch_timestamp,
