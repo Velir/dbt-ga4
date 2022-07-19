@@ -56,7 +56,7 @@ with source as (
     and cast(_table_suffix as int64) >= {{var('start_date')}}
     {% if is_incremental() %}
         {% if var('static_incremental_days', false ) %}
-            and parse_date('%Y%m%d', event_date) in ({{ partitions_to_replace | join(',') }})
+            and parse_date('%Y%m%d', _TABLE_SUFFIX) in ({{ partitions_to_replace | join(',') }})
         {% else %}
             -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
             -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
