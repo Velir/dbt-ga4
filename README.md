@@ -119,6 +119,20 @@ vars:
           - name: "country_code"
             value_type: "int_value"
 ```
+### User Properties
+
+User properties are provided by GA4 in the `user_properties` repeated field. The most recent user property for each user can be extracted by configuring the `user_properties` variable in your project as follows:
+
+```
+vars:
+  ga4:
+    user_properties:
+      - user_property_name: "membership_level"
+        value_type: "int_value"
+      - user_property_name: "account_status"
+        value_type: "string_value"
+```
+
 ### Derived User Properties
 
 Derived user properties are different from "User Properties" in that they are derived from event parameters. This provides additional flexibility in allowing operators to turn any event parameter into a user parameter. 
