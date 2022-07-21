@@ -1,7 +1,5 @@
-{% if var('static_incremental_days')|int != 0 %}
-    {% set partitions_to_replace = [
-        'current_date'
-    ] %}
+{% if var('static_incremental_days', false ) %}
+    {% set partitions_to_replace = [] %}
     {% for i in range(var('static_incremental_days')) %}
         {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
     {% endfor %}
@@ -10,10 +8,10 @@
             materialized = 'incremental',
             incremental_strategy = 'insert_overwrite',
             partition_by={
-            "field": "event_date_dt",
-            "data_type": "date",
+                "field": "event_date_dt",
+                "data_type": "date",
             },
-            partitions = partitions_to_replace
+            partitions = partitions_to_replace,
         )
     }}
 {% else %}
@@ -22,9 +20,9 @@
             materialized = 'incremental',
             incremental_strategy = 'insert_overwrite',
             partition_by={
-            "field": "event_date_dt",
-            "data_type": "date",
-            }
+                "field": "event_date_dt",
+                "data_type": "date",
+            },
         )
     }}
 {% endif %}
@@ -40,7 +38,7 @@ with source as (
         event_bundle_sequence_id,
         event_server_timestamp_offset,
         user_id,
-        user_pseudo_id as client_id,
+        user_pseudo_id,
         privacy_info,
         user_properties,
         user_first_touch_timestamp,
@@ -63,14 +61,14 @@ with source as (
     {% endif %}
     
     {% if is_incremental() %}
-        {% if var('static_incremental_days')|int != 0 %}
-            --and parse_date('%Y%m%d', event_date) in ({{ partitions_to_replace | join(',') }})
+
+        {% if var('static_incremental_days', false ) %}
             and parse_date('%Y%m%d', _TABLE_SUFFIX) in ({{ partitions_to_replace | join(',') }})
         {% else %}
             -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
             -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
             and parse_date('%Y%m%d',_TABLE_SUFFIX) >= _dbt_max_partition
-        {% endif %} 
+        {% endif %}
     {% endif %}
 ),
 renamed as (
@@ -84,7 +82,7 @@ renamed as (
         event_bundle_sequence_id,
         event_server_timestamp_offset,
         user_id,
-        client_id,
+        user_pseudo_id,
         privacy_info,
         user_properties,
         user_first_touch_timestamp,
@@ -100,12 +98,13 @@ renamed as (
         {{ ga4.unnest_key('event_params', 'ga_session_id', 'int_value') }},
         {{ ga4.unnest_key('event_params', 'page_location') }},
         {{ ga4.unnest_key('event_params', 'ga_session_number',  'int_value') }},
-        {{ ga4.unnest_key('event_params', 'session_engaged', 'int_value') }},
+        (case when (SELECT value.string_value FROM unnest(event_params) WHERE key = "session_engaged") = "1" then 1 end) as session_engaged,
         {{ ga4.unnest_key('event_params', 'engagement_time_msec', 'int_value') }},
         {{ ga4.unnest_key('event_params', 'page_title') }},
         {{ ga4.unnest_key('event_params', 'page_referrer') }},
         {{ ga4.unnest_key('event_params', 'source') }},
         {{ ga4.unnest_key('event_params', 'medium') }},
+        {{ ga4.unnest_key('event_params', 'campaign') }},
         CASE 
             WHEN event_name = 'page_view' THEN 1
             ELSE 0
