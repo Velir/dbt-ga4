@@ -18,11 +18,12 @@ Features include:
 |-------|-------------|
 | stg_ga4__events | Contains cleaned event data that is enhanced with useful event and session keys. |
 | stg_ga4__event_* | 1 model per event (ex: page_view, purchase) which flattens event parameters specific to that event |
+| stg_ga4__event_items | Contains item data associated with e-commerce events (Purchase, add to cart, etc) |
 | stg_ga4__event_to_query_string_params | Mapping between each event and any query parameters & values that were contained in the event's `page_location` field |
-| stg_ga4__user_properties | Finds the most recent occurance of specific event_params and assigns them to a user's client_id. User properties are specified as variables (see documentation below) |
+| stg_ga4__user_properties | Finds the most recent occurance of specific event_params and assigns them to a user's user_key. User properties are specified as variables (see documentation below) |
 | stg_ga4__session_conversions | Produces session-grouped event counts for a configurable list of event names (see documentation below) |
 | stg_ga4__sessions_traffic_sources | Finds the first source, medium, campaign and default channel grouping for each session |
-| dim_ga4__users | Dimension table for users which contains attributes such as first and last page viewed. | 
+| dim_ga4__users | Dimension table for users which contains attributes such as first and last page viewed. Unique on `user_key` which is a hash of the `user_id` if it exists, otherwise it falls back to the `user_pseudo_id`.| 
 | dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and campaign data |
 
 # Seeds
@@ -156,13 +157,13 @@ vars:
       conversion_events:['purchase','download']
 ```
 
-# Incremental Loading of Event Data
+# Incremental Loading of Event Data (and how to handle late-arriving hits)
 
-By default, GA4 exports data into sharded event tables that use the event date as the table suffix in the format of `events_YYYYMMDD`. This package incrementally loads data from these tables (and not the `intraday` tables) into `base_ga4__events` which is partitioned on date. There are two incremental loading strategies available:
+By default, GA4 exports data into sharded event tables that use the event date as the table suffix in the format of `events_YYYYMMDD`. This package incrementally loads data from these tables (not the `intraday` tables) into `base_ga4__events` which is partitioned on date. There are two incremental loading strategies available:
 
 - Dynamic incremental partitions (Default) - This strategy queries the destination table to find the latest date available. Data beyond that date range is loaded in incrementally on each run.
 
-- Static incremental partitions - This strategy incrementally loads in the last X days worth of data regardless of what data is availabe. In certain cases, this improves performance because the `max(event_date)` does not need to be calculated dynamically. This is enabled when the `static_incremental_days` variable is set to an integers. A setting of `3` would load data from `current_date - 1` `current_date - 2` and `current_date - 3`. Note that `current_date` uses UTC as the timezone.
+- Static incremental partitions - This strategy is enabled when the `static_incremental_days` variable is set to an integer. It incrementally loads in the last X days worth of data regardless of what data is availabe. Google will update event tables within the last 72 hours to handle late-arriving hits so you should use this strategy if late-arriving hits is a concern. The 'dynamic incremental' strategy will not re-process past date tables. Ex: A `static_incremental_days` setting of `3` would load data from `current_date - 1` `current_date - 2` and `current_date - 3`. Note that `current_date` uses UTC as the timezone.
 
 ## Intraday Events
 

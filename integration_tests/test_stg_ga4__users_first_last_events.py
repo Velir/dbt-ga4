@@ -2,12 +2,12 @@ import pytest
 from dbt.tests.util import read_file,check_relations_equal,run_dbt
 
 # Define mocks via CSV (seeds) or SQL (models)
-mock_stg_ga4__events_csv = """client_id,event_key,event_timestamp,geo,device,traffic_source
+mock_stg_ga4__events_csv = """user_key,event_key,event_timestamp,geo,device,traffic_source
 1111,event_key_client_1_0,1981-05-20T06:46:40,AL,Computer,Internet
 1111,event_key_client_1_1,1981-05-20T06:46:50,MO,Phone,Dial-Up
 """.lstrip()
 
-expected_csv = """client_id,first_event,last_event,first_geo,first_device,first_traffic_source,last_geo,last_device,last_traffic_source
+expected_csv = """user_key,first_event,last_event,first_geo,first_device,first_traffic_source,last_geo,last_device,last_traffic_source
 1111,event_key_client_1_0,event_key_client_1_1,AL,Computer,Internet,MO,Phone,Dial-Up
 """.lstrip()
 
