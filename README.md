@@ -121,7 +121,7 @@ vars:
 ```
 ### User Properties
 
-User properties are provided by GA4 in the `user_properties` repeated field. The most recent user property for each user can be extracted by configuring the `user_properties` variable in your project as follows:
+User properties are provided by GA4 in the `user_properties` repeated field. The most recent user property for each user will be extracted and included in the `dim_ga4__users` model by configuring the `user_properties` variable in your project as follows:
 
 ```
 vars:

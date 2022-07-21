@@ -40,10 +40,20 @@ include_first_last_page_views as (
     from include_first_last_events 
     left join {{ref('stg_ga4__users_first_last_pageviews')}} as first_last_page_views on
         include_first_last_events.user_key = first_last_page_views.user_key
-)
+),
+include_user_properties as (
+    
 
 select * from include_first_last_page_views
 {% if var('derived_user_properties', false) %}
--- If custom user properties have been assigned as variables, join them on the client ID
+-- If derived user properties have been assigned as variables, join them on the user_key
 left join {{ref('stg_ga4__derived_user_properties')}} using (user_key)
 {% endif %}
+{% if var('user_properties', false) %}
+-- If user properties have been assigned as variables, join them on the user_key
+left join {{ref('stg_ga4__user_properties')}} using (user_key)
+{% endif %}
+
+)
+
+select * from include_user_properties
