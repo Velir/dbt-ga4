@@ -20,6 +20,7 @@ Features include:
 | stg_ga4__event_* | 1 model per event (ex: page_view, purchase) which flattens event parameters specific to that event |
 | stg_ga4__event_items | Contains item data associated with e-commerce events (Purchase, add to cart, etc) |
 | stg_ga4__event_to_query_string_params | Mapping between each event and any query parameters & values that were contained in the event's `page_location` field |
+| stg_ga4__user_properties | Finds the most recent occurance of specified user_properties for each user|
 | stg_ga4__derived_user_properties | Finds the most recent occurance of specific event_params and assigns them to a user's user_key. Derived user properties are specified as variables (see documentation below) |
 | stg_ga4__session_conversions | Produces session-grouped event counts for a configurable list of event names (see documentation below) |
 | stg_ga4__sessions_traffic_sources | Finds the first source, medium, campaign and default channel grouping for each session |
