@@ -43,7 +43,7 @@ include_first_last_page_views as (
 )
 
 select * from include_first_last_page_views
-{% if var('user_properties', false) %}
+{% if var('derived_user_properties', false) %}
 -- If custom user properties have been assigned as variables, join them on the client ID
-left join {{ref('stg_ga4__user_properties')}} using (user_key)
+left join {{ref('stg_ga4__derived_user_properties')}} using (user_key)
 {% endif %}

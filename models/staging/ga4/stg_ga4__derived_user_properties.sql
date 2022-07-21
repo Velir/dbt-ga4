@@ -1,5 +1,5 @@
 {{ config(
-  enabled = true if var('user_properties', false) != false else false,
+  enabled = true if var('derived_user_properties', false) else false,
   materialized = "table"
 ) }}
 
@@ -13,14 +13,14 @@ unnest_user_properties as
     select 
         user_key,
         event_timestamp
-        {% for up in var('user_properties', []) %}
+        {% for up in var('derived_user_properties', []) %}
             ,{{ ga4.unnest_key('event_params',  up.event_parameter ,  up.value_type ) }}
         {% endfor %}
     from events_from_valid_users
 )
 -- create 1 CTE per user property that pulls only events with non-null values for that event parameters. 
 -- Find the most recent property for that user and join later
-{% for up in var('user_properties', []) %}
+{% for up in var('derived_user_properties', []) %}
 ,non_null_{{up.event_parameter}} as
 (
     select
@@ -52,17 +52,17 @@ user_keys as
 (
     select distinct
         user_key
-    from unnest_user_properties
+    from events_from_valid_users
 ),
 join_properties as 
 (
     select
         user_key
-        {% for up in var('user_properties', []) %}
+        {% for up in var('derived_user_properties', []) %}
         ,last_value_{{up.event_parameter}}_grouped.{{up.user_property_name}}
         {% endfor %}
     from user_keys
-    {% for up in var('user_properties', []) %}
+    {% for up in var('derived_user_properties', []) %}
     left join last_value_{{up.event_parameter}}_grouped using (user_key)
     {% endfor %}
 )
