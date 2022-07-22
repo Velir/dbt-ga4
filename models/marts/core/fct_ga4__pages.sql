@@ -4,22 +4,24 @@ with page_view as (
         extract( hour from (select  timestamp_micros(event_timestamp))) as hour,
         page_location,  -- does not include query string; disable this model, copy this to your project and switch to original_page_location to segment by page_location with query string
         concat( cast(event_date_dt as string), cast(extract( hour from (select  timestamp_micros(event_timestamp))) as string), page_location ) as page_key,
+        page_title,  -- would like to move this to dim_ga4__pages but need to think how to handle page_title changing over time
         count(event_name) as visits,
         count(distinct user_key ) as users,
         sum( if(ga_session_number = 1,1,0)) as new_users,
         sum(entrances) as entrances,
         sum(exits) as exits,
-        avg(engagement_time_msec) as average_time_on_page
+        sum(engagement_time_msec) as total_time_on_page 
 from {{ref('stg_ga4__event_page_view')}}
-    group by 1,2,3,4
+    group by 1,2,3,4,5
 ), scroll as (
     select
         event_date_dt,
         extract( hour from (select timestamp_micros(event_timestamp))) as hour,
         page_location, 
+        page_title,
         count(event_name) as scroll_events
     from {{ref('stg_ga4__event_scroll')}}
-    group by 1,2,3        
+    group by 1,2,3,4
 )
 {% if var('conversion_events',false) %}
 ,
