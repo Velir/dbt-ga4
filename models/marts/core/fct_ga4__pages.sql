@@ -2,7 +2,7 @@ with page_view as (
     select
         event_date_dt,
         extract( hour from (select  timestamp_micros(event_timestamp))) as hour,
-        page_location,  -- does not include query string; disable this model, copy this to your project and switch to original_page_location to segment by page_location with query string
+        page_location,  -- includes query string parameters not listed in query_parameter_exclusions variable
         concat( cast(event_date_dt as string), cast(extract( hour from (select  timestamp_micros(event_timestamp))) as string), page_location ) as page_key,
         page_title,  -- would like to move this to dim_ga4__pages but need to think how to handle page_title changing over time
         count(event_name) as visits,
