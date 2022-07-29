@@ -12,8 +12,8 @@ add_user_key as (
     select 
         *,
         case
-            when user_id is not null then md5(user_id)
-            when user_pseudo_id is not null then md5(user_pseudo_id)
+            when user_id is not null then to_base64(md5(user_id))
+            when user_pseudo_id is not null then to_base64(md5(user_pseudo_id))
             else null -- this case is reached when privacy settings are enabled
         end as user_key
     from base_events
@@ -22,7 +22,7 @@ add_user_key as (
 include_session_key as (
     select 
         *,
-        md5(CONCAT(stream_id, CAST(TO_BASE64(user_key) as STRING), cast(ga_session_id as STRING))) as session_key -- Surrogate key to determine unique session across streams and users. Sessions do NOT reset after midnight in GA4
+        to_base64(md5(CONCAT(stream_id, CAST(user_key as STRING), cast(ga_session_id as STRING)))) as session_key -- Surrogate key to determine unique session across streams and users. Sessions do NOT reset after midnight in GA4
     from add_user_key
 ),
 include_event_number as (
@@ -33,7 +33,7 @@ include_event_number as (
 include_event_key as (
     select 
         include_event_number.*,
-        md5(CONCAT(CAST(TO_BASE64(session_key) as STRING), CAST(session_event_number as STRING))) as event_key -- Surrogate key for unique events
+        to_base64(md5(CONCAT(CAST(session_key as STRING), CAST(session_event_number as STRING)))) as event_key -- Surrogate key for unique events
     from include_event_number
 ),
 -- Remove specific query strings from page_location field
