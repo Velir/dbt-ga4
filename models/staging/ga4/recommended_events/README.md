@@ -6,7 +6,7 @@ These events are disabled by default so as not to slow down the building of your
 
 To enable these models, enter the event file name, without the file extension, in your `dbt_project.yml` and set the enabled configuration to true.
 
-This is how you would enable the purchase event:
+This is how you would enable the purchase event.
 
 ```
 models:

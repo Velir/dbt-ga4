@@ -1,17 +1,11 @@
 
-# Misc
-
-- DBT guide to package creation: https://docs.getdbt.com/docs/guides/building-packages
-- DBT project structure notes: https://discourse.getdbt.com/t/how-we-structure-our-dbt-projects/355
-
 # TODO
 
-- Add a lookback window variable for user dimensions. it may be overly expensive to scan ALL events looking for first/last occurances of event parameters. 
-- Add common date dimension transformations (See https://www.ga4bigquery.com/date-and-time-dimensions-metrics-ga4/)
+- It may be overly expensive to scan ALL events looking for first/last occurances of user's event parameters. We can move data from 1st & last session into a new table and scan that table instead. 
 - mechanism to take in an array variable listing custom events and output 1 model per event (is this possible?)
 - Add event timing (avg time to next page) metrics
 - Session + conversion metrics
-- Handle `privacy_info` field - without analytics storage, the client ID will be null. Should remove these users from dim_users
+- Anything else to do with `privacy_info` field? Right now removing 'null' client ids from user dim tables. 
 - Create staging tables for the following events:
     - view_promotion    
     - add_to_cart
@@ -26,15 +20,19 @@
 - Example of a funnel model https://github.com/teej/sf-funnels
 - Review LookML examples for inspiration: https://github.com/llooker/ga_four_block_dev/tree/master/views/event_data_dimensions
     - Add landing page / exit page, session start/end time, session duration, is bounce, campaign source to `dim_sessions` model
-- Configuration flag to turn off ecommerce tables
 - Configuration and dynamic templates to create custom event tables and dimensions
 - Configuration to create custom dimensions (session, user, event_*) from event parameters
 - Refactor 'user properties' functionality to pull from the `user_properties` field
 - Support for large intraday tables (100+ shards). Currently they are unioned in as a view on top of partitioned base table. We could load in data up until yesterday into the partitioned table and then union in today's data.
 - Allow users to configure certain event names as conversions. provide additional metrics around conversion events (conversion count per session, per user).  
-- Update `dim_sessions` to pull based on session key rather than session_start event
+- Update `dim_sessions` to pull based on session key rather than session_start event. Looks like session_start no longer correclty identifies all sessions. See https://measure.slack.com/archives/C03AE85U5/p1658244315268039
 - Merge and clean up dim_sessions & fct_sessions. Just consider it ga4__sessions and ga4__users.
 - Use Fivetran's `union_data` method (or something similar) to handle multiple, unioned GA4 exports. https://github.com/fivetran/dbt_xero_source/blob/main/models/tmp/stg_xero__account_tmp.sql
+
+## Misc
+
+- DBT guide to package creation: https://docs.getdbt.com/docs/guides/building-packages
+- DBT project structure notes: https://discourse.getdbt.com/t/how-we-structure-our-dbt-projects/355
 
 ## Discussion: Configuration to create custom dimensions
 

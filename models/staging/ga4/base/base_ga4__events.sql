@@ -1,4 +1,4 @@
-{% if var('static_incremental_days', false ) ==  true %}
+{% if var('static_incremental_days', false ) %}
     {% set partitions_to_replace = [] %}
     {% for i in range(var('static_incremental_days')) %}
         {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
@@ -8,10 +8,10 @@
             materialized = 'incremental',
             incremental_strategy = 'insert_overwrite',
             partition_by={
-            "field": "event_date_dt",
-            "data_type": "date",
+                "field": "event_date_dt",
+                "data_type": "date",
             },
-            partitions = partitions_to_replace
+            partitions = partitions_to_replace,
         )
     }}
 {% else %}
@@ -20,9 +20,9 @@
             materialized = 'incremental',
             incremental_strategy = 'insert_overwrite',
             partition_by={
-            "field": "event_date_dt",
-            "data_type": "date",
-            }
+                "field": "event_date_dt",
+                "data_type": "date",
+            },
         )
     }}
 {% endif %}
@@ -55,13 +55,13 @@ with source as (
     where _table_suffix not like '%intraday%' -- intraday events are supported through the project variable: include_intraday_events
     and cast(_table_suffix as int64) >= {{var('start_date')}}
     {% if is_incremental() %}
-        {% if var('static_incremental_days', false ) ==  true %}
-            and parse_date('%Y%m%d', event_date) in ({{ partitions_to_replace | join(',') }})
+        {% if var('static_incremental_days', false ) %}
+            and parse_date('%Y%m%d', _TABLE_SUFFIX) in ({{ partitions_to_replace | join(',') }})
         {% else %}
             -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
             -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
             and parse_date('%Y%m%d',_TABLE_SUFFIX) >= _dbt_max_partition
-        {% endif %} 
+        {% endif %}
     {% endif %}
 ),
 renamed as (
