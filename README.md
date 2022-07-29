@@ -164,9 +164,9 @@ By default, GA4 exports data into sharded event tables that use the event date a
 - Dynamic incremental partitions (Default) - This strategy queries the destination table to find the latest date available. Data beyond that date range is loaded in incrementally on each run.
 - Static incremental partitions - This strategy is enabled when the `static_incremental_days` variable is set to an integer. It incrementally loads in the last X days worth of data regardless of what data is availabe. Google will update event tables within the last 72 hours to handle late-arriving hits so you should use this strategy if late-arriving hits is a concern. The 'dynamic incremental' strategy will not re-process past date tables. Ex: A `static_incremental_days` setting of `3` would load data from `current_date - 1` `current_date - 2` and `current_date - 3`. Note that `current_date` uses UTC as the timezone.
 
-## Frequency
+# Export Frequency
 
-The value of the "frequency" variable should match the "Frequency" setting on GA4's BigQuery Linking Admin page.
+The value of the `frequency` variable should match the "Frequency" setting on GA4's BigQuery Linking Admin page.
 
 | GA4 | dbt_project.yml |
 |-----|-----------------|
@@ -174,9 +174,17 @@ The value of the "frequency" variable should match the "Frequency" setting on GA
 | Streaming | "streaming" |
 | both Daily and Streaming | "daily+streaming" |
 
-The daily option is for sites that use just the daily, batch export. It can also be used as a substitute for the "daily+streaming" option where you don't care about including today's data so it doesn't strictly need to match the GA4 "Frequency" setting.
+The daily option (default) is for sites that use just the daily, batch export. It can also be used as a substitute for the "daily+streaming" option where you don't care about including today's data so it doesn't strictly need to match the GA4 "Frequency" setting.
 The streaming option is for sites that only use the streaming export. The streaming export is not constrained by Google's one million event daily limit and so is the best option for sites that may exceed that limit. Selecting both "Daily" and "Streaming" in GA4 causes the streaming, intraday BigQuery tables to be deleted when the daily, batch tables are updated.
 The "daily+streaming" option uses the daily batch export and unions the streaming intraday tables. It is intended to append today's data from the streaming intraday to the batch tables.
+
+Example:
+
+```
+vars:
+  ga4:
+      frequency:"daily+streaming"
+```
 
 # Connecting to BigQuery
 
