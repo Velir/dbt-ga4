@@ -1,18 +1,14 @@
 {% if var('frequency', 'daily') == 'daily+streaming' %}
     {{ config(
-    enabled= true 
-    ) }}
-{% elif var('include_intraday_events') is defined %} -- Support legacy variable
-    {{ config(
-    enabled= var('include_intraday_events', false) 
+    enabled = true 
     ) }}
 {% else %}
     {{ config(
-    enabled= false 
+    enabled = false 
     ) }}
 {% endif %}
--- This model will be unioned with `base_ga4__events` which means that their columns must match
 
+-- This model will be unioned with `base_ga4__events` which means that their columns must match
 with source as (
     select 
         parse_date('%Y%m%d',event_date) as event_date_dt,

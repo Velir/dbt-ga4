@@ -2,7 +2,7 @@
 
 with base_events as (
     select * from {{ ref('base_ga4__events')}}
-    {% if var('frequency', 'daily') == 'daily+streaming' or  (var('include_intraday_events', false) == true and var('frequency', 'daily') != 'streaming' ) %}
+    {% if var('frequency', 'daily') == 'daily+streaming' %}
     union all
     select * from {{ref('base_ga4__events_intraday')}}
     {% endif %}
