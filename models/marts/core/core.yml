@@ -19,3 +19,5 @@ models:
       - name: session_key
         tests:
           - unique
+  - name: fct_ga4__pages
+    description: Metrics related to pages such as visits, users, new_users, entrances and exits as well as configurable conversion counts. Each row is grouped by page_location, event_date_dt, and hour.

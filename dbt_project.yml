@@ -14,7 +14,7 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "dbt_packages"
 
 # The following variables should be set in the project that loads this package. 
-#vars:
+# vars:
 #    include_intraday_events: false # true|false indicates whether intraday events should be unioned into the event model
 #    project: "your_project"
 #    dataset: "your_dataset"
