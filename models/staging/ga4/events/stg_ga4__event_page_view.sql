@@ -1,6 +1,5 @@
  with page_view_with_params as (
    select *,
-      {{ ga4.unnest_key('event_params', 'entrances',  'int_value') }},
       {{ ga4.unnest_key('event_params', 'value', 'float_value') }},
       lag(page_location, 1) over (partition by (session_key) order by event_timestamp asc) as session_previous_page,
       case when split(split(page_location,'/')[safe_ordinal(4)],'?')[safe_ordinal(1)] = '' then null else concat('/',split(split(page_location,'/')[safe_ordinal(4)],'?')[safe_ordinal(1)]) end as pagepath_level_1,
