@@ -15,11 +15,7 @@ with source as (
         event_bundle_sequence_id,
         event_server_timestamp_offset,
         user_id,
-<<<<<<< HEAD
-        user_pseudo_id as user_key,
-=======
         user_pseudo_id,
->>>>>>> main
         privacy_info,
         user_properties,
         user_first_touch_timestamp,
