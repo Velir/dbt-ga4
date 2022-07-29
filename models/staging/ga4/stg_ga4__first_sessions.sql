@@ -1,55 +1,51 @@
 {{ config(
     materialized= 'incremental',
-    unique_key='session_key'
+    unique_key='session_key',
 )
 }}
-with all_page_views as (
-    select
+
+with session_start_dims as (
+    select 
         session_key,
-        ifnull(max(session_engaged), 0) as session_engaged,
-        sum(engagement_time_msec) as sum_engagement_time_msec,
-    from {{ref('stg_ga4__events')}}
-    group by session_key
-),
-first_page_view as (
-    select
-        session_key,
-        user_key,
-        event_date_dt,
-        event_timestamp,
-        event_value_in_usd,
         traffic_source,
         ga_session_number,
         page_location as landing_page,
         page_hostname as landing_page_hostname,
-        entrances,
         geo,
         device,
-        event_key as first_page_view_event_key
-    from {{ref('stg_ga4__events')}}
-    left join all_page_views using (session_key)
-    where event_name = "page_view" and ga_session_number = 1 and entrances = 1
+        row_number() over (partition by session_key order by session_event_number asc) as row_num
+    from {{ref('stg_ga4__event_session_start')}}
+    where ga_session_number = 1
 ),
-last_page_view as (
-    select
-        session_key,
-        event_key as last_page_view_event_key
-    from {{ref('stg_ga4__events')}}
-    where event_timestamp in (select max(event_timestamp) from {{ref('stg_ga4__events')}} group by session_key) and ga_session_number = 1
-)
-
-
-{% if var('conversion_events',false) %}
-,
-join_conversions as (
+-- Arbitrarily pull the first session_start event to remove duplicates
+remove_dupes as 
+(
+    select * from session_start_dims
+    where row_num = 1
+),
+join_traffic_source as (
     select 
-        *
-    from first_page_view
-    left join {{ref('stg_ga4__session_conversions')}} using (session_key)
-    left join last_page_view using (session_key)
+        remove_dupes.*,
+        session_source as source,
+        session_medium as medium,
+        session_campaign as campaign,
+        session_default_channel_grouping as default_channel_grouping
+    from remove_dupes
+    left join {{ref('stg_ga4__sessions_traffic_sources')}} using (session_key)
 )
-select * from join_conversions
-{% else %}
-select * from last_page_view
-left join last_page_view using (session_key)
-{% endif %}
+
+
+select
+    user_key,
+    first_session_key,
+    first_seen_timestamp,
+    first_seen_dt,
+    num_sessions,
+    num_page_views,
+    num_purchases,
+    first_geo,
+    first_device,
+    first_traffic_source,
+    first_page_location,
+    first_page_hostname,
+    first_page_referrer
