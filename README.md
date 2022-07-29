@@ -138,15 +138,15 @@ vars:
 
 ### Derived User Properties
 
-Derived user properties are different from "User Properties" in that they are derived from event parameters. This provides additional flexibility in allowing operators to turn any event parameter into a user parameter. 
+Derived user properties are different from "User Properties" in that they are derived from event parameters. This provides additional flexibility in allowing users to turn any event parameter into a user parameter. 
 
-The most recent instance of these event parameters are found and provided in the `dim_ga4__users` model. 
+Derived User Properties are included in the `dim_ga4__users` model and contain the latest event parameter value per user. 
 
 ```
 derived_user_properties:
   - event_parameter: "[your event parameter]"
     user_property_name: "[a unique name for the derived user property]"
-    value_type: "[one of string_value|int_value|float_value|double_value]"
+    value_type: "[string_value|int_value|float_value|double_value]"
 ```
 
 For example: 
