@@ -44,7 +44,7 @@ Add the following to your `packages.yml` file:
 ```
 packages:
   - package: Velir/ga4
-    version: [">=0.1.0", "<0.2.0"]
+    version: [">=1.0.0", "<1.2.0"]
 ```
 
 ## Install From GitHub
@@ -54,7 +54,7 @@ Add the following to your `packages.yml` file:
 ```
 packages:
   - git: "https://github.com/Velir/dbt-ga4.git"
-    revision: 0.1.4
+    revision: 1.0.0
 ```
 
 ## Install From Local Directory
