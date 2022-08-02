@@ -29,12 +29,6 @@ models:
       - name: user_key
         tests: 
           - unique
-  - name: stg_ga4__items
-    description: Captures the items data from ecommerce events.
-    columns:
-      - name: event_key
-        tests:
-          - unique
   - name: stg_ga4__events
     description: Staging model that contains window functions used to generate unique keys
     columns:
@@ -43,7 +37,7 @@ models:
           - unique
   - name: stg_ga4__event_scroll
     description: Staging model containing only 'scroll' events. Includes the 'percent_scrolled' parameter.
-  - name: stg_ga4__user_properties
+  - name: stg_ga4__derived_user_properties
     description: Optional model that will pull out the most recent instance of a particular event parameter for each user_key. Later used in the dim_ga4__users dimension table.
     columns:
       - name: user_key
