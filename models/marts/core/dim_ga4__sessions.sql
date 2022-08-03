@@ -1,9 +1,38 @@
 -- Dimension table for sessions based on the session_start event.
+{% if var('static_incremental_days', false ) %}
+    {% set partitions_to_replace = [] %}
+    {% for i in range(var('static_incremental_days')) %}
+        {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
+    {% endfor %}
+    {{
+        config(
+            materialized = 'incremental',
+            incremental_strategy = 'insert_overwrite',
+            partition_by={
+                "field": "session_start_date",
+                "data_type": "date",
+            },
+            partitions = partitions_to_replace,
+        )
+    }}
+{% else %}
+    {{
+        config(
+            materialized = 'incremental',
+            incremental_strategy = 'insert_overwrite',
+            partition_by={
+                "field": "session_start_date",
+                "data_type": "date",
+            },
+        )
+    }}
+{% endif %}
 
 with session_start_dims as (
     select 
         session_key,
         traffic_source,
+        event_date_dt as session_start_date,
         ga_session_number,
         page_location as landing_page,
         page_hostname as landing_page_hostname,
@@ -11,6 +40,11 @@ with session_start_dims as (
         device,
         row_number() over (partition by session_key order by session_event_number asc) as row_num
     from {{ref('stg_ga4__event_session_start')}}
+    {% if is_incremental() %}
+        {% if var('static_incremental_days', false ) %}
+            and session_start_date in ({{ partitions_to_replace | join(',') }})
+        {% endif %}
+    {% endif %}
 ),
 -- Arbitrarily pull the first session_start event to remove duplicates
 remove_dupes as 

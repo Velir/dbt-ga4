@@ -1,5 +1,8 @@
 -- User dimensions: first geo, first device, last geo, last device, first seen, last seen
-
+{{ config(
+    materialized= 'table',
+)
+}}
 with users as (
     select 
         user_key,
