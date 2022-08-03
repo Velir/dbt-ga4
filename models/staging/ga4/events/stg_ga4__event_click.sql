@@ -2,7 +2,6 @@
  
  with click_with_params as (
    select *,
-      {{ ga4.unnest_key('event_params', 'entrances',  'int_value') }},
       {{ ga4.unnest_key('event_params', 'outbound') }},
       {{ ga4.unnest_key('event_params', 'link_classes') }},
       {{ ga4.unnest_key('event_params', 'link_domain') }},

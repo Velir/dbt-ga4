@@ -2,7 +2,6 @@
  
  with event_with_params as (
    select *,
-      {{ ga4.unnest_key('event_params', 'entrances',  'int_value') }},
       {{ ga4.unnest_key('event_params', 'value', 'float_value') }},
       {{ ga4.unnest_key('event_params', 'file_extension') }},
       {{ ga4.unnest_key('event_params', 'file_name') }},
