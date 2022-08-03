@@ -2,7 +2,6 @@
  
  with event_with_params as (
    select *,
-      {{ ga4.unnest_key('event_params', 'entrances',  'int_value') }},
       {{ ga4.unnest_key('event_params', 'search_term') }},
       {{ ga4.unnest_key('event_params', 'unique_search_term') }}
       {% if var("view_search_results_custom_parameters", "none") != "none" %}

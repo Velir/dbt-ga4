@@ -1,3 +1,8 @@
+{{ config(
+    materialized= 'table',
+)
+}}
+
 with page_view as (
     select
         event_date_dt,
