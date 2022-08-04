@@ -1,7 +1,14 @@
 -- This staging model contains key creation and window functions. Keeping window functions outside of the base incremental model ensures that the incremental updates don't artificially limit the window partition sizes (ex: if a session spans 2 days, but only 1 day is in the incremental update)
+{% if var('static_incremental_days', false ) %}
+    {% set partitions_to_query = [] %}
+    {% for i in range(var('static_incremental_days')) %}
+        {% set partitions_to_query = partitions_to_query.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
+    {% endfor %}
+{% endif %}
 
 with base_events as (
     select * from {{ ref('base_ga4__events')}}
+    where event_date_dt in ({{ partitions_to_query | join(',') }})
     {% if var('frequency', 'daily') == 'daily+streaming' %}
     union all
     select * from {{ref('base_ga4__events_intraday')}}
