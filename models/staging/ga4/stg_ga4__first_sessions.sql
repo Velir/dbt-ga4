@@ -20,7 +20,8 @@ with events as (
         traffic_source as first_traffic_source,
         page_referrer as first_page_referrer,
         page_location as first_page_location,
-        page_hostname as first_page_hostname
+        page_hostname as first_page_hostname,
+        events.* except(session_key)
     from {{ref('stg_ga4__events')}}
     right join events using (session_key) -- if the session_start event is missing
     where event_name = "session_start" 

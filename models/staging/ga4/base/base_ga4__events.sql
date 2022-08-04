@@ -1,6 +1,6 @@
-{% if var('static_incremental_days', false ) %}
+{% if is_incremental %}
     {% set partitions_to_replace = [] %}
-    {% for i in range(var('static_incremental_days')) %}
+    {% for i in range(var('static_incremental_days', 1)) %}
         {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
     {% endfor %}
     {{
@@ -61,14 +61,11 @@ with source as (
     {% endif %}
     
     {% if is_incremental() %}
+        and parse_date('%Y%m%d', _TABLE_SUFFIX) in ({{ partitions_to_replace | join(',') }})
+        -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
+        -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
+        -- and parse_date('%Y%m%d',_TABLE_SUFFIX) >= _dbt_max_partition
 
-        {% if var('static_incremental_days', false ) %}
-            and parse_date('%Y%m%d', _TABLE_SUFFIX) in ({{ partitions_to_replace | join(',') }})
-        {% else %}
-            -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
-            -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
-            and parse_date('%Y%m%d',_TABLE_SUFFIX) >= _dbt_max_partition
-        {% endif %}
     {% endif %}
 ),
 renamed as (

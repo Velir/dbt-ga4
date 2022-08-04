@@ -1,7 +1,7 @@
 -- Fact table for sessions. Join on session_key
-{% if var('static_incremental_days', false ) %}
+{% if is_incremental %}
     {% set partitions_to_replace = [] %}
-    {% for i in range(var('static_incremental_days')) %}
+    {% for i in range(var('static_incremental_days', 1)) %}
         {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
     {% endfor %}
     {{
@@ -41,8 +41,8 @@ with session_metrics as
         sum(engagement_time_msec) as sum_engagement_time_msec
     from {{ref('stg_ga4__events')}}
     {% if is_incremental() %}
-        {% if var('static_incremental_days', false ) %}
-            and session_start_date in ({{ partitions_to_replace | join(',') }})
+        {% if var('static_incremental_days', 1 ) %}
+            where event_date_dt in ({{ partitions_to_replace | join(',') }})
         {% endif %}
     {% endif %}
     group by 1,2
