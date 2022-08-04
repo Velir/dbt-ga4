@@ -1,6 +1,7 @@
 {{ config(
   enabled = true if var('user_properties', false) else false,
-  materialized = "table"
+  materialized = "incremental",
+  unique_key='user_key',
 ) }}
 
 -- Remove null user_keys (users with privacy enabled)
