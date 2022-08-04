@@ -1,8 +1,8 @@
 {{ config(
-    materialized= 'table',
+    materialized= 'incremental',
+    unique_key=['page_location', 'hour', 'event_date_dt']
 )
 }}
-
 with page_view as (
     select
         event_date_dt,

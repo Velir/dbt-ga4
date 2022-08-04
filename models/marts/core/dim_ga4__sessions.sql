@@ -1,7 +1,7 @@
 -- Dimension table for sessions based on the session_start event.
-{% if var('static_incremental_days', false ) %}
+{% if is_incremental %}
     {% set partitions_to_replace = [] %}
-    {% for i in range(var('static_incremental_days')) %}
+    {% for i in range(var('static_incremental_days', 1)) %}
         {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
     {% endfor %}
     {{
@@ -41,8 +41,8 @@ with session_start_dims as (
         row_number() over (partition by session_key order by session_event_number asc) as row_num
     from {{ref('stg_ga4__event_session_start')}}
     {% if is_incremental() %}
-        {% if var('static_incremental_days', false ) %}
-            and session_start_date in ({{ partitions_to_replace | join(',') }})
+        {% if var('static_incremental_days', 1 ) %}
+            where event_date_dt in ({{ partitions_to_replace | join(',') }})
         {% endif %}
     {% endif %}
 ),
