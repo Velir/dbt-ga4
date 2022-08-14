@@ -1,8 +1,6 @@
--- stg_ga4__event_share.sql
-
 {{
   config(
-      enabled = true,
+      enabled = false,
   )
 }}
 
