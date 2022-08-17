@@ -29,4 +29,4 @@ models:
             +enabled: true
 ```
 
-At the time of writing, only the ecommerce events are currently configured. If you need a specific model, please consider creating a pull request with the model that you need in the [dbt-ga4 GitHub repository](https://github.com/Velir/dbt-ga4).
+Not all recommended events have been implemented. If you need a specific event, please consider creating a pull request with the model that you need in the [dbt-ga4 GitHub repository](https://github.com/Velir/dbt-ga4).
