@@ -3,9 +3,15 @@ from dbt.tests.util import read_file,check_relations_equal,run_dbt
 
 # Define mocks via CSV (seeds) or SQL (models)
 mock_base_ga4__events_csv = """user_id,user_pseudo_id,ga_session_id,stream_id,page_location
-user_id_1,user_pseudo_id_1,ga_session_id_1,stream_id_1,http://www.website.com
-,user_pseudo_id_2,ga_session_id_1,stream_id_1,http://www.website.com
+user_id_1,user_pseudo_id_1,ga_session_id_1,stream_id_1,http://www.website.com/?foo=bar
 """.lstrip()
+
+#TODO
+#,user_pseudo_id_2,ga_session_id_1,stream_id_1,http://www.website.com
+
+expected_csv = """user_id,user_pseudo_id,ga_session_id,stream_id,user_key,session_key,session_event_number,event_key,original_page_location,page_location,page_hostname,page_query_string
+user_id_1,user_pseudo_id_1,ga_session_id_1,stream_id_1,c/nWU/GWhlWiLU0S6R/rwg==,9fDgaCrbd4ieAj1QpcWDjw==,1,FgBuqiZAGtlzSpZZgrY2VA==,http://www.website.com/?foo=bar,http://www.website.com/?foo=bar,website.com,foo=bar
+"""
 
 actual = read_file('../models/staging/ga4/stg_ga4__events.sql')
 
@@ -14,7 +20,8 @@ class TestUsersFirstLastEvents():
     @pytest.fixture(scope="class")
     def seeds(self):
         return {
-            "base_ga4__events.csv": mock_base_ga4__events_csv
+            "base_ga4__events.csv": mock_base_ga4__events_csv,
+            "expected.csv": expected_csv
         }
 
     # everything that goes in the "macros"
@@ -28,37 +35,7 @@ class TestUsersFirstLastEvents():
     @pytest.fixture(scope="class")
     def models(self):
         return {
-            "actual.sql": actual,
-            "expected.sql": """
-            
-            select
-                'user_id_1' as user_id,
-                'user_pseudo_id_1' as user_pseudo_id,
-                'ga_session_id_1' as ga_session_id,
-                'stream_id_1' as stream_id,
-                md5('user_id_1') as user_key,
-                md5(CONCAT('stream_id_1', CAST(TO_BASE64(md5('user_id_1')) as STRING), cast('ga_session_id_1' as STRING))) as session_key,
-                1 as session_event_number,
-                md5(CONCAT(CAST(TO_BASE64(md5(CONCAT('stream_id_1', CAST(TO_BASE64(md5('user_id_1')) as STRING), cast('ga_session_id_1' as STRING)))) as STRING), CAST(1 as STRING))) as event_key,
-                'http://www.website.com' as original_page_location,
-                'http://www.website.com' as page_location,
-                'website.com' as page_hostname,
-                CAST(null as STRING) as page_query_string
-            UNION ALL
-            select
-                CAST(null as string) as user_id,
-                'user_pseudo_id_2' as user_pseudo_id,
-                'ga_session_id_1' as ga_session_id,
-                'stream_id_1' as stream_id,
-                md5('user_pseudo_id_2') as user_key,
-                md5(CONCAT('stream_id_1', CAST(TO_BASE64(md5('user_pseudo_id_2')) as STRING), cast('ga_session_id_1' as STRING))) as session_key,
-                1 as session_event_number,
-                md5(CONCAT(CAST(TO_BASE64(md5(CONCAT('stream_id_1', CAST(TO_BASE64(md5('user_pseudo_id_2')) as STRING), cast('ga_session_id_1' as STRING)))) as STRING), CAST(1 as STRING))) as event_key,
-                'http://www.website.com' as original_page_location,
-                'http://www.website.com' as page_location,
-                'website.com' as page_hostname,
-                CAST(null as STRING) as page_query_string
-            """
+            "actual.sql": actual
         }
     
     def test_mock_run_and_check(self, project):
