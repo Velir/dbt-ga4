@@ -1,15 +1,9 @@
-with events_last as (
-    select
+with events_by_user_key as (
+    select distinct
         user_key,
         last_value(event_key) OVER (PARTITION BY user_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) as last_event_key
     from {{ref('stg_ga4__events')}}
     where user_key is not null --remove users with privacy settings enabled
-),
-events_by_user_key as (
-    select distinct
-        user_key,
-        last_event_key
-    from events_last
 ),
 events_joined as (
     select
