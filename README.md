@@ -22,6 +22,7 @@ Features include:
 | stg_ga4__event_to_query_string_params | Mapping between each event and any query parameters & values that were contained in the event's `page_location` field |
 | stg_ga4__user_properties | Finds the most recent occurance of specified user_properties for each user|
 | stg_ga4__derived_user_properties | Finds the most recent occurance of specific event_params and assigns them to a user's user_key. Derived user properties are specified as variables (see documentation below) |
+| stg_ga4__derived_session_properties | Finds the most recent occurance of specific event_params and assigns them to a session's session_key. Derived session properties are specified as variables (see documentation below) |
 | stg_ga4__session_conversions | Produces session-grouped event counts for a configurable list of event names (see documentation below) |
 | stg_ga4__sessions_traffic_sources | Finds the first source, medium, campaign and default channel grouping for each session |
 | dim_ga4__users | Dimension table for users which contains attributes such as first and last page viewed. Unique on `user_key` which is a hash of the `user_id` if it exists, otherwise it falls back to the `user_pseudo_id`.| 
@@ -174,6 +175,34 @@ vars:
           user_property_name: "most_recent_param"  
           value_type: "string_value"
 ```
+
+### Derived Session Properties
+
+Derived session properties are similar to derived user properties, but on a per-session basis, for properties that change slowly over time. This provides additional flexibility in allowing users to turn any event parameter into a session property. 
+
+Derived Session Properties are included in the `fct_ga4__sessions` model and contain the latest event parameter value per session. 
+
+```
+derived_session_properties:
+  - event_parameter: "[your event parameter]"
+    session_property_name: "[a unique name for the derived session property]"
+    value_type: "[string_value|int_value|float_value|double_value]"
+```
+
+For example: 
+
+```
+vars:
+  ga4:
+    derived_session_properties:
+      - event_parameter: "page_location"
+        session_property_name: "most_recent_page_location"
+        value_type: "string_value"
+      - event_parameter: "another_event_param"
+        session_property_name: "most_recent_param"
+        value_type: "string_value"
+```
+
 ### GA4 Recommended Events
 
 See the README file at /dbt_packages/models/staging/ga4/recommended_events for instructions on enabling [Google's recommended events](https://support.google.com/analytics/answer/9267735?hl=en).
