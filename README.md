@@ -72,20 +72,20 @@ This package assumes that you have an existing DBT project with a BigQuery profi
 
 ```
 vars:
-    ga4:
-        project: "your_gcp_project"
-        dataset: "your_ga4_dataset"
-        start_date: "YYYYMMDD" # Earliest date to load
-        frequency: "daily" # daily|streaming|daily+streaming Match to the type of export configured in GA4; daily+streaming appends today's intraday data to daily data
+  ga4:
+    project: "your_gcp_project"
+    dataset: "your_ga4_dataset"
+    start_date: "YYYYMMDD" # Earliest date to load
+    frequency: "daily" # daily|streaming|daily+streaming Match to the type of export configured in GA4; daily+streaming appends today's intraday data to daily data
 ```
 
 If you don't have any GA4 data of your own, you can connect to Google's public data set with the following settings:
 
 ```
 vars:
-    project: "bigquery-public-data"
-    dataset: "ga4_obfuscated_sample_ecommerce"
-    start_date: "20210120"
+  project: "bigquery-public-data"
+  dataset: "ga4_obfuscated_sample_ecommerce"
+  start_date: "20210120"
 ```
 
 More info about the GA4 obfuscated dataset here: https://support.google.com/analytics/answer/10937659?hl=en#zippy=%2Cin-this-article
@@ -166,13 +166,13 @@ For example:
 ```
 vars:
   ga4:
-      derived_user_properties:
-        - event_parameter: "page_location"
-          user_property_name: "most_recent_page_location"  
-          value_type: "string_value"
-        - event_parameter: "another_event_param"
-          user_property_name: "most_recent_param"  
-          value_type: "string_value"
+    derived_user_properties:
+      - event_parameter: "page_location"
+        user_property_name: "most_recent_page_location"
+        value_type: "string_value"
+      - event_parameter: "another_event_param"
+        user_property_name: "most_recent_param"
+        value_type: "string_value"
 ```
 ### GA4 Recommended Events
 
@@ -185,7 +185,7 @@ Specific event names can be specified as conversions by setting the `conversion_
 ```
 vars:
   ga4:
-      conversion_events:['purchase','download']
+    conversion_events:['purchase','download']
 ```
 
 # Incremental Loading of Event Data (and how to handle late-arriving hits)
@@ -214,7 +214,7 @@ Example:
 ```
 vars:
   ga4:
-      frequency:"daily+streaming"
+    frequency:"daily+streaming"
 ```
 
 # Connecting to BigQuery
