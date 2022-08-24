@@ -40,13 +40,16 @@ include_event_key as (
 remove_query_params as (
 
     select 
-        * EXCEPT (page_location),
+        * EXCEPT (page_location, page_referrer),
         page_location as original_page_location,
+        page_referrer as original_page_referrer,
         -- If there are query parameters to exclude, exclude them using regex
         {% if var('query_parameter_exclusions',none) is not none %}
-        {{remove_query_parameters('page_location',var('query_parameter_exclusions'))}} as page_location
+        {{remove_query_parameters('page_location',var('query_parameter_exclusions'))}} as page_location,
+        {{remove_query_parameters('page_referrer',var('query_parameter_exclusions'))}} as page_referrer
         {% else %}
-        page_location
+        page_location,
+        page_referrer
         {% endif %}
     from include_event_key
 ),
