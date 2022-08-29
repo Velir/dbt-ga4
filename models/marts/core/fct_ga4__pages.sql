@@ -1,6 +1,6 @@
 {{ config(
     materialized= 'incremental',
-    unique_key=['page_key']
+    unique_key='page_key'
 )
 }}
 with page_view as (
@@ -19,11 +19,9 @@ from {{ref('stg_ga4__event_page_view')}}
 ), scroll as (
     select
         page_key,
-        event_date_dt,
-        page_location, 
         count(event_name) as scroll_events
     from {{ref('stg_ga4__event_scroll')}}
-    group by 1,2,3
+    group by 1
 )
 {% if var('conversion_events',false) %}
 ,

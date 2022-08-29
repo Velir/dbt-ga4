@@ -1,6 +1,6 @@
 {{ config(
     materialized= 'incremental',
-    unique_key=['page_key']
+    unique_key='page_key'
 )
 }}
 -- get the last value for ephemeral dimensions each day
