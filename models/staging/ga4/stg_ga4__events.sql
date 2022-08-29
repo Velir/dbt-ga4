@@ -44,6 +44,12 @@ include_event_key as (
         to_base64(md5(CONCAT(CAST(session_key as STRING), CAST(session_event_number as STRING)))) as event_key -- Surrogate key for unique events
     from include_event_number
 ),
+include_page_key as (
+    select
+        include_event_key.*,
+        to_base64(md5(concat( cast(event_date_dt as string), page_location ))) as page_key
+    from include_event_key
+),
 -- Remove specific query strings from page_location field
 remove_query_params as (
 
@@ -59,7 +65,7 @@ remove_query_params as (
         page_location,
         page_referrer
         {% endif %}
-    from include_event_key
+    from include_page_key
 ),
 enrich_params as (
     select 

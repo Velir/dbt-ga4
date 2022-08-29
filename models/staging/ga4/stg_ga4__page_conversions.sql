@@ -3,24 +3,16 @@
 ) }}
 with events as (
     select 
-        1 as event_count,
-        event_name,
-        event_date_dt,
-        extract( hour from (select  timestamp_micros(event_timestamp))) as hour,
-        page_location
+        page_key,
+        1 as event_count
     from {{ref('stg_ga4__events')}}
-),
-pk as (
-    select
-        distinct (concat( cast(event_date_dt as string), cast(hour as string), page_location )) as page_key,
-    from events
 )
 -- For loop that creates 1 cte per conversions, grouped by page_location
 {% for ce in var('conversion_events',[]) %}
 ,
 conversion_{{ce}} as (
     select
-        distinct (concat( cast(event_date_dt as string), cast(hour as string), page_location )) as page_key,
+        page_key,
         sum(event_count) as conversion_count,
     from events
     where event_name = '{{ce}}'
