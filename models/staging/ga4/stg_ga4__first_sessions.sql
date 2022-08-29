@@ -10,10 +10,10 @@ with first_events as (
     where ga_session_number = 1
 )
 select
-    session_key,
+    session_key as first_session_key,
     user_key,
-    event_date_dt as session_start_date,
-    event_timestamp as session_start_timestamp,
+    event_date_dt as first_session_start_date,
+    event_timestamp as first_session_start_timestamp,
     geo_country as first_geo_country,
     geo_region as first_geo_region,
     geo_city as first_geo_city,    
