@@ -13,6 +13,9 @@
       {{ ga4.unnest_key('event_params', 'click_tag_name') }},
       {{ ga4.unnest_key('event_params', 'click_url') }},
       {{ ga4.unnest_key('event_params', 'file_name') }}
+      {% if var("default_custom_parameters", "none") != "none" %}
+        {{ ga4.stage_custom_parameters( var("default_custom_parameters") )}}
+      {% endif %}
       {% if var("click_custom_parameters", "none") != "none" %}
         {{ ga4.stage_custom_parameters( var("click_custom_parameters") )}}
       {% endif %}
