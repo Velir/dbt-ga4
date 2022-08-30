@@ -1,6 +1,6 @@
 {{ config(
     materialized= 'incremental',
-    unique_key='session_key',
+    unique_key='first_session_key',
 )
 }}
 with first_events as (

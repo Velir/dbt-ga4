@@ -5,7 +5,7 @@
 )
 }}
 
-with last_event_values as (  -- get the last session start event for each user
+with last_event_values as (  -- get the last session event for each user
     select
         *
     from {{ref('stg_ga4__users_last_events')}} 
