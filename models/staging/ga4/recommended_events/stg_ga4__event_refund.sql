@@ -21,7 +21,7 @@ with refund_with_params as (
     {{ ga4.unnest_key('event_params', 'value', 'float_value') }},
     {{ ga4.unnest_key('event_params', 'tax', 'float_value') }},
     {{ ga4.unnest_key('event_params', 'shipping', 'float_value') }},
-    {{ ga4.unnest_key('event_params', 'affiliation') }},
+    {{ ga4.unnest_key('event_params', 'affiliation') }}
     {% if var("default_custom_parameters", "none") != "none" %}
       {{ ga4.stage_custom_parameters( var("default_custom_parameters") )}}
     {% endif %}

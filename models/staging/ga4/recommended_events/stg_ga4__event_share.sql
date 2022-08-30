@@ -8,7 +8,7 @@ with share_with_params as (
     select *,
     {{ ga4.unnest_key('event_params', 'method') }},
     {{ ga4.unnest_key('event_params', 'content_type') }},
-    {{ ga4.unnest_key('event_params', 'item_id') }},
+    {{ ga4.unnest_key('event_params', 'item_id') }}
     {% if var("default_custom_parameters", "none") != "none" %}
       {{ ga4.stage_custom_parameters( var("default_custom_parameters") )}}
     {% endif %}
