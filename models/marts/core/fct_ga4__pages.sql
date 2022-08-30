@@ -14,7 +14,7 @@ with page_view as (
         sum(entrances) as entrances,
         sum(exits) as exits,
         sum(engagement_time_msec) as total_time_on_page 
-from {{ref('stg_ga4__event_page_view')}}
+    from {{ref('stg_ga4__event_page_view')}}
     group by 1,2,3
 ), scroll as (
     select
