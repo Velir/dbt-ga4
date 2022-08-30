@@ -6,6 +6,9 @@
       case when split(split(page_location,'/')[safe_ordinal(5)],'?')[safe_ordinal(1)] = '' then null else concat('/',split(split(page_location,'/')[safe_ordinal(5)],'?')[safe_ordinal(1)]) end as pagepath_level_2,
       case when split(split(page_location,'/')[safe_ordinal(6)],'?')[safe_ordinal(1)] = '' then null else concat('/',split(split(page_location,'/')[safe_ordinal(6)],'?')[safe_ordinal(1)]) end as pagepath_level_3,
       case when split(split(page_location,'/')[safe_ordinal(7)],'?')[safe_ordinal(1)] = '' then null else concat('/',split(split(page_location,'/')[safe_ordinal(7)],'?')[safe_ordinal(1)]) end as pagepath_level_4
+      {% if var("default_custom_parameters", "none") != "none" %}
+        {{ ga4.stage_custom_parameters( var("default_custom_parameters") )}}
+      {% endif %}
       {% if var("page_view_custom_parameters", "none") != "none" %}
         {{ ga4.stage_custom_parameters( var("page_view_custom_parameters") )}}
       {% endif %}

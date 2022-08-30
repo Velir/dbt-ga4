@@ -10,6 +10,9 @@
       {{ ga4.unnest_key('event_params', 'link_id') }},
       {{ ga4.unnest_key('event_params', 'link_text') }},
       {{ ga4.unnest_key('event_params', 'link_url') }}
+      {% if var("default_custom_parameters", "none") != "none" %}
+        {{ ga4.stage_custom_parameters( var("default_custom_parameters") )}}
+      {% endif %}
       {% if var("file_download_custom_parameters", "none") != "none" %}
         {{ ga4.stage_custom_parameters( var("file_download_custom_parameters") )}}
       {% endif %}

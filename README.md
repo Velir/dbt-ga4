@@ -22,6 +22,7 @@ Features include:
 | stg_ga4__event_to_query_string_params | Mapping between each event and any query parameters & values that were contained in the event's `page_location` field |
 | stg_ga4__user_properties | Finds the most recent occurance of specified user_properties for each user|
 | stg_ga4__derived_user_properties | Finds the most recent occurance of specific event_params and assigns them to a user's user_key. Derived user properties are specified as variables (see documentation below) |
+| stg_ga4__derived_session_properties | Finds the most recent occurance of specific event_params and assigns them to a session's session_key. Derived session properties are specified as variables (see documentation below) |
 | stg_ga4__session_conversions | Produces session-grouped event counts for a configurable list of event names (see documentation below) |
 | stg_ga4__sessions_traffic_sources | Finds the first source, medium, campaign and default channel grouping for each session |
 | dim_ga4__users | Dimension table for users which contains attributes such as first and last page viewed. Unique on `user_key` which is a hash of the `user_id` if it exists, otherwise it falls back to the `user_pseudo_id`.| 
@@ -72,20 +73,20 @@ This package assumes that you have an existing DBT project with a BigQuery profi
 
 ```
 vars:
-    ga4:
-        project: "your_gcp_project"
-        dataset: "your_ga4_dataset"
-        start_date: "YYYYMMDD" # Earliest date to load
-        frequency: "daily" # daily|streaming|daily+streaming Match to the type of export configured in GA4; daily+streaming appends today's intraday data to daily data
+  ga4:
+    project: "your_gcp_project"
+    dataset: "your_ga4_dataset"
+    start_date: "YYYYMMDD" # Earliest date to load
+    frequency: "daily" # daily|streaming|daily+streaming Match to the type of export configured in GA4; daily+streaming appends today's intraday data to daily data
 ```
 
 If you don't have any GA4 data of your own, you can connect to Google's public data set with the following settings:
 
 ```
 vars:
-    project: "bigquery-public-data"
-    dataset: "ga4_obfuscated_sample_ecommerce"
-    start_date: "20210120"
+  project: "bigquery-public-data"
+  dataset: "ga4_obfuscated_sample_ecommerce"
+  start_date: "20210120"
 ```
 
 More info about the GA4 obfuscated dataset here: https://support.google.com/analytics/answer/10937659?hl=en#zippy=%2Cin-this-article
@@ -134,6 +135,16 @@ vars:
         rename_to: "country"
 ```
 
+If there are custom parameters you need on all events, you can define defaults using `default_custom_parameters`, for example:
+
+```
+vars:
+  ga4:
+    default_custom_parameters:
+      - name: "country_code"
+        value_type: "int_value"
+```
+
 ### User Properties
 
 User properties are provided by GA4 in the `user_properties` repeated field. The most recent user property for each user will be extracted and included in the `dim_ga4__users` model by configuring the `user_properties` variable in your project as follows:
@@ -166,14 +177,42 @@ For example:
 ```
 vars:
   ga4:
-      derived_user_properties:
-        - event_parameter: "page_location"
-          user_property_name: "most_recent_page_location"  
-          value_type: "string_value"
-        - event_parameter: "another_event_param"
-          user_property_name: "most_recent_param"  
-          value_type: "string_value"
+    derived_user_properties:
+      - event_parameter: "page_location"
+        user_property_name: "most_recent_page_location"
+        value_type: "string_value"
+      - event_parameter: "another_event_param"
+        user_property_name: "most_recent_param"
+        value_type: "string_value"
 ```
+
+### Derived Session Properties
+
+Derived session properties are similar to derived user properties, but on a per-session basis, for properties that change slowly over time. This provides additional flexibility in allowing users to turn any event parameter into a session property. 
+
+Derived Session Properties are included in the `fct_ga4__sessions` model and contain the latest event parameter value per session. 
+
+```
+derived_session_properties:
+  - event_parameter: "[your event parameter]"
+    session_property_name: "[a unique name for the derived session property]"
+    value_type: "[string_value|int_value|float_value|double_value]"
+```
+
+For example: 
+
+```
+vars:
+  ga4:
+    derived_session_properties:
+      - event_parameter: "page_location"
+        session_property_name: "most_recent_page_location"
+        value_type: "string_value"
+      - event_parameter: "another_event_param"
+        session_property_name: "most_recent_param"
+        value_type: "string_value"
+```
+
 ### GA4 Recommended Events
 
 See the README file at /dbt_packages/models/staging/ga4/recommended_events for instructions on enabling [Google's recommended events](https://support.google.com/analytics/answer/9267735?hl=en).
@@ -185,7 +224,7 @@ Specific event names can be specified as conversions by setting the `conversion_
 ```
 vars:
   ga4:
-      conversion_events:['purchase','download']
+    conversion_events:['purchase','download']
 ```
 
 # Incremental Loading of Event Data (and how to handle late-arriving hits)
@@ -214,7 +253,7 @@ Example:
 ```
 vars:
   ga4:
-      frequency:"daily+streaming"
+    frequency:"daily+streaming"
 ```
 
 # Connecting to BigQuery

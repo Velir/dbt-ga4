@@ -10,6 +10,9 @@
       {{ ga4.unnest_key('event_params', 'video_provider') }},
       {{ ga4.unnest_key('event_params', 'vide_title') }},
       {{ ga4.unnest_key('event_params', 'visible') }}
+      {% if var("default_custom_parameters", "none") != "none" %}
+        {{ ga4.stage_custom_parameters( var("default_custom_parameters") )}}
+      {% endif %}
       {% if var("video_start_custom_parameters", "none") != "none" %}
         {{ ga4.stage_custom_parameters( var("video_start_custom_parameters") )}}
       {% endif %}
