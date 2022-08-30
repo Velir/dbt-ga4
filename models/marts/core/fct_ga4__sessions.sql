@@ -13,17 +13,26 @@ with session_metrics as
         sum(engagement_time_msec) as sum_engagement_time_msec
     from {{ref('stg_ga4__events')}}
     group by 1,2
+),
+
+include_session_properties as (
+    select * from session_metrics
+    {% if var('derived_session_properties', false) %}
+    -- If derived session properties have been assigned as variables, join them on the session_key
+    left join {{ref('stg_ga4__derived_session_properties')}} using (session_key)
+    {% endif %}
 )
+
 {% if var('conversion_events',false) %}
 ,
 join_conversions as (
     select 
         *
-    from session_metrics
+    from include_session_properties
     left join {{ref('stg_ga4__session_conversions')}} using (session_key)
 )
 select * from join_conversions
 {% else %}
-select * from session_metrics
+select * from include_session_properties
 {% endif %}
 
