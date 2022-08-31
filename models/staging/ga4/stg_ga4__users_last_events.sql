@@ -37,6 +37,9 @@ events_joined as (
         events_last.event_timestamp as last_seen_timestamp,
         events_last.event_date_dt as last_seen_dt,
         events_last.ga_session_number as num_sessions
+        {% if var("stg_ga4__users_last_events_custom_parameters", "none") != "none" %}
+            {{ ga4.mart_custom_parameters( var("stg_ga4__users_last_events_custom_parameters"), 'last_' )}}
+        {% endif %}
     from events_by_user_key
     left join {{ref('stg_ga4__events')}} events_last
         on events_by_user_key.last_event_key = events_last.event_key

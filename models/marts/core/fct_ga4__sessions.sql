@@ -39,13 +39,19 @@ with session_metrics as
         sum(event_value_in_usd) as sum_event_value_in_usd,
         ifnull(max(session_engaged), 0) as session_engaged,
         sum(engagement_time_msec) as sum_engagement_time_msec
+        {% if var("fct_ga4__sessions_custom_parameters", "none") != "none" %}
+            {{ ga4.mart_custom_parameters( var("fct_ga4__sessions_custom_parameters") )}}
+        {% endif %}
     from {{ref('stg_ga4__events')}}
     {% if is_incremental() %}
         {% if var('static_incremental_days', 1 ) %}
             where event_date_dt in ({{ partitions_to_replace | join(',') }})
         {% endif %}
     {% endif %}
-    group by 1,2
+    group by 1,2    
+    {% if var("fct_ga4__sessions_custom_parameters", "none") != "none" %}  
+        {{ ga4.mart_group_by_custom_parameters( var("fct_ga4__sessions_custom_parameters") )}} 
+    {% endif %}
 ),
 
 include_session_properties as (

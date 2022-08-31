@@ -145,6 +145,18 @@ vars:
         value_type: "int_value"
 ```
 
+Advanced: You can add custom parameters to your data marts. However, this requires knowledge of advanced knowledge of BigQuery to get the desired result. It is easy to break your
+
+```
+[mart_name_custom_parameters]
+  - parameter_name: "[name of custom parameter]"
+    aggregation: ""  --  required for metrics on marts that group by
+```
+
+For metrics, the aggregation parameter is any (BigQuery aggregate function)[https://cloud.google.com/bigquery/docs/reference/standard-sql/aggregate_functions]. It is required for metrics on marts that have a `group by` clause or empty where there is no grouping. The most common values for aggregation are `sum` and `count`.
+
+For dimensions, the aggregation parameter is should be set to `group` in models that have a `group by` clause or empty where there is no grouping.
+
 ### User Properties
 
 User properties are provided by GA4 in the `user_properties` repeated field. The most recent user property for each user will be extracted and included in the `dim_ga4__users` model by configuring the `user_properties` variable in your project as follows:

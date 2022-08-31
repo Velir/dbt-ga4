@@ -61,6 +61,9 @@ with session_start_dims as (
         traffic_source_medium,
         traffic_source_source,
         row_number() over (partition by session_key order by session_event_number asc) as row_num
+        {% if var("dim_ga4__sessions_custom_parameters", "none") != "none" %}
+            {{ ga4.mart_custom_parameters( var("dim_ga4__sessions_custom_parameters") )}}
+        {% endif %}
     from {{ref('stg_ga4__events')}}
     {% if is_incremental() %}
         {% if var('static_incremental_days', 1 ) %}

@@ -14,8 +14,14 @@ with page_view as (
         sum(entrances) as entrances,
         sum(exits) as exits,
         sum(engagement_time_msec) as total_time_on_page 
+        {% if var("fct_ga4__pages_custom_parameters", "none") != "none" %}
+            {{ ga4.mart_custom_parameters( var("fct_ga4__pages_custom_parameters") )}}
+        {% endif %}
     from {{ref('stg_ga4__event_page_view')}}
-    group by 1,2,3
+    group by 1,2,3 
+    {% if var("fct_ga4__pages_custom_parameters", "none") != "none" %}  
+        {{ ga4.mart_group_by_custom_parameters( var("fct_ga4__pages_custom_parameters") )}} 
+    {% endif %}
 ), scroll as (
     select
         page_key,

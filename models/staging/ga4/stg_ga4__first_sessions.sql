@@ -39,6 +39,9 @@ select
     traffic_source_source as first_traffic_source_source,
     page_referrer as first_page_referrer,
     page_location as first_page_location,
-    page_hostname as first_page_hostname,
+    page_hostname as first_page_hostname
+    {% if var("stg_ga4__first_sessions_custom_parameters", "none") != "none" %}
+        {{ ga4.mart_custom_parameters( var("stg_ga4__first_sessions_custom_parameters"), 'first_' )}}
+    {% endif %}
 from {{ ref('stg_ga4__events') }}
 right join first_events using (event_key)
