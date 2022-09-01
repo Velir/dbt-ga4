@@ -1,10 +1,31 @@
-{{ config(
-    materialized= 'incremental',
-    unique_key='page_key'
-)
-}}
--- get the last value for ephemeral dimensions each day
--- todo: add custom dimensions
+{% if is_incremental %}
+    {% set partitions_to_replace = ['current_date'] %}
+    {% for i in range(var('static_incremental_days', 1)) %}
+        {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
+    {% endfor %}
+    {{
+        config(
+            materialized = 'incremental',
+            incremental_strategy = 'insert_overwrite',
+            partition_by={
+                "field": "event_date_dt",
+                "data_type": "date",
+            },
+            partitions = partitions_to_replace,
+        )
+    }}
+{% else %}
+    {{
+        config(
+            materialized = 'incremental',
+            incremental_strategy = 'insert_overwrite',
+            partition_by={
+                "field": "event_date_dt",
+                "data_type": "date",
+            },
+        )
+    }}
+{% endif %}
 with page_view as (
     select
         page_key,
@@ -25,6 +46,11 @@ with page_view as (
             {% endif %}
         from {{ref('stg_ga4__event_page_view')}}
     )
+    {% if is_incremental() %}
+    {% if var('static_incremental_days', 1 ) %}
+        where event_date_dt in ({{ partitions_to_replace | join(',') }})
+    {% endif %}
+{% endif %}
     group by 1,2,3,4
     {% if var("dim_ga4__pages_custom_parameters", "none") != "none" %}  
         {{ ga4.mart_group_by_custom_parameters( var("dim_ga4__pages_custom_parameters") )}} 
