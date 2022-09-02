@@ -1,13 +1,12 @@
+-- incremental with no key combines with where user_key not in {{this}} to only add sessions with new user_keys
 {{ config(
     materialized= 'incremental',
-    unique_key='first_session_key',
 )
 }}
-with first_events as (
+with first_events as (  -- get only the first event in the partions being updated
     select
-        first_page_view_event_key as event_key,
-    from {{ ref('stg_ga4__sessions_first_last_pageviews') }}
-    where ga_session_number = 1
+        first_value(first_event_key) over (partition by user_key order by first_event_timestamp asc) as event_key
+    from {{ ref('stg_ga4__sessions_first_last_events') }}
 )
 select
     session_key as first_session_key,
@@ -44,4 +43,7 @@ select
         {{ ga4.mart_custom_parameters( var("stg_ga4__first_sessions_custom_parameters"), 'first_' )}}
     {% endif %}
 from {{ ref('stg_ga4__events') }}
-right join first_events using (event_key)
+right join first_events using (event_key) -- right join to only get first_events in session
+{% if is_incremental() %}
+    where user_key not in (select user_key from {{ this }})
+{% endif %}

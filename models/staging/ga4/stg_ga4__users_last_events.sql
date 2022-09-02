@@ -1,8 +1,8 @@
 with events_by_user_key as (
     select distinct
         user_key,
-        last_value(event_key) OVER (PARTITION BY user_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) as last_event_key
-    from {{ref('stg_ga4__events')}}
+        last_event_key
+    from {{ref('stg_ga4__sessions_first_last_events')}}
     where user_key is not null --remove users with privacy settings enabled
 ),
 events_joined as (
@@ -37,8 +37,8 @@ events_joined as (
         events_last.event_timestamp as last_seen_timestamp,
         events_last.event_date_dt as last_seen_dt,
         events_last.ga_session_number as num_sessions
-        {% if var("stg_ga4__users_last_events_custom_parameters", "none") != "none" %}
-            {{ ga4.mart_custom_parameters( var("stg_ga4__users_last_events_custom_parameters"), 'last_' )}}
+        {% if var("stg_ga4__user_last_events_custom_parameters", "none") != "none" %}
+            {{ ga4.mart_custom_parameters( var("stg_ga4__user_last_events_custom_parameters"), 'last_' )}}
         {% endif %}
     from events_by_user_key
     left join {{ref('stg_ga4__events')}} events_last
