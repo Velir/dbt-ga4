@@ -6,6 +6,7 @@
     {{
         config(
             materialized = 'incremental',
+            tags=["incremental"],
             incremental_strategy = 'insert_overwrite',
             partition_by={
                 "field": "event_date_dt",
@@ -18,6 +19,7 @@
     {{
         config(
             materialized = 'incremental',
+            tags=["incremental"],
             incremental_strategy = 'insert_overwrite',
             partition_by={
                 "field": "event_date_dt",
@@ -52,7 +54,8 @@ with page_view as (
     {% if var("fct_ga4__pages_custom_parameters", "none") != "none" %}  
         {{ ga4.mart_group_by_custom_parameters( var("fct_ga4__pages_custom_parameters") )}} 
     {% endif %}
-), scroll as (
+)
+, scroll_events_cte as (
     select
         page_key,
         count(event_name) as scroll_events
@@ -66,13 +69,13 @@ with page_view as (
     {% endif %}
     group by 1
 )
+
 {% if var('conversion_events',false) %}
 ,
-join_conversions as (
+conversions_cte as (
     select 
         *
-    from page_view
-    left join {{ ref('stg_ga4__page_conversions') }} using (page_key)
+    from {{ ref('stg_ga4__page_conversions') }} conversions 
     {% if is_incremental() %}
         {% if var('static_incremental_days', false ) %}
             where event_date_dt in ({{ partitions_to_replace | join(',') }})
@@ -81,15 +84,20 @@ join_conversions as (
         {% endif %}
     {% endif %}
 )
+
 select
-    join_conversions.*,
-    ifnull(scroll.scroll_events, 0) as scroll_events
-from join_conversions
-left join scroll using (page_key)
+    page_view.* EXCEPT (page_key,event_date_dt),
+    conversions_cte.*,
+    ifnull(scroll_events_cte.scroll_events, 0) as scroll_events
+from page_view
+left join conversions_cte using (page_key)
+left join scroll_events_cte using (page_key)
+
 {% else %}
+-- Else if no conversions to join
 select
     page_view.*,
-    ifnull(scroll.scroll_events, 0) as scroll_events
+    ifnull(scroll_events_cte.scroll_events, 0) as scroll_events
 from page_view
-left join scroll using (page_key)
+left join scroll_events_cte using (page_key)
 {% endif %}
