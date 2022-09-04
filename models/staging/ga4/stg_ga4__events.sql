@@ -55,13 +55,19 @@ remove_query_params as (
         {% endif %}
     from include_event_key
 ),
+-- TODO talk to Damon about definition of page_key and whether it should be set pre/post exclude query params
+include_page_key as (
+    select
+        *,
+        to_base64(md5(concat( cast(event_date_dt as string), page_location ))) as page_key
+    from remove_query_params
+),
 enrich_params as (
     select 
         *,
         {{extract_hostname_from_url('page_location')}} as page_hostname,
         {{extract_query_string_from_url('page_location')}} as page_query_string,
-    from remove_query_params
+    from include_page_key
 )
-
 
 select * from enrich_params
