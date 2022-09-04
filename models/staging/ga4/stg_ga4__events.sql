@@ -33,7 +33,7 @@ include_session_key as (
 include_event_key as (
     select 
         include_session_key.*,
-        to_base64(md5(CONCAT(CAST(session_key as STRING), CAST(1 as STRING)))) as event_key -- Surrogate key for unique events
+        to_base64(md5(CONCAT(CAST(session_key as STRING), CAST(event_timestamp as STRING)))) as event_key -- Surrogate key for unique events
     from include_session_key
 ),
 -- Remove specific query strings from page_location field
