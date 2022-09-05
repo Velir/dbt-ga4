@@ -7,7 +7,7 @@ with user_mappings as (
 ),
 user_pseudo_id_cte as (
     select 
-        user_pseudo_id
+        user_pseudo_id,
         -- last_seen_timestamp is included so we know which dates to process in an incremental run
         max(event_timestamp) as last_seen_timestamp
     from user_mappings
@@ -18,7 +18,7 @@ most_recent_user_id_mapping as (
         user_pseudo_id,
         -- Find the most recent user_id
         LAST_VALUE(user_id)
-            OVER (PARTITION BY user_pseudo_id ORDER BY event_timestap ASC
+            OVER (PARTITION BY user_pseudo_id ORDER BY event_timestamp ASC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS last_seen_user_id
     from user_mappings
     where user_id is not null
