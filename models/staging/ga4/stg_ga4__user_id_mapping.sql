@@ -5,10 +5,13 @@ with user_mappings as (
         event_timestamp 
     from {{ref('stg_ga4__events')}}
 ),
-distinct_user_pseudo_id as (
-    select distinct
+user_pseudo_id_cte as (
+    select 
         user_pseudo_id
+        -- last_seen_timestamp is included so we know which dates to process in an incremental run
+        max(event_timestamp) as last_seen_timestamp
     from user_mappings
+    group by 1
 ),
 most_recent_user_id_mapping as (
     select
@@ -23,6 +26,7 @@ most_recent_user_id_mapping as (
 
 select
     user_pseudo_id,
+    last_seen_timestamp,
     most_recent_user_id_mapping.last_seen_user_id
-from distinct_user_pseudo_id
+from user_pseudo_id_cte
     left join most_recent_user_id_mapping using (user_pseudo_id)
