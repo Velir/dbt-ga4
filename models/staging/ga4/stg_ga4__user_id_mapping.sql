@@ -1,9 +1,21 @@
+{{
+    config(
+        materialized = 'incremental',
+        tags = ["incremental"],
+        unique_key='user_pseudo_id'
+    )
+}}
+
 with user_mappings as (
     select 
         user_id,
         user_pseudo_id,
         event_timestamp 
     from {{ref('stg_ga4__events')}}
+    {% if is_incremental() %}
+        -- Process mappings starting the day before the most recent mapping
+        where event_date_dt >= DATE_SUB((SELECT max(DATE(TIMESTAMP_MICROS(last_seen_timestamp))) from {{this}}), INTERVAL 1 DAY)
+    {% endif %}
 ),
 user_pseudo_id_cte as (
     select 
