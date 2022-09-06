@@ -4,7 +4,7 @@
 )
 }}
 with first_events as (  -- get only the first event in the partions being updated
-    select
+    select distinct
         first_value(first_event_key) over (partition by user_key order by first_event_timestamp asc) as event_key
     from {{ ref('stg_ga4__sessions_first_last_events') }}
 )
