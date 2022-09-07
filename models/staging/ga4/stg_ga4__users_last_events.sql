@@ -2,8 +2,15 @@ with events_by_user_key as (
     select distinct
         user_key,
         last_event_key
-    from {{ref('stg_ga4__sessions_first_last_events')}}
-    where user_key is not null --remove users with privacy settings enabled
+    from
+    (
+        select 
+            user_key, 
+            last_event_key, 
+            row_number() over (partition by user_key order by last_seen_timestamp desc) as rn 
+        from {{ref('stg_ga4__sessions_first_last_events')}} 
+    ) 
+    where rn = 1
 ),
 events_joined as (
     select
