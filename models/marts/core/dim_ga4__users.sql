@@ -55,7 +55,6 @@ select
 from new_values
 left join current_values using (user_key)
 left join first_session using (user_key)
-group by user_key
 
 {% else %} -- build the table from scratch
 user_events as (
