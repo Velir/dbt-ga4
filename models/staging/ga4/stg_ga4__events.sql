@@ -25,16 +25,18 @@ include_session_key as (
         to_base64(md5(CONCAT(stream_id, CAST(user_key as STRING), cast(ga_session_id as STRING)))) as session_key -- Surrogate key to determine unique session across streams and users. Sessions do NOT reset after midnight in GA4
     from add_user_key
 ),
+/*
+-- Removing row_number() calculation as it negates the base table partition. Would like to include equivalent method of determining event uniqueness somehow
 include_event_number as (
     select include_session_key.*,
         row_number() over(partition by session_key) as session_event_number -- Number each event within a session to help generate a uniqu event key
     from include_session_key
-),
+),*/
 include_event_key as (
     select 
-        include_event_number.*,
-        to_base64(md5(CONCAT(CAST(session_key as STRING), CAST(session_event_number as STRING)))) as event_key -- Surrogate key for unique events
-    from include_event_number
+        include_session_key.*,
+        to_base64(md5(CONCAT(CAST(session_key as STRING), event_name, CAST(event_timestamp as STRING)))) as event_key -- Surrogate key for unique events
+    from include_session_key
 ),
 -- Remove specific query strings from page_location field
 remove_query_params as (
