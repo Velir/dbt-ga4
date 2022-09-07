@@ -7,7 +7,7 @@ with events_by_user_key as (
         select 
             user_key, 
             last_event_key, 
-            row_number() over (partition by user_key order by last_seen_timestamp desc) as rn 
+            row_number() over (partition by user_key order by first_event_timestamp desc) as rn 
         from {{ref('stg_ga4__sessions_first_last_events')}} 
     ) 
     where rn = 1
