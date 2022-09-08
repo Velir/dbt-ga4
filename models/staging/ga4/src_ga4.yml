@@ -14,21 +14,42 @@ sources:
       - name: first_sessions
         identifier: stg_ga4__first_sessions
         description: Staging table that holds the first sessions for every user. Used to avoid full table lookups when building incremental user models.
-          columns:
-            - name: user_key
-              tests:
-                - unique
+        columns:
+          - name: user_key
+            tests:
+              - unique
       - name: users_last_pageview
         identifier: stg_ga4__users_last_pageview
         description: Holds values from the most recent page_view event for users in the partitions being queried.
-          columns:
-            - name: user_key
-              tests:
-                - unique
+        columns:
+          - name: user_key
+            tests:
+              - unique
       - name: users_last_event
         identifier: stg_ga4__users_last_event
         description: Holds values from the most recent event for users in the partitions being queried.
-          columns:
-            - name: user_key
-              tests:
-                - unique
+        columns:
+          - name: user_key
+            tests:
+              - unique
+      - name: user_properties
+        identifier: stg_ga4__user_properties
+        description: Adds custom user properties to user models.
+        columns:
+          - name: user_key
+            tests:
+              - unique
+      - name: sessions_last_pageview
+        identifier: stg_ga4__sessions_last_pageview
+        description: Holds values from the most recent page_view event for sessions in the partitions being queried.
+        columns:
+          - name: session_key
+            tests:
+              - unique
+      - name: sessions_last_event
+        identifier: stg_ga4__sessions_last_event
+        description: Holds values from the most recent event for sessions in the partitions being queried.
+        columns:
+          - name: session_key
+            tests:
+              - unique
