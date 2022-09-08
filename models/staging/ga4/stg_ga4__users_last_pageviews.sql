@@ -2,8 +2,15 @@ with page_views_by_user_key as (
     select distinct
         user_key,
         last_page_view_event_key
-    from {{ref('stg_ga4__sessions_first_last_pageviews')}}
-    where user_key is not null -- Remove users with privacy settings enabled
+    from
+    (
+        select
+            user_key,
+            last_page_view_event_key,
+            row_number() over (partition by user_key order by first_event_timestamp desc) as rn 
+        from {{ref('stg_ga4__sessions_first_last_pageviews')}} 
+    ) 
+    where rn = 1
 ),
 page_views_joined as (
     select
