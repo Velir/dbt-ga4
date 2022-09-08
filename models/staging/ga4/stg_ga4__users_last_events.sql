@@ -56,4 +56,4 @@ events_joined as (
     from {{ref('stg_ga4__users_last_pageviews')}}
     right join events_joined using (user_key)
 )
-select * from events_joined
+select * from pageview
