@@ -11,3 +11,24 @@ sources:
       - name: events_intraday
         identifier: events_intraday_*
         description: Intraday events table which is optionally exported by GA4. Always contains events from the current day.
+      - name: first_sessions
+        identifier: stg_ga4__first_sessions
+        description: Staging table that holds the first sessions for every user. Used to avoid full table lookups when building incremental user models.
+          columns:
+            - name: user_key
+              tests:
+                - unique
+      - name: users_last_pageview
+        identifier: stg_ga4__users_last_pageview
+        description: Holds values from the most recent page_view event for users in the partitions being queried.
+          columns:
+            - name: user_key
+              tests:
+                - unique
+      - name: users_last_event
+        identifier: stg_ga4__users_last_event
+        description: Holds values from the most recent event for users in the partitions being queried.
+          columns:
+            - name: user_key
+              tests:
+                - unique
