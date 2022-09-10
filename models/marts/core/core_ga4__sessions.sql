@@ -2,7 +2,12 @@
     config(
         materialized = 'incremental',
         tags = ["incremental"],
-        unique_key='session_key'
+        unique_key='session_key',
+        partition_by={
+        "field": "session_start_date",
+        "data_type": "date",
+        "granularity": "day"
+        }
     )
 }}
 
@@ -33,6 +38,8 @@
             ifnull(max(session_engaged), 0) as session_engaged,
             sum(engagement_time_msec) as sum_engagement_time_msec
         from {{ref('stg_ga4__events')}}
+        -- This documentation states that using a dynamic value to prune partitions will not work:
+        -- https://cloud.google.com/bigquery/docs/querying-partitioned-tables#better_performance_with_pseudo-columns
         where event_date_dt >= (select max_session_start_date_less_1 from max_date_cte)
         and session_key in (select session_key from sessions_to_process)
         group by 1,2
