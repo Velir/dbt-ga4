@@ -2,16 +2,22 @@ import pytest
 from dbt.tests.util import read_file,check_relations_equal,run_dbt
 
 # Define mocks via CSV (seeds) or SQL (models)
-mock_stg_ga4__events_csv = """user_key,event_key,event_timestamp,geo,device,traffic_source
-1111,event_key_client_1_0,1981-05-20T06:46:40,AL,Computer,Internet
-1111,event_key_client_1_1,1981-05-20T06:46:50,MO,Phone,Dial-Up
+mock_stg_ga4__events_csv = """session_key,event_name
+AAAA,page_view
+AAAA,my_conversion
+AAAA,my_conversion
+BBBB,my_conversion
+CCCC,some_other_event
 """.lstrip()
 
-expected_csv = """user_key,first_event,last_event,first_geo,first_device,first_traffic_source,last_geo,last_device,last_traffic_source
-1111,event_key_client_1_0,event_key_client_1_1,AL,Computer,Internet,MO,Phone,Dial-Up
+expected_csv = """session_key,my_conversion_count
+AAAA,2
+BBBB,1
+CCCC,0
 """.lstrip()
 
-actual = read_file('../models/staging/ga4/stg_ga4__users_first_last_events.sql')
+# TODO, need to set the conversion_events variable somehow
+actual = read_file('../models/staging/ga4/stg_ga4__session_conversions.sql')
 
 class TestUsersFirstLastEvents():
     # everything that goes in the "seeds" directory (= CSV format)
@@ -30,5 +36,5 @@ class TestUsersFirstLastEvents():
         }
     
     def test_mock_run_and_check(self, project):
-        run_dbt(["build"])
+        run_dbt(["build", "--vars", "conversion_events: ['my_conversion']"])
         check_relations_equal(project.adapter, ["actual", "expected"])

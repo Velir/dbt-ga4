@@ -10,7 +10,7 @@ with session_start_dims as (
         geo,
         device,
         row_number() over (partition by session_key order by session_event_number asc) as row_num
-    from {{ref("stg_ga4__event_session_start")}}
+    from {{ref('stg_ga4__event_session_start')}}
 ),
 -- Arbitrarily pull the first session_start event to remove duplicates
 remove_dupes as 
@@ -23,6 +23,10 @@ join_traffic_source as (
         remove_dupes.*,
         session_source as source,
         session_medium as medium,
+<<<<<<< HEAD
+=======
+        session_campaign as campaign,
+>>>>>>> main
         session_default_channel_grouping as default_channel_grouping
     from remove_dupes
     left join {{ref('stg_ga4__sessions_traffic_sources')}} using (session_key)

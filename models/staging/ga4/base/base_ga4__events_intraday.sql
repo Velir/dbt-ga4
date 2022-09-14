@@ -15,7 +15,7 @@ with source as (
         event_bundle_sequence_id,
         event_server_timestamp_offset,
         user_id,
-        user_pseudo_id as client_id,
+        user_pseudo_id,
         privacy_info,
         user_properties,
         user_first_touch_timestamp,
@@ -27,7 +27,7 @@ with source as (
         stream_id,
         platform,
         ecommerce,
-        items
+        items,
     from {{ source('ga4', 'events_intraday') }}
 ),
 renamed as (
@@ -41,7 +41,7 @@ renamed as (
         event_bundle_sequence_id,
         event_server_timestamp_offset,
         user_id,
-        client_id,
+        user_pseudo_id,
         privacy_info,
         user_properties,
         user_first_touch_timestamp,
@@ -54,14 +54,16 @@ renamed as (
         platform,
         ecommerce,
         items,
-        {{ unnest_key('event_params', 'ga_session_id', 'int_value') }},
-        {{ unnest_key('event_params', 'page_location') }},
-        {{ unnest_key('event_params', 'ga_session_number',  'int_value') }},
-        {{ unnest_key('event_params', 'session_engaged', 'int_value') }},
-        {{ unnest_key('event_params', 'page_title') }},
-        {{ unnest_key('event_params', 'page_referrer') }},
-        {{ unnest_key('event_params', 'source') }},
-        {{ unnest_key('event_params', 'medium') }},
+        {{ ga4.unnest_key('event_params', 'ga_session_id', 'int_value') }},
+        {{ ga4.unnest_key('event_params', 'page_location') }},
+        {{ ga4.unnest_key('event_params', 'ga_session_number',  'int_value') }},
+        (case when (SELECT value.string_value FROM unnest(event_params) WHERE key = "session_engaged") = "1" then 1 end) as session_engaged,
+        {{ ga4.unnest_key('event_params', 'engagement_time_msec', 'int_value') }},
+        {{ ga4.unnest_key('event_params', 'page_title') }},
+        {{ ga4.unnest_key('event_params', 'page_referrer') }},
+        {{ ga4.unnest_key('event_params', 'source') }},
+        {{ ga4.unnest_key('event_params', 'medium') }},
+        {{ ga4.unnest_key('event_params', 'campaign') }},
         CASE 
             WHEN event_name = 'page_view' THEN 1
             ELSE 0

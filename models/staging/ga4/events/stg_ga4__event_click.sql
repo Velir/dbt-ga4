@@ -2,19 +2,19 @@
  
  with click_with_params as (
    select *,
-      {{ unnest_key('event_params', 'entrances',  'int_value') }},
-      {{ unnest_key('event_params', 'outbound') }},
-      {{ unnest_key('event_params', 'link_classes') }},
-      {{ unnest_key('event_params', 'link_domain') }},
-      {{ unnest_key('event_params', 'link_url') }},
-      {{ unnest_key('event_params', 'click_element') }},
-      {{ unnest_key('event_params', 'link_id') }},
-      {{ unnest_key('event_params', 'click_region') }},
-      {{ unnest_key('event_params', 'click_tag_name') }},
-      {{ unnest_key('event_params', 'click_url') }},
-      {{ unnest_key('event_params', 'file_name') }}
+      {{ ga4.unnest_key('event_params', 'entrances',  'int_value') }},
+      {{ ga4.unnest_key('event_params', 'outbound') }},
+      {{ ga4.unnest_key('event_params', 'link_classes') }},
+      {{ ga4.unnest_key('event_params', 'link_domain') }},
+      {{ ga4.unnest_key('event_params', 'link_url') }},
+      {{ ga4.unnest_key('event_params', 'click_element') }},
+      {{ ga4.unnest_key('event_params', 'link_id') }},
+      {{ ga4.unnest_key('event_params', 'click_region') }},
+      {{ ga4.unnest_key('event_params', 'click_tag_name') }},
+      {{ ga4.unnest_key('event_params', 'click_url') }},
+      {{ ga4.unnest_key('event_params', 'file_name') }}
       {% if var("click_custom_parameters", "none") != "none" %}
-        {{ stage_custom_parameters( var("click_custom_parameters") )}}
+        {{ ga4.stage_custom_parameters( var("click_custom_parameters") )}}
       {% endif %}
  from {{ref('stg_ga4__events')}}
  where event_name = 'click'

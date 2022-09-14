@@ -6,11 +6,11 @@ Features include:
 - Flattened models to access common events and event parameters such as `page_view`, `session_start`, and `purchase`
 - Conversion of sharded event tables into a single partitioned table
 - Incremental loading of GA4 data into your staging tables 
-- Session and User dimensional models
+- Session and user dimensional models with conversion counts
 - Easy access to query parameters such as GCLID and UTM params
 - Support for custom event parameters & custom user properties
-- Convert source/medium to default channel grouping
-- Exclude query parameters from page_location to clean up URL-related metrics
+- Mapping from source/medium to default channel grouping
+- Ability to exclude query parameters (like `fbclid`) from page paths
 
 # Models
 
@@ -18,11 +18,23 @@ Features include:
 |-------|-------------|
 | stg_ga4__events | Contains cleaned event data that is enhanced with useful event and session keys. |
 | stg_ga4__event_* | 1 model per event (ex: page_view, purchase) which flattens event parameters specific to that event |
+| stg_ga4__event_items | Contains item data associated with e-commerce events (Purchase, add to cart, etc) |
 | stg_ga4__event_to_query_string_params | Mapping between each event and any query parameters & values that were contained in the event's `page_location` field |
-| stg_ga4__user_properties | Finds the most recent occurance of specific event_params and assigns them to a user's client_id. Event params are specified as variables (see documentation below) |
-| stg_ga4__sessions_traffic_sources | Finds the source, medium, and default channel grouping for each session |
-| dim_ga4__users | Dimension table for users which contains attributes such as first and last page viewed. | 
+| stg_ga4__user_properties | Finds the most recent occurance of specific event_params and assigns them to a user's user_key. User properties are specified as variables (see documentation below) |
+| stg_ga4__session_conversions | Produces session-grouped event counts for a configurable list of event names (see documentation below) |
+| stg_ga4__sessions_traffic_sources | Finds the first source, medium, campaign and default channel grouping for each session |
+| dim_ga4__users | Dimension table for users which contains attributes such as first and last page viewed. Unique on `user_key` which is a hash of the `user_id` if it exists, otherwise it falls back to the `user_pseudo_id`.| 
 | dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and campaign data |
+| fct_ga4__pages | Fact table for pages which aggregates common page metrics by page_location, date, and hour. |
+| fct_ga4__sessions | Fact table for session metrics including session_engaged, sum_engagement_time_msecs, and others. |
+
+# Seeds
+
+| seed file | description |
+|-----------|-------------|
+| ga4_source_categories.csv| Google's mapping between `source` and `source_category`. Downloaded from https://support.google.com/analytics/answer/9756891?hl=en |
+
+Be sure to run `dbt seed` before you run `dbt run`.
 
 # Installation & Configuration
 ## Install from DBT Package Hub
@@ -41,7 +53,7 @@ Add the following to your `packages.yml` file:
 ```
 packages:
   - git: "https://github.com/Velir/dbt-ga4.git"
-    revision: 0.1.3
+    revision: 0.1.4
 ```
 
 ## Install From Local Directory
@@ -88,9 +100,9 @@ vars:
   ga4: 
     query_parameter_exclusions: ["gclid","fbclid","_ga"] 
 ```
-### Custom Events
+### Custom Parameters
 
-One important feature of GA4 is that you can add custom parameters to any event. These custom parameters will be picked up by this package if they are defined as variables within your `dbt_project.yml` file using the following syntax:
+Within GA4, you can add custom parameters to any event. These custom parameters will be picked up by this package if they are defined as variables within your `dbt_project.yml` file using the following syntax:
 
 ```
 [event name]_custom_parameters
@@ -116,7 +128,7 @@ User-scoped event properties can be assigned using the following variable config
 ```
 user_properties:
   - event_parameter: "[your event parameter]"
-    user_propertyname: "[a unique name for the user property]"
+    user_property_name: "[a unique name for the user property]"
     value_type: "[one of string_value|int_value|float_value|double_value]"
 ```
 
@@ -133,6 +145,31 @@ vars:
           user_property_name: "most_recent_param"  
           value_type: "string_value"
 ```
+### GA4 Recommended Events
+
+See the README file at /dbt_packages/models/staging/ga4/recommended_events for instructions on enabling [Google's recommended events](https://support.google.com/analytics/answer/9267735?hl=en).
+
+### Conversion Events
+
+Specific event names can be specified as conversions by setting the `conversion_events` variable in your `dbt_project.yml` file. These events will be counted against each session and included in the `fct_sessions.sql` dimensional model. Ex:
+
+```
+vars:
+  ga4:
+      conversion_events:['purchase','download']
+```
+
+# Incremental Loading of Event Data (and how to handle late-arriving hits)
+
+By default, GA4 exports data into sharded event tables that use the event date as the table suffix in the format of `events_YYYYMMDD`. This package incrementally loads data from these tables (not the `intraday` tables) into `base_ga4__events` which is partitioned on date. There are two incremental loading strategies available:
+
+- Dynamic incremental partitions (Default) - This strategy queries the destination table to find the latest date available. Data beyond that date range is loaded in incrementally on each run.
+
+- Static incremental partitions - This strategy is enabled when the `static_incremental_days` variable is set to an integer. It incrementally loads in the last X days worth of data regardless of what data is availabe. Google will update event tables within the last 72 hours to handle late-arriving hits so you should use this strategy if late-arriving hits is a concern. The 'dynamic incremental' strategy will not re-process past date tables. Ex: A `static_incremental_days` setting of `3` would load data from `current_date - 1` `current_date - 2` and `current_date - 3`. Note that `current_date` uses UTC as the timezone.
+
+## Intraday Events
+
+Users can enable the inclusion of intraday data by setting `include_intraday_events: true`. Intraday events are not included in incremental loads, but are instead unioned with historical events.
 
 # Connecting to BigQuery
 

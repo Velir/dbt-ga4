@@ -2,17 +2,17 @@
  
  with event_with_params as (
    select *,
-      {{ unnest_key('event_params', 'entrances',  'int_value') }},
-      {{ unnest_key('event_params', 'value', 'float_value') }},
-      {{ unnest_key('event_params', 'file_extension') }},
-      {{ unnest_key('event_params', 'file_name') }},
-      {{ unnest_key('event_params', 'link_classes') }},
-      {{ unnest_key('event_params', 'link_domain') }},
-      {{ unnest_key('event_params', 'link_id') }},
-      {{ unnest_key('event_params', 'link_text') }},
-      {{ unnest_key('event_params', 'link_url') }}
+      {{ ga4.unnest_key('event_params', 'entrances',  'int_value') }},
+      {{ ga4.unnest_key('event_params', 'value', 'float_value') }},
+      {{ ga4.unnest_key('event_params', 'file_extension') }},
+      {{ ga4.unnest_key('event_params', 'file_name') }},
+      {{ ga4.unnest_key('event_params', 'link_classes') }},
+      {{ ga4.unnest_key('event_params', 'link_domain') }},
+      {{ ga4.unnest_key('event_params', 'link_id') }},
+      {{ ga4.unnest_key('event_params', 'link_text') }},
+      {{ ga4.unnest_key('event_params', 'link_url') }}
       {% if var("file_download_custom_parameters", "none") != "none" %}
-        {{ stage_custom_parameters( var("file_download_custom_parameters") )}}
+        {{ ga4.stage_custom_parameters( var("file_download_custom_parameters") )}}
       {% endif %}
  from {{ref('stg_ga4__events')}}    
  where event_name = 'file_download'
