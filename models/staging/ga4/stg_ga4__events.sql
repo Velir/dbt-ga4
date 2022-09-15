@@ -62,7 +62,7 @@ enrich_params as (
         {{extract_query_string_from_url('page_location')}} as page_query_string,
     from remove_query_params
 ),
-fix_params as (
+detect_gclid as (
     select
         * except (medium, campaign),
         case
@@ -75,4 +75,4 @@ fix_params as (
         end as campaign
     from enrich_params
 )
-select * from fix_params
+select * from detect_gclid
