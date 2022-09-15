@@ -9,7 +9,6 @@ with page_view as (
         count(distinct user_key ) as users,
         sum( if(ga_session_number = 1,1,0)) as new_users,
         sum(entrances) as entrances,
-        sum(exits) as exits,
         sum(engagement_time_msec) as total_time_on_page 
 from {{ref('stg_ga4__event_page_view')}}
     group by 1,2,3,4,5
