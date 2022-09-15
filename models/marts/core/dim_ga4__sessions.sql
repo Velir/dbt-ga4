@@ -23,10 +23,7 @@ join_traffic_source as (
         remove_dupes.*,
         session_source as source,
         session_medium as medium,
-<<<<<<< HEAD
-=======
         session_campaign as campaign,
->>>>>>> main
         session_default_channel_grouping as default_channel_grouping
     from remove_dupes
     left join {{ref('stg_ga4__sessions_traffic_sources')}} using (session_key)

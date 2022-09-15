@@ -51,6 +51,9 @@ with source as (
         platform,
         ecommerce,
         items,
+        {{ ga4.unnest_key('event_params', 'page_location') }},
+        {{ ga4.unnest_key('event_params', 'medium') }},
+        {{ ga4.unnest_key('event_params', 'campaign') }}
     from {{ source('ga4', 'events') }}
     where _table_suffix not like '%intraday%' -- intraday events are supported through the project variable: include_intraday_events
     and cast(_table_suffix as int64) >= {{var('start_date')}}
@@ -88,16 +91,22 @@ renamed as (
         platform,
         ecommerce,
         items,
+        page_location,
         {{ ga4.unnest_key('event_params', 'ga_session_id', 'int_value') }},
-        {{ ga4.unnest_key('event_params', 'page_location') }},
         {{ ga4.unnest_key('event_params', 'ga_session_number',  'int_value') }},
         (case when (SELECT value.string_value FROM unnest(event_params) WHERE key = "session_engaged") = "1" then 1 end) as session_engaged,
         {{ ga4.unnest_key('event_params', 'engagement_time_msec', 'int_value') }},
         {{ ga4.unnest_key('event_params', 'page_title') }},
         {{ ga4.unnest_key('event_params', 'page_referrer') }},
         {{ ga4.unnest_key('event_params', 'source') }},
-        {{ ga4.unnest_key('event_params', 'medium') }},
-        {{ ga4.unnest_key('event_params', 'campaign') }},
+        case
+            when page_location like '%gclid%' then "cpc"
+            else medium
+        end as medium,
+        case
+            when page_location like '%gclid%' then "(cpc)"
+            else campaign
+        end as campaign,
         CASE 
             WHEN event_name = 'page_view' THEN 1
             ELSE 0
