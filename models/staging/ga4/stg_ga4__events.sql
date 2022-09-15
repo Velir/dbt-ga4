@@ -56,7 +56,18 @@ enrich_params as (
         {{extract_hostname_from_url('page_location')}} as page_hostname,
         {{extract_query_string_from_url('page_location')}} as page_query_string,
     from remove_query_params
+),
+fix_params as (
+    select
+        * except (medium, campaign),
+        case
+            when page_query_string like '%gclid%' then "cpc"
+            else medium
+        end as medium,
+        case
+            when page_query_string like '%gclid%' then "(cpc)"
+            else campaign
+        end as campaign
+    from enrich_params
 )
-
-
-select * from enrich_params
+select * from fix_params
