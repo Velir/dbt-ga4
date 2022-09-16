@@ -33,8 +33,6 @@ with session_metrics as
     select 
         session_key,
         user_key,
-        min(event_date_dt) as session_start_date,
-        min(event_timestamp) as session_start_timestamp,
         countif(event_name = 'page_view') as count_page_views,
         sum(event_value_in_usd) as sum_event_value_in_usd,
         ifnull(max(session_engaged), 0) as session_engaged,
@@ -52,10 +50,18 @@ with session_metrics as
     {% if var("fct_ga4__sessions_custom_parameters", "none") != "none" %}  
         {{ ga4.mart_group_by_custom_parameters( var("fct_ga4__sessions_custom_parameters") )}} 
     {% endif %}
+), first_page_view_params as (
+    select
+        session_key,
+        first_event_timestamp as session_start_timestamp,
+        first_event_date_dt as session_start_date
+    from {{ ref('stg_ga4__sessions_first_last_pageviews') }}
 ),
-
 include_session_properties as (
-    select * from session_metrics
+    select 
+        *
+    from session_metrics
+    left join first_page_view_params using (session_key)
     {% if var('derived_session_properties', false) %}
     -- If derived session properties have been assigned as variables, join them on the session_key
     left join {{ref('stg_ga4__derived_session_properties')}} using (session_key)
@@ -74,4 +80,3 @@ select * from join_conversions
 {% else %}
 select * from include_session_properties
 {% endif %}
-
