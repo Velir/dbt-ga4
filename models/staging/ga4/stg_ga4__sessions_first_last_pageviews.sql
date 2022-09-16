@@ -14,7 +14,7 @@ events_by_session_key as (
         session_key,
         user_key,
         first_page_view_timestamp,
-        first_page_view_date,
+        first_page_view_date_dt,
         first_page_view_event_key,
         last_page_view_event_key
     from page_views_first_last
