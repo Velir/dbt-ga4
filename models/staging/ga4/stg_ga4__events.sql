@@ -50,6 +50,19 @@ include_page_key as (
         to_base64(md5(concat( cast(event_date_dt as string), page_location ))) as page_key
     from include_event_key
 ),
+detect_gclid as (
+    select
+        * except (medium, campaign),
+        case
+            when page_location like '%gclid%' then "cpc"
+            else medium
+        end as medium,
+        case
+            when page_location like '%gclid%' then "(cpc)"
+            else campaign
+        end as campaign
+    from include_page_key
+),
 -- Remove specific query strings from page_location field
 remove_query_params as (
 
@@ -65,7 +78,7 @@ remove_query_params as (
         page_location,
         page_referrer
         {% endif %}
-    from include_page_key
+    from detect_gclid
 ),
 enrich_params as (
     select 
