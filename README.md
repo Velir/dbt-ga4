@@ -107,7 +107,7 @@ vars:
 Within GA4, you can add custom parameters to any event. These custom parameters will be picked up by this package if they are defined as variables within your `dbt_project.yml` file using the following syntax:
 
 ```
-[event name]_custom_parameters
+[event name]_custom_parameters:
   - name: "[name of custom parameter]"
     value_type: "[string_value|int_value|float_value|double_value]"
 ```
@@ -143,6 +143,14 @@ vars:
     default_custom_parameters:
       - name: "country_code"
         value_type: "int_value"
+```
+
+If you want to add the count of events other than the default page_views to your fct_ga4__sessions model, you can list which event names that you want to count using `session_event_count_metrics` and get a count of those events in each session, for example:
+
+```
+vars:
+  ga4:
+    session_event_count_metrics: ['add_to_cart','purchase']
 ```
 
 ### User Properties

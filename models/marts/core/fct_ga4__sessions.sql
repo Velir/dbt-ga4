@@ -8,6 +8,9 @@ with session_metrics as
         min(event_date_dt) as session_start_date,
         min(event_timestamp) as session_start_timestamp,
         countif(event_name = 'page_view') as count_page_views,
+        {% if var("session_event_count_metrics") is defined and var("session_event_count_metrics")|length > 0  %}
+            {{ ga4.session_event_count_metrics( var("session_event_count_metrics") )}}
+        {% endif %}
         sum(event_value_in_usd) as sum_event_value_in_usd,
         ifnull(max(session_engaged), 0) as session_engaged,
         sum(engagement_time_msec) as sum_engagement_time_msec
