@@ -59,7 +59,6 @@ with source as (
         where _table_suffix not like '%intraday%'
         and cast( _table_suffix as int64) >= {{var('start_date')}}
     {% endif %}
-    
     {% if is_incremental() %}
 
         {% if var('static_incremental_days', false ) %}
