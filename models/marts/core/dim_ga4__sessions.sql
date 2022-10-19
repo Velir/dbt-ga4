@@ -30,7 +30,7 @@ with session_start_dims as (
         traffic_source_name,
         traffic_source_medium,
         traffic_source_source,
-    from {{ref('stg_ga4__event_session_start')}}
+    from {{ref('stg_ga4__first_session_start')}}
 ),
 join_traffic_source as (
     select 
