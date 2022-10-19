@@ -35,7 +35,7 @@ include_event_number as (
 include_event_key as (
     select 
         include_session_key.*,
-        to_base64(md5(CONCAT(CAST(session_key as STRING), event_name, CAST(event_timestamp as STRING)))) as event_key -- Surrogate key for unique events
+        to_base64(md5(CONCAT(CAST(session_key as STRING), event_name, CAST(event_timestamp as STRING), CAST(event_previous_timestamp as STRING)))) as event_key -- Surrogate key for unique events
     from include_session_key
 ),
 detect_gclid as (
