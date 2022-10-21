@@ -5,6 +5,7 @@ with session_start_dims as (
         session_key,
         page_location as landing_page,
         page_hostname as landing_page_hostname,
+        page_referrer as landing_page_referrer,
         geo_continent,
         geo_country,
         geo_region,
