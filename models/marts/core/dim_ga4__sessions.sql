@@ -11,6 +11,8 @@ with session_start_dims as (
         geo_city,
         geo_sub_continent,
         geo_metro,
+        stream_id,
+        platform,
         device_category,
         device_mobile_brand_name,
         device_mobile_model_name,
