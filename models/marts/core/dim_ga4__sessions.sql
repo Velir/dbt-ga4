@@ -1,10 +1,6 @@
 -- Dimension table for sessions based on the session_start event.
-with first_session_start_event as (
-    select * from {{ref('stg_ga4__events_session_row_number')}}
-    where event_name = 'session_start'
-        and event_row_number = 1
-),
-session_start_dims as (
+
+with session_start_dims as (
     select 
         session_key,
         page_location as landing_page,
@@ -36,7 +32,7 @@ session_start_dims as (
         traffic_source_name,
         traffic_source_medium,
         traffic_source_source,
-    from first_session_start_event
+    from {{ref('stg_ga4__first_session_start')}}
 ),
 join_traffic_source as (
     select 
