@@ -7,7 +7,7 @@ user_id_1,pageview,12345,user_pseudo_id_1,ga_session_id_1,stream_id_1,http://www
 """.lstrip()
 
 expected_csv = """user_id,event_name,event_timestamp,user_pseudo_id,ga_session_id,stream_id,source,user_key,session_key,event_key,medium,campaign,original_page_location,original_page_referrer,page_location,page_referrer,page_hostname,page_query_string
-user_id_1,pageview,12345,user_pseudo_id_1,ga_session_id_1,stream_id_1,google,c/nWU/GWhlWiLU0S6R/rwg==,oofQgRkJyisBugwfj6eKVA==,HtZ29M483yK2N0WRkRZo0A==,organic,(organic),http://www.website.com/?foo=bar,http://www.cnn.com/,http://www.website.com/?foo=bar,http://www.cnn.com/,website.com,foo=bar
+user_id_1,pageview,12345,user_pseudo_id_1,ga_session_id_1,stream_id_1,google,c/nWU/GWhlWiLU0S6R/rwg==,9fDgaCrbd4ieAj1QpcWDjw==,70B/o+ww2nOTa32ASF/ulw==,organic,(organic),http://www.website.com/?foo=bar,http://www.cnn.com/,http://www.website.com/?foo=bar,http://www.cnn.com/,website.com,foo=bar
 """
 
 actual = read_file('../models/staging/ga4/stg_ga4__events.sql')
