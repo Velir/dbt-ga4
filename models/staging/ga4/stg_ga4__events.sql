@@ -13,8 +13,8 @@ add_user_key as (
         *,
         case
             when user_id is not null then to_base64(md5(user_id))
-            when user_pseudo_id is not null then to_base64(md5(user_pseudo_id))
-            else null -- this case is reached when privacy settings are enabled
+            when user_pseudo_id is not null and user_pseudo_id != '' then to_base64(md5(user_pseudo_id))
+            else null -- this case is reached when privacy settings are enabled and (possibly) for certain audience triggered events
         end as user_key
     from base_events
 ), 
