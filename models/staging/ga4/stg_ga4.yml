@@ -30,7 +30,7 @@ models:
         tests: 
           - unique
   - name: stg_ga4__events
-    description: Staging model that contains window functions used to generate unique keys
+    description: Staging model that generates unique keys for users, sessions, and events
     columns:
       - name: event_key
         tests:
