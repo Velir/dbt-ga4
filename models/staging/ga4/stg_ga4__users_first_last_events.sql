@@ -77,6 +77,8 @@ events_joined as (
         on events_by_user_key.first_event = events_first.event_key
     left join {{ref('stg_ga4__events')}} events_last
         on events_by_user_key.last_event = events_last.event_key
+    --In cases where there are duplicate event_keys that generate duplicate, joined user_key records, pick 1
+    qualify row_number() over(partition by user_key) = 1
 )
 
 select * from events_joined
