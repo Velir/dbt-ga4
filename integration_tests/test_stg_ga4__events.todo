@@ -1,3 +1,5 @@
+# Test test currently fails because the event_key depends on the event_params nested field. Cannot mock that using CSV. 
+
 import pytest
 from dbt.tests.util import read_file,check_relations_equal,run_dbt
 
@@ -37,5 +39,5 @@ class TestStgEvents():
     
     def test_mock_run_and_check(self, project):
         run_dbt(["build"])
-        #breakpoint()
+        breakpoint()
         check_relations_equal(project.adapter, ["actual", "expected"])
