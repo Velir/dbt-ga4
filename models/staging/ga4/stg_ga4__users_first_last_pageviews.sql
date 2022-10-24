@@ -32,8 +32,6 @@ page_views_joined as (
         on page_views_by_user_key.first_page_view_event_key = first_page_view.event_key
     left join {{ref('stg_ga4__event_page_view')}} last_page_view
         on page_views_by_user_key.last_page_view_event_key = last_page_view.event_key
-    --In cases where there are duplicate event_keys that generate duplicate, joined user_key records, pick 1
-    qualify row_number() over(partition by user_key) = 1
 )
 
 select * from page_views_joined

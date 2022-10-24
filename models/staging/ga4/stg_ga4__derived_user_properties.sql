@@ -65,8 +65,6 @@ join_properties as
     {% for up in var('derived_user_properties', []) %}
     left join last_value_{{up.event_parameter}}_grouped using (user_key)
     {% endfor %}
-    --In cases where there are duplicate event_keys that generate duplicate, joined user_key records, pick 1
-    qualify row_number() over(partition by user_key) = 1
 )
 
 
