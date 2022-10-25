@@ -18,17 +18,18 @@ add_user_key as (
         end as user_key
     from base_events
 ), 
--- Add unique keys for sessions and events
+-- Add unique key for sessions. session_key will be null if user_pseudo_id is null due to consent being denied. ga_session_id may be null during audience trigger events. 
 include_session_key as (
     select 
         *,
-        to_base64(md5(CONCAT(stream_id, CAST(user_key as STRING), IFNULL(CAST(ga_session_id as STRING), 'no_session')))) as session_key -- Surrogate key to determine unique session across streams and users. Sessions do NOT reset after midnight in GA4
+        to_base64(md5(CONCAT(stream_id, user_pseudo_id, IFNULL(CAST(ga_session_id as STRING), 'no_session')))) as session_key -- Surrogate key to determine unique session across streams and users. Sessions do NOT reset after midnight in GA4
     from add_user_key
 ),
+-- Add unique key for events
 include_event_key as (
     select 
         include_session_key.*,
-        to_base64(md5(CONCAT(CAST(user_key as STRING), session_key, event_name, CAST(event_timestamp as STRING), to_json_string(event_params)))) as event_key -- Surrogate key for unique events. These keys may not be unique given how GA4 operates. 
+        to_base64(md5(CONCAT(session_key, event_name, CAST(event_timestamp as STRING), to_json_string(event_params)))) as event_key -- Surrogate key for unique events. These keys may not be unique given how GA4 operates. 
     from include_session_key
 ),
 detect_gclid as (
