@@ -22,7 +22,7 @@ add_user_key as (
 include_session_key as (
     select 
         *,
-        to_base64(md5(CONCAT(stream_id, user_pseudo_id, IFNULL(CAST(ga_session_id as STRING), 'no_session')))) as session_key -- Surrogate key to determine unique session across streams and users. Sessions do NOT reset after midnight in GA4
+        to_base64(md5(CONCAT(stream_id, user_pseudo_id, CAST(ga_session_id as STRING)))) as session_key -- Surrogate key to determine unique session across streams and users. Sessions do NOT reset after midnight in GA4
     from add_user_key
 ),
 -- Add unique key for events
