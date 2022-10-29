@@ -21,24 +21,12 @@ set_default_channel_grouping as (
 session_source as (
     select    
         session_key,
-
-        (case
-          when FIRST_VALUE(source) OVER (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) is null then "(direct)"
-          else FIRST_VALUE(source) OVER (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) end
-        ) as session_source,
-
-        (case 
-          when FIRST_VALUE(medium) OVER (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) is null then "(none)"
-          else FIRST_VALUE(medium) OVER (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) end
-        ) as session_medium,
-
-        (case 
-          when FIRST_VALUE(campaign) OVER (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) is null then "(direct)"
-          else FIRST_VALUE(campaign) OVER (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) end
-        ) as session_campaign,
-
-        FIRST_VALUE(default_channel_grouping) OVER (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS session_default_channel_grouping
+        COALESCE(FIRST_VALUE(source) OVER (session_window), "(direct)") AS session_source,
+        COALESCE(FIRST_VALUE(medium) OVER (session_window), "(none)") AS session_medium,
+        COALESCE(FIRST_VALUE(campaign) OVER (session_window), "(direct)") AS session_campaign,
+        FIRST_VALUE(default_channel_grouping) OVER (session_window) AS session_default_channel_grouping
     from set_default_channel_grouping
+    WINDOW session_window AS (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
 )
 
 select distinct  * from session_source
