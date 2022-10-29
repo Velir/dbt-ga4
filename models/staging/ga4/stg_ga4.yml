@@ -13,6 +13,12 @@ models:
       - name: page_location
         tests:
           - not_null
+  - name: stg_ga4__user_properties
+    description: Unnested user_properties. Uses the user_properties DBT variable
+    columns:
+      - name: user_key
+        tests:
+          - unique
   - name: stg_ga4__event_session_start
     description: GA4 events filtered to only show 'session_start' events. Pivots common event parameters into separate columns. 
   - name: stg_ga4__event_purchase
@@ -30,7 +36,11 @@ models:
         tests: 
           - unique
   - name: stg_ga4__events
-    description: Staging model that contains window functions used to generate unique keys
+    description: Staging model that generates keys for users, sessions, and events
+    columns:
+      - name: event_key
+        tests:
+          - unique
   - name: stg_ga4__event_scroll
     description: Staging model containing only 'scroll' events. Includes the 'percent_scrolled' parameter.
   - name: stg_ga4__derived_user_properties

@@ -17,6 +17,7 @@ page_views_by_user_key as (
         last_page_view_event_key
     from page_views_first_last
 ),
+
 page_views_joined as (
     select
         page_views_by_user_key.*,
