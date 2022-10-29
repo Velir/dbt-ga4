@@ -14,7 +14,7 @@ models:
         tests:
           - unique
   - name: fct_ga4__sessions
-    description: Metrics related to sessions such as number of pageviews and event value accrued. Each row represents a single session.
+    description: Incremental metrics model providing session metrics such as number of pageviews and event value accrued. Each row represents a single session. 
     columns:
       - name: session_key
         tests:
