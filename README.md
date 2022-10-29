@@ -16,7 +16,7 @@ Features include:
 
 | model | description |
 |-------|-------------|
-| stg_ga4__events | Contains cleaned event data that is enhanced with useful event and session keys. |
+| stg_ga4__events | Contains cleaned event data that is enhanced with useful event and session keys. See note below regarding cases where event keys may not be unique.|
 | stg_ga4__event_* | 1 model per event (ex: page_view, purchase) which flattens event parameters specific to that event |
 | stg_ga4__event_items | Contains item data associated with e-commerce events (Purchase, add to cart, etc) |
 | stg_ga4__event_to_query_string_params | Mapping between each event and any query parameters & values that were contained in the event's `page_location` field |
@@ -226,6 +226,10 @@ vars:
   ga4:
     conversion_events:['purchase','download']
 ```
+
+# Event Key Uniqueness
+
+The `stg_ga4__events` model generates a surrogate key for each event using a combination of the session key, event name, event timestamp, and the event parameters. Given how GA4 (and specifically gtag.js) work, however, it is not uncommon to see multiple events containing exactly the same timestamps and parameters. This in turn creates duplicate `event_key` values and can introduce downstream issues when joining on `event_key`.  Running `dbt test -m stg_ga4__events` will fail if you have duplicate event keys. In these cases, the recommended approach is to update your collection implementation to include a new event parameter that will guarantee uniqueness for each event. For example, adding a `client_event_timestamp` or a `random_int` event parameter to each event should be sufficient to ensure that each `event_key` is unique.
 
 # Incremental Loading of Event Data (and how to handle late-arriving hits)
 
