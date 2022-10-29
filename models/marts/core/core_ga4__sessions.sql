@@ -11,6 +11,8 @@
     )
 }}
 
+-- TODO: incorporate session conversions. requires refactoring that model to partition on session start date
+
 {% if is_incremental() %}
     with session_metrics as (
         select 
