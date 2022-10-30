@@ -227,10 +227,6 @@ vars:
     conversion_events:['purchase','download']
 ```
 
-# Event Key Uniqueness
-
-The `stg_ga4__events` model generates a surrogate key for each event using a combination of the session key, event name, event timestamp, and the event parameters. Given how GA4 (and specifically gtag.js) work, however, it is not uncommon to see multiple events containing exactly the same timestamps and parameters. This in turn creates duplicate `event_key` values and can introduce downstream issues when joining on `event_key`.  Running `dbt test -m stg_ga4__events` will fail if you have duplicate event keys. In these cases, the recommended approach is to update your collection implementation to include a new event parameter that will guarantee uniqueness for each event. For example, adding a `client_event_timestamp` or a `random_int` event parameter to each event should be sufficient to ensure that each `event_key` is unique.
-
 # Incremental Loading of Event Data (and how to handle late-arriving hits)
 
 By default, GA4 exports data into sharded event tables that use the event date as the table suffix in the format of `events_YYYYMMDD` or `events_intraday_YYYYMMDD`. This package incrementally loads data from these tables into `base_ga4__events` which is partitioned on date. There are two incremental loading strategies available:
