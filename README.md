@@ -24,7 +24,7 @@ Features include:
 | stg_ga4__derived_user_properties | Finds the most recent occurance of specific event_params and assigns them to a user's user_key. Derived user properties are specified as variables (see documentation below) |
 | stg_ga4__derived_session_properties | Finds the most recent occurance of specific event_params and assigns them to a session's session_key. Derived session properties are specified as variables (see documentation below) |
 | stg_ga4__session_conversions | Produces session-grouped event counts for a configurable list of event names (see documentation below) |
-| stg_ga4__sessions_traffic_sources | Finds the first source, medium, campaign and default channel grouping for each session |
+| stg_ga4__sessions_traffic_sources | Finds the first source, medium, campaign, content, paid search term (from UTM tracking), and default channel grouping for each session |
 | dim_ga4__users | Dimension table for users which contains attributes such as first and last page viewed. Unique on `user_key` which is a hash of the `user_id` if it exists, otherwise it falls back to the `user_pseudo_id`.| 
 | dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and campaign data |
 | fct_ga4__pages | Fact table for pages which aggregates common page metrics by page_location, date, and hour. |

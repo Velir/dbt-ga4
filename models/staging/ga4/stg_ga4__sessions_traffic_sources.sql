@@ -5,6 +5,8 @@ with session_events as (
         lower(source) as source,
         medium,
         campaign,
+        content,
+        term,
         source_category
     from {{ref('stg_ga4__events')}}
     left join {{ref('ga4_source_categories')}} using (source)
@@ -24,6 +26,8 @@ session_source as (
         COALESCE(FIRST_VALUE(source) OVER (session_window), "(direct)") AS session_source,
         COALESCE(FIRST_VALUE(medium) OVER (session_window), "(none)") AS session_medium,
         COALESCE(FIRST_VALUE(campaign) OVER (session_window), "(direct)") AS session_campaign,
+        COALESCE(FIRST_VALUE(content) OVER (session_window), "(none)") AS session_content,
+        COALESCE(FIRST_VALUE(term) OVER (session_window), "(none)") AS session_term,
         FIRST_VALUE(default_channel_grouping) OVER (session_window) AS session_default_channel_grouping
     from set_default_channel_grouping
     WINDOW session_window AS (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
