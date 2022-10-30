@@ -141,10 +141,9 @@ renamed as (
         CASE 
             WHEN event_name = 'purchase' THEN 1
             ELSE 0
-        END AS is_purchase,
+        END AS is_purchase
     from source
 )
 
-select
-    *
-from renamed
+select * from renamed
+qualify row_number() over(partition by event_date_dt, stream_id, user_pseudo_id, ga_session_id, event_name, event_timestamp, to_json_string(event_params)) = 1
