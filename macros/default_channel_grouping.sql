@@ -25,6 +25,9 @@ case
     then 'Affiliates'
   when {{source_category}} = 'SOURCE_CATEGORY_SHOPPING' and REGEXP_CONTAINS({{medium}},r"^(.*cp.*|ppc|paid.*)$")
     then 'Paid Shopping'
+  when ({{source_category}} = 'SOURCE_CATEGORY_VIDEO' AND REGEXP_CONTAINS({{medium}},r"^(.*cp.*|ppc|paid.*)$"))
+    or {{source}} = 'dv360_video'
+    then 'Paid Video'
   when REGEXP_CONTAINS({{medium}}, r"^(cpc|ppc|paidsearch)$")
     then 'Paid Search'
   when REGEXP_CONTAINS({{medium}}, r"^(display|cpm|banner)$")
