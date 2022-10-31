@@ -28,10 +28,11 @@ case
   when ({{source_category}} = 'SOURCE_CATEGORY_VIDEO' AND REGEXP_CONTAINS({{medium}},r"^(.*cp.*|ppc|paid.*)$"))
     or {{source}} = 'dv360_video'
     then 'Paid Video'
+  when REGEXP_CONTAINS({{medium}}, r"^(display|cpm|banner)$")
+    or {{source}} = 'dv360_display'
+    then 'Display'
   when REGEXP_CONTAINS({{medium}}, r"^(cpc|ppc|paidsearch)$")
     then 'Paid Search'
-  when REGEXP_CONTAINS({{medium}}, r"^(display|cpm|banner)$")
-    then 'Display'
   when REGEXP_CONTAINS({{medium}}, r"^(cpv|cpa|cpp|content-text)$")
     then 'Other Advertising'
   when {{medium}} = 'organic' or {{source_category}} = 'SOURCE_CATEGORY_SEARCH'
