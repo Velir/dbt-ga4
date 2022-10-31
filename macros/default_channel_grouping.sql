@@ -23,8 +23,6 @@ case
     then 'Email'
   when REGEXP_CONTAINS({{medium}}, r"affiliate|affiliates") = true
     then 'Affiliates'
-  when {{medium}} = 'referral'
-    then 'Referral'
   when {{source_category}} = 'SOURCE_CATEGORY_SHOPPING' and REGEXP_CONTAINS({{medium}},r"^(.*cp.*|ppc|paid.*)$")
     then 'Paid Shopping'
   when REGEXP_CONTAINS({{medium}}, r"^(cpc|ppc|paidsearch)$")
@@ -39,6 +37,8 @@ case
     then 'Organic Video'
   when {{source_category}} = 'SOURCE_CATEGORY_SHOPPING'
     then 'Organic Shopping'
+  when {{medium}} = 'referral'
+    then 'Referral'
   when {{medium}} = 'audio'
     then 'Audio'
   when {{medium}} = 'sms'
