@@ -25,7 +25,7 @@ session_source as (
         session_key,
         COALESCE(FIRST_VALUE(source) OVER (session_window), "(direct)") AS session_source,
         COALESCE(FIRST_VALUE(medium) OVER (session_window), "(none)") AS session_medium,
-        COALESCE(FIRST_VALUE(campaign) OVER (session_window), "(direct)") AS session_campaign,
+        COALESCE(FIRST_VALUE(campaign) OVER (session_window), "(none)") AS session_campaign,
         COALESCE(FIRST_VALUE(content) OVER (session_window), "(none)") AS session_content,
         COALESCE(FIRST_VALUE(term) OVER (session_window), "(none)") AS session_term,
         FIRST_VALUE(default_channel_grouping) OVER (session_window) AS session_default_channel_grouping
