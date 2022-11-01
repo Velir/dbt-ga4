@@ -67,6 +67,20 @@ packages:
 packages:
   - local: ../dbt-ga4
 ```
+
+
+## GTM configuration unqiue timestamp
+1. All GA4 events must have a new event parameter called 'utc_timestamp' which has a millseconds unix timestamp
+2. Create a new gtm variable with the following code 
+3. helpful website for testing timestamps https://www.unixtimestamp.com/
+```
+function() {
+    var UnixTimeStamp = Math.floor((new Date()).getTime())
+    return UnixTimeStamp;
+  }
+```
+
+
 ## Required Variables
 
 This package assumes that you have an existing DBT project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded. Source data is located using the following variables which must be set in your `dbt_project.yml` file.
