@@ -30,7 +30,7 @@
 with source as (
     select 
         parse_date('%Y%m%d',event_date) as event_date_dt,
-        event_timestamp,
+        IFNULL((select value.int_value from unnest(event_params) where key = 'utc_timestamp'),CAST(event_timestamp/1000 as INT64)) event_timestamp, -- use event based UTC, Fallback to event_timestamp for GA4 automatic events
         event_name,
         event_params,
         event_previous_timestamp,
