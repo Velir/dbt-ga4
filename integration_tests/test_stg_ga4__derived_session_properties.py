@@ -2,14 +2,14 @@ import pytest
 from dbt.tests.util import read_file,check_relations_equal,run_dbt
 
 mock_stg_ga4__events_json = """
-{  "session_key": "AAA",  "event_timestamp": "1617691790431476",  "event_name": "first_visit",  "event_params": [{    "key": "my_param",    "value": {      "string_value": null,      "int_value": 1,      "float_value": null,      "double_value": null    }}]}
+{  "session_key": "AAA",  "event_timestamp": "1617691790431476",  "event_name": "first_visit",  "event_params": [{    "key": "my_param",    "value": {      "string_value": null,      "int_value": 1,      "float_value": null,      "double_value": null    }}],  "user_properties": [{    "key": "my_property",    "value": {      "string_value": "value1",      "int_value": null,      "float_value": null,      "double_value": null    }}]}
 {  "session_key": "AAA",  "event_timestamp": "1617691790431477",  "event_name": "first_visit",  "event_params": [{    "key": "my_param",    "value": {      "string_value": null,      "int_value": 2,      "float_value": null,      "double_value": null    }}]}
-{  "session_key": "BBB",  "event_timestamp": "1617691790431477",  "event_name": "first_visit",  "event_params": [{    "key": "my_param",    "value": {      "string_value": null,      "int_value": 1,      "float_value": null,      "double_value": null    }}]}
+{  "session_key": "BBB",  "event_timestamp": "1617691790431477",  "event_name": "first_visit",  "event_params": [{    "key": "my_param",    "value": {      "string_value": null,      "int_value": 1,      "float_value": null,      "double_value": null    }}],  "user_properties": [{    "key": "my_property",    "value": {      "string_value": "value2",      "int_value": null,      "float_value": null,      "double_value": null    }}]}
 """.lstrip()
 
-expected_csv = """session_key,my_derived_property
-AAA,2
-BBB,1
+expected_csv = """session_key,my_derived_property,my_derived_property2
+AAA,2,value1
+BBB,1,value2
 """.lstrip()
 
 models__config_yml = """
@@ -69,6 +69,6 @@ class TestDerivedSessionProperties():
     
     def test_mock_run_and_check(self, project):
         self.upload_json_fixture(project, "source.json", mock_stg_ga4__events_json, "mock_stg_ga4__events_json" )
-        run_dbt(["build", "--vars", "derived_session_properties: [{'event_parameter':'my_param','session_property_name':'my_derived_property','value_type':'int_value'}]"])
+        run_dbt(["build", "--vars", "derived_session_properties: [{'event_parameter':'my_param','session_property_name':'my_derived_property','value_type':'int_value'},{'user_property':'my_property','session_property_name':'my_derived_property2','value_type':'string_value'}]"])
         #breakpoint()
         check_relations_equal(project.adapter, ["actual", "expected"])

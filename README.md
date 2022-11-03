@@ -20,9 +20,9 @@ Features include:
 | stg_ga4__event_* | 1 model per event (ex: page_view, purchase) which flattens event parameters specific to that event |
 | stg_ga4__event_items | Contains item data associated with e-commerce events (Purchase, add to cart, etc) |
 | stg_ga4__event_to_query_string_params | Mapping between each event and any query parameters & values that were contained in the event's `page_location` field |
-| stg_ga4__user_properties | Finds the most recent occurance of specified user_properties for each user|
-| stg_ga4__derived_user_properties | Finds the most recent occurance of specific event_params and assigns them to a user's user_key. Derived user properties are specified as variables (see documentation below) |
-| stg_ga4__derived_session_properties | Finds the most recent occurance of specific event_params and assigns them to a session's session_key. Derived session properties are specified as variables (see documentation below) |
+| stg_ga4__user_properties | Finds the most recent occurance of specified user_properties for each user |
+| stg_ga4__derived_user_properties | Finds the most recent occurance of specific event_params value and assigns them to a user's user_key. Derived user properties are specified as variables (see documentation below) |
+| stg_ga4__derived_session_properties | Finds the most recent occurance of specific event_params or user_properties value and assigns them to a session's session_key. Derived session properties are specified as variables (see documentation below) |
 | stg_ga4__session_conversions | Produces session-grouped event counts for a configurable list of event names (see documentation below) |
 | stg_ga4__sessions_traffic_sources | Finds the first source, medium, campaign, content, paid search term (from UTM tracking), and default channel grouping for each session |
 | dim_ga4__users | Dimension table for users which contains attributes such as first and last page viewed. Unique on `user_key` which is a hash of the `user_id` if it exists, otherwise it falls back to the `user_pseudo_id`.| 
@@ -190,11 +190,14 @@ vars:
 
 Derived session properties are similar to derived user properties, but on a per-session basis, for properties that change slowly over time. This provides additional flexibility in allowing users to turn any event parameter into a session property. 
 
-Derived Session Properties are included in the `fct_ga4__sessions` model and contain the latest event parameter value per session. 
+Derived Session Properties are included in the `fct_ga4__sessions` model and contain the latest event parameter or user property value per session.
 
 ```
 derived_session_properties:
   - event_parameter: "[your event parameter]"
+    session_property_name: "[a unique name for the derived session property]"
+    value_type: "[string_value|int_value|float_value|double_value]"
+  - user_property: "[your user property key]"
     session_property_name: "[a unique name for the derived session property]"
     value_type: "[string_value|int_value|float_value|double_value]"
 ```
@@ -211,6 +214,9 @@ vars:
       - event_parameter: "another_event_param"
         session_property_name: "most_recent_param"
         value_type: "string_value"
+      - user_property: "first_open_time"
+        session_property_name: "first_open_time"
+        value_type: "int_value"
 ```
 
 ### GA4 Recommended Events
