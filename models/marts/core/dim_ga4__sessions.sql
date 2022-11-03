@@ -41,6 +41,8 @@ join_traffic_source as (
         session_source as source,
         session_medium as medium,
         session_campaign as campaign,
+        session_content as content,
+        session_term as term,
         session_default_channel_grouping as default_channel_grouping
     from session_start_dims
     left join {{ref('stg_ga4__sessions_traffic_sources')}} using (session_key)
