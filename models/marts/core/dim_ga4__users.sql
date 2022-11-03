@@ -5,14 +5,21 @@
 )
 }}
 
-with first_session as (
+
+with last_event_values as (  -- get the last session event for each user
     select
         *
-    from {{ref('stg_ga4__user_first_sessions')}}
+    from {{ref('stg_ga4__users_last_events')}} 
 )
-select 
-    user_events.*,
-    first_session.* except(user_key)
-from user_events
-left join first_session using (user_key)
-where user_key is not null -- Remove users with privacy settings enabled
+select
+    *
+from {{ref('stg_ga4__first_sessions')}}
+right join last_event_values using (user_key) -- limit to users with sessions in the window of time that we are working on
+{% if var('derived_user_properties', false) %}
+    -- If derived user properties have been assigned as variables, join them on the user_key
+    left join {{ref('stg_ga4__derived_user_properties')}} using (user_key)
+{% endif %}
+{% if var('user_properties', false) %}
+    -- If user properties have been assigned as variables, join them on the user_key
+    left join {{ref('stg_ga4__user_properties')}} using (user_key)
+{% endif %}
