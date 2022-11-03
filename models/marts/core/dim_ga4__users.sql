@@ -16,4 +16,3 @@ select
 from user_events
 left join first_session using (user_key)
 where user_key is not null -- Remove users with privacy settings enabled
-{% endif %}
