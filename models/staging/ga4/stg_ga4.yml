@@ -56,9 +56,9 @@ models:
         tests:
           - unique  
   - name: stg_ga4__session_conversions
-    description: Optional incremental model that counts the number of events listed in the 'conversion_events' var. Aggregated by session_key. Partitioned on session_start_date
+    description: Incremental model that counts the number of events listed in the 'conversion_events' var. Aggregated by session_key. Partitioned on session_start_date. Only enabled when the conversion_events variable is set.
     columns:
-      - name: session_key
+      - name: session_partition_key
         tests:
           - unique
   - name: stg_ga4__event_items

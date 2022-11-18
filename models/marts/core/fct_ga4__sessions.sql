@@ -8,10 +8,11 @@ select
     sum(session_partition_count_page_views) as count_pageviews,
     max(session_partition_max_session_engaged) as is_session_engaged,
     sum(session_partition_sum_engagement_time_msec) as sum_engaged_time_msec
-    {% for ce in var('conversion_events',[]) %}
-        , sum({{ce}}_count) as sum_{{ce}}
-    {% endfor %}
-    
+    {% if var('conversion_events', false) %}
+        {% for ce in var('conversion_events',[]) %}
+            , sum({{ce}}_count) as sum_{{ce}}
+        {% endfor %}
+    {% endif %}
 from {{ref('fct_ga4__sessions_daily')}}
 group by 1,2
 
