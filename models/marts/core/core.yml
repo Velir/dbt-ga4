@@ -14,10 +14,16 @@ models:
         tests:
           - unique
   - name: fct_ga4__sessions
-    description: Metrics related to sessions such as number of pageviews and event value accrued. Each row represents a single session.
+    description: Fact table containing session metrics. 1 row per session. Sessions can span multiple days, so it isn't possible to partition this table by day. 
     columns:
       - name: session_key
         tests:
           - unique
+  - name: fct_ga4__sessions_daily
+    description: Incremental session metrics model providing aggregate metrics per day such as number of pageviews and event value accrued. Each row represents 1 day of metrics for a single session. 
+    columns:
+      - name: session_partition_key
+        tests:
+          - unique
   - name: fct_ga4__pages
-    description: Metrics related to pages such as visits, users, new_users, entrances and exits as well as configurable conversion counts. Each row is grouped by page_location, event_date_dt, and hour.
+    description: Incremental model with page metrics such as visits, users, new_users, entrances and exits as well as configurable conversion counts. Each row is grouped by page_location, event_date_dt, and hour.

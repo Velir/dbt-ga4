@@ -1,5 +1,4 @@
 -- Dimension table for sessions based on the session_start event.
-
 with session_start_dims as (
     select 
         session_key,
@@ -46,6 +45,15 @@ join_traffic_source as (
         session_default_channel_grouping as default_channel_grouping
     from session_start_dims
     left join {{ref('stg_ga4__sessions_traffic_sources')}} using (session_key)
+),
+include_session_properties as (
+    select 
+        * 
+    from join_traffic_source
+    {% if var('derived_session_properties', false) %}
+    -- If derived session properties have been assigned as variables, join them on the session_key
+    left join {{ref('stg_ga4__derived_session_properties')}} using (session_key)
+    {% endif %}
 )
 
-select * from join_traffic_source
+select * from include_session_properties

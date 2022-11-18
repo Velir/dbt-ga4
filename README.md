@@ -28,7 +28,8 @@ Features include:
 | dim_ga4__users | Dimension table for users which contains attributes such as first and last page viewed. Unique on `user_key` which is a hash of the `user_id` if it exists, otherwise it falls back to the `user_pseudo_id`.| 
 | dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and campaign data |
 | fct_ga4__pages | Fact table for pages which aggregates common page metrics by page_location, date, and hour. |
-| fct_ga4__sessions | Fact table for session metrics including session_engaged, sum_engagement_time_msecs, and others. |
+| fct_ga4__sessions_daily | Fact table for session metrics, partitioned by date. A single session may span multiple rows given that sessions can span multiple days.  |
+| fct_ga4__sessions | Fact table that aggregates session metrics across days. This table is not partitioned, so be mindful of performance/cost when querying. |
 
 # Seeds
 
