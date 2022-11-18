@@ -99,6 +99,8 @@ renamed as (
         {{ ga4.unnest_key('event_params', 'source') }},
         {{ ga4.unnest_key('event_params', 'medium') }},
         {{ ga4.unnest_key('event_params', 'campaign') }},
+        {{ ga4.unnest_key('event_params', 'content') }},
+        {{ ga4.unnest_key('event_params', 'term') }},
         CASE 
             WHEN event_name = 'page_view' THEN 1
             ELSE 0
@@ -111,3 +113,4 @@ renamed as (
 )
 
 select * from renamed
+qualify row_number() over(partition by event_date_dt, stream_id, user_pseudo_id, ga_session_id, event_name, event_timestamp, to_json_string(event_params)) = 1

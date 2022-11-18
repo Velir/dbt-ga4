@@ -81,3 +81,11 @@ models:
         description: campaign value of the first event of the session after session_start and first_visit
         tests:
           - not_null
+      - name: session_content
+        description: content value of the first event of the session after session_start and first_visit
+        tests:
+          - not_null
+      - name: session_term
+        description: term value of the first event of the session after session_start and first_visit
+        tests:
+          - not_null
