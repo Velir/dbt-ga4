@@ -35,7 +35,7 @@ with session_metrics as (
 {% else %}
     ,
     session_conversions as (
-    select * from {{ref('stg_ga4__session_conversions')}}
+    select * from {{ref('stg_ga4__session_conversions_daily')}}
     {% if is_incremental() %}
         where session_partition_date >= DATE_SUB(_dbt_max_partition, INTERVAL 1 DAY)
     {% endif %}
