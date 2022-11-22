@@ -4,6 +4,7 @@
 with events as (
     select 
         page_key,
+        event_name,
         1 as event_count
     from {{ref('stg_ga4__events')}}
 )
