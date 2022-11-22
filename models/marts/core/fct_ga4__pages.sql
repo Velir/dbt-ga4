@@ -57,7 +57,13 @@ with page_view as (
     from {{ref('stg_ga4__event_scroll')}}
     group by 1
 )
-{% if var('conversion_events',false) %}
+{% if var('conversion_events',false)  == false %}
+select
+    page_view.*,
+    ifnull(scroll.scroll_events, 0) as scroll_events
+from page_view
+left join scroll using (page_key)
+{% else %}
 ,
 join_conversions as (
     select 
@@ -70,10 +76,5 @@ select
     ifnull(scroll.scroll_events, 0) as scroll_events
 from join_conversions
 left join scroll using (page_key)
-{% else %}
-select
-    page_view.*,
-    ifnull(scroll.scroll_events, 0) as scroll_events
-from page_view
-left join scroll using (page_key)
+
 {% endif %}

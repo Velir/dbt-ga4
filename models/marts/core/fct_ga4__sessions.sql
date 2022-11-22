@@ -68,7 +68,9 @@ include_session_properties as (
     {% endif %}
 )
 
-{% if var('conversion_events',false) %}
+{% if var('conversion_events',false) == false %}
+    select * from include_session_properties
+{% else %}
 ,
 join_conversions as (
     select 
@@ -77,6 +79,4 @@ join_conversions as (
     left join {{ref('stg_ga4__session_conversions')}} using (session_key)
 )
 select * from join_conversions
-{% else %}
-select * from include_session_properties
 {% endif %}
