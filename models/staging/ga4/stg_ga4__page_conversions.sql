@@ -29,7 +29,7 @@ final_pivot as (
         {% for ce in var('conversion_events',[]) %}
         , ifnull(conversion_{{ce}}.conversion_count,0) as {{ce}}_count
         {% endfor %}
-    from pk
+    from events
     {% for ce in var('conversion_events',[]) %}
     left join conversion_{{ce}} using (page_key)
     {% endfor %}
