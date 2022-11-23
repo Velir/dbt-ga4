@@ -56,7 +56,7 @@ models:
         tests:
           - unique  
   - name: stg_ga4__session_conversions_daily
-    description: Incremental model that counts the number of events per day listed in the 'conversion_events' variable. Aggregated by session_key. Partitioned on session_start_date. Only enabled when the conversion_events variable is set.
+    description: Incremental model that counts the number of events per day listed in the 'conversion_events' variable. Aggregated and partitioned on session_start_date. Only enabled when the conversion_events variable is set.
     columns:
       - name: session_partition_key
         tests:
