@@ -2,11 +2,12 @@
 target/
 dbt_packages/
 logs/
-google-cloud-sdk/
-integration_tests/.env
-integration_tests/__pycache__
-integration_tests/.pytest_cache
 
+google-cloud-sdk/
+unit_tests/.env
+unit_tests/__pycache__
+unit_tests/.pytest_cache
+unit_tests/dbt-service-account.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

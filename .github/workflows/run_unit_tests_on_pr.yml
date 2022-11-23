@@ -3,10 +3,8 @@ name: Run Unit Tests on Pull Request
 on: 
   pull_request:
 env:
-  DBT_PROFILES_DIR: ./
-  DBT_GOOGLE_PROJECT_PROD: ${{ secrets.DBT_GOOGLE_PROJECT_PROD }}
-  # The DBT_GOOGLE_BIGQUERY_KEYFILE_PROD secret will be written to a json file below
-  DBT_GOOGLE_BIGQUERY_KEYFILE_PROD: ./dbt-service-account.json
+  BIGQUERY_PROJECT: ${{ secrets.BIGQUERY_PROJECT }}
+  KEYFILE_LOCATION: ./dbt-service-account.json
 
 jobs:
   pytest_run_all:
@@ -28,7 +26,7 @@ jobs:
         run: 'echo "$KEYFILE" > ./dbt-service-account.json'
         shell: bash
         env:
-          KEYFILE: ${{secrets.DBT_GOOGLE_BIGQUERY_KEYFILE_PROD}}
+          KEYFILE: ${{secrets.GCP_BIGQUERY_USER_KEYFILE}}
 
       - name: Install dependencies
         run: |
@@ -36,9 +34,5 @@ jobs:
           pip install dbt-bigquery
           pip install pytest
       
-      # Add dbt seed or other commands here if needed
-      - name: Build dbt models
-        run: dbt build --target staging
-
-      - name: Test dbt models
-        run: dbt test --target staging
+      - name: Run tests
+        run: python -m pytest .
