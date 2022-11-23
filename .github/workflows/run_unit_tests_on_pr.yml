@@ -1,0 +1,44 @@
+name: Run Unit Tests on Pull Request
+
+on: 
+  pull_request:
+env:
+  DBT_PROFILES_DIR: ./
+  DBT_GOOGLE_PROJECT_PROD: ${{ secrets.DBT_GOOGLE_PROJECT_PROD }}
+  # The DBT_GOOGLE_BIGQUERY_KEYFILE_PROD secret will be written to a json file below
+  DBT_GOOGLE_BIGQUERY_KEYFILE_PROD: ./dbt-service-account.json
+
+jobs:
+  pytest_run_all:
+    name: Pytest Run All
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+        working-directory: ./unit_tests
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/setup-python@v1
+        with:
+          python-version: "3.7.x"
+
+      - name: Authenticate using service account
+        run: 'echo "$KEYFILE" > ./dbt-service-account.json'
+        shell: bash
+        env:
+          KEYFILE: ${{secrets.DBT_GOOGLE_BIGQUERY_KEYFILE_PROD}}
+
+      - name: Install dependencies
+        run: |
+          pip install dbt-core
+          pip install dbt-bigquery
+          pip install pytest
+      
+      # Add dbt seed or other commands here if needed
+      - name: Build dbt models
+        run: dbt build --target staging
+
+      - name: Test dbt models
+        run: dbt test --target staging
