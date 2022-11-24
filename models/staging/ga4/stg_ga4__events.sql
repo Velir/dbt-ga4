@@ -41,13 +41,17 @@ include_event_key as (
 ),
 detect_gclid as (
     select
-        * except (medium, campaign),
+        * except (source, medium, campaign),
         case
-            when page_location like '%gclid%' then "cpc"
+            when (page_location like '%gclid%' and source is null) then "google"
+            else source
+        end as source,
+        case
+            when (page_location like '%gclid%' and medium is null) then "cpc"
             else medium
         end as medium,
         case
-            when page_location like '%gclid%' then "(cpc)"
+            when (page_location like '%gclid%' and campaign is null) then "(cpc)"
             else campaign
         end as campaign
     from include_event_key
