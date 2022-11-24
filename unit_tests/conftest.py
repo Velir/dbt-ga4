@@ -12,7 +12,7 @@ def dbt_profile_target():
         return {
             'type': 'bigquery',
             'method': 'service-account',
-            'keyfile': os.getcwd() + os.environ.get("KEYFILE_LOCATION"),
+            'keyfile': os.environ.get("GITHUB_WORKSPACE") + "/unit_tests/dbt-service-account.json",
             'threads': 4,
             'timeout_seconds': 300,
             'project':  os.environ.get("BIGQUERY_PROJECT")
