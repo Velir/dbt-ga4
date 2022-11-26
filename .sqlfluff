@@ -1,0 +1,35 @@
+[sqlfluff]
+templater = jinja
+dialect = snowflake
+exclude_rules = L027,L031,L032
+
+[sqlfluff:indentation]
+indented_joins = False
+indented_ctes = True
+
+[sqlfluff:templater:jinja]
+apply_dbt_builtins = True
+
+[sqlfluff:templater:jinja:macros]
+dbt_utils = "{% macro dbt_utils() %}{% endmacro %}"
+
+[sqlfluff:rules:L003]
+tab_space_size = 4
+indent_unit = space
+
+[sqlfluff:rules:L010]
+capitalisation_policy = lower
+
+[sqlfluff:rules:L014]
+extended_capitalisation_policy = lower
+
+[sqlfluff:rules:L016]
+max_line_length = 120
+tab_space_size = 4
+indent_unit = space
+
+[sqlfluff:layout:type:comma]
+line_position = leading
+
+[sqlfluff:rules:L030]
+capitalisation_policy = lower
