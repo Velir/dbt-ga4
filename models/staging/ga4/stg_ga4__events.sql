@@ -79,5 +79,11 @@ enrich_params as (
         {{extract_hostname_from_url('page_location')}} as page_hostname,
         {{extract_query_string_from_url('page_location')}} as page_query_string,
     from remove_query_params
+),
+page_key as (
+    select
+        *,
+        (concat( cast(event_date_dt as string), cast(EXTRACT(HOUR FROM TIMESTAMP_MICROS(event_timestamp)) as string), page_location )) as page_key
+    from enrich_params
 )
-select * from enrich_params
+select * from page_key
