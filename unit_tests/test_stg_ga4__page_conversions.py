@@ -33,5 +33,5 @@ class TestPageConversions():
     
     def test_mock_run_and_check(self, project):
         run_dbt(["build", "--vars", "conversion_events: ['page_view']"])
-        breakpoint()
+        #breakpoint()
         check_relations_equal(project.adapter, ["actual", "expected"])
