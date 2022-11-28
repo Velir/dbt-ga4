@@ -2,7 +2,7 @@
 
 with users as (
     select 
-        user_key,
+        user_pseudo_id,
         min(event_timestamp) as first_seen_timestamp,
         min(event_date_dt) as first_seen_dt,
         max(event_timestamp) as last_seen_timestamp,
@@ -11,7 +11,7 @@ with users as (
         sum(is_page_view) as num_page_views,
         sum(is_purchase) as num_purchases
     from {{ref('stg_ga4__events')}}
-    where user_key is not null -- Remove users with privacy settings enabled
+    where user_pseudo_id is not null -- Remove users with privacy settings enabled
     group by 1
 
 ),
