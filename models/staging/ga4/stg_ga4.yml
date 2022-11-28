@@ -89,3 +89,12 @@ models:
         description: term value of the first event of the session after session_start and first_visit
         tests:
           - not_null
+  - name: stg_ga4__user_id_mapping
+    description: Mapping table that contains the latest association between user_pseudo_id and user_id. Unique on user_pseudo_id
+    columns:
+      - name: pseudo_user_id
+        description: Device ID obtained from GA4
+        tests:
+          - not_null
+          - unique
+
