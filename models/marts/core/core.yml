@@ -7,10 +7,10 @@ models:
       - name: session_key
         tests:
           - unique
-  - name: dim_ga4__users
-    description: Dimension table for users which includes data from the first and last event produced by the user. Unique on user_key
+  - name: dim_ga4__user_pseudo_ids
+    description: Dimension table for user devices (user_pseudo_id) which includes data from the first and last event produced. Unique on user_pseudo_id
     columns:
-      - name: user_key
+      - name: user_pseudo_id
         tests:
           - unique
   - name: fct_ga4__sessions

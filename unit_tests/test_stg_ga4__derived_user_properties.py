@@ -2,12 +2,12 @@ import pytest
 from dbt.tests.util import read_file,check_relations_equal,run_dbt
 
 mock_stg_ga4__events_json = """
-{  "user_key": "AAA",  "event_timestamp": "1617691790431476",  "event_name": "first_visit",  "event_params": [{    "key": "my_param",    "value": {      "string_value": null,      "int_value": 1,      "float_value": null,      "double_value": null    }}]}
-{  "user_key": "AAA",  "event_timestamp": "1617691790431477",  "event_name": "first_visit",  "event_params": [{    "key": "my_param",    "value": {      "string_value": null,      "int_value": 2,      "float_value": null,      "double_value": null    }}]}
-{  "user_key": "BBB",  "event_timestamp": "1617691790431477",  "event_name": "first_visit",  "event_params": [{    "key": "my_param",    "value": {      "string_value": null,      "int_value": 1,      "float_value": null,      "double_value": null    }}]}
+{  "user_pseudo_id": "AAA",  "event_timestamp": "1617691790431476",  "event_name": "first_visit",  "event_params": [{    "key": "my_param",    "value": {      "string_value": null,      "int_value": 1,      "float_value": null,      "double_value": null    }}]}
+{  "user_pseudo_id": "AAA",  "event_timestamp": "1617691790431477",  "event_name": "first_visit",  "event_params": [{    "key": "my_param",    "value": {      "string_value": null,      "int_value": 2,      "float_value": null,      "double_value": null    }}]}
+{  "user_pseudo_id": "BBB",  "event_timestamp": "1617691790431477",  "event_name": "first_visit",  "event_params": [{    "key": "my_param",    "value": {      "string_value": null,      "int_value": 1,      "float_value": null,      "double_value": null    }}]}
 """.lstrip()
 
-expected_csv = """user_key,my_derived_property
+expected_csv = """user_pseudo_id,my_derived_property
 AAA,2
 BBB,1
 """.lstrip()

@@ -62,7 +62,7 @@ join_properties as
         {% endfor %}
     from user_pseudo_ids
     {% for up in var('user_properties', []) %}
-    left join last_value_{{up.user_property_name}}_grouped using (user_key)
+    left join last_value_{{up.user_property_name}}_grouped using (user_pseudo_id)
     {% endfor %}
 )
 

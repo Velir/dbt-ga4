@@ -20,7 +20,7 @@ page_views_by_user_pseudo_id as (
 
 page_views_joined as (
     select
-        page_views_by_user_key.*,
+        page_views_by_user_pseudo_id.*,
         first_page_view.page_location as first_page_location,
         first_page_view.page_hostname as first_page_hostname,
         first_page_view.page_referrer as first_page_referrer, 
