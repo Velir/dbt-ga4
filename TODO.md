@@ -4,7 +4,6 @@
 - It may be overly expensive to scan ALL events looking for first/last occurances of user's event parameters. We can move data from 1st & last session into a new table and scan that table instead. 
 - mechanism to take in an array variable listing custom events and output 1 model per event (is this possible?)
 - Add event timing (avg time to next page) metrics
-- Session + conversion metrics
 - Anything else to do with `privacy_info` field? Right now removing 'null' client ids from user dim tables. 
 - Create staging tables for the following events:
     - view_promotion    
@@ -22,11 +21,6 @@
     - Add landing page / exit page, session start/end time, session duration, is bounce, campaign source to `dim_sessions` model
 - Configuration and dynamic templates to create custom event tables and dimensions
 - Configuration to create custom dimensions (session, user, event_*) from event parameters
-- Refactor 'user properties' functionality to pull from the `user_properties` field
-- Support for large intraday tables (100+ shards). Currently they are unioned in as a view on top of partitioned base table. We could load in data up until yesterday into the partitioned table and then union in today's data.
-- Allow users to configure certain event names as conversions. provide additional metrics around conversion events (conversion count per session, per user).  
-- Update `dim_sessions` to pull based on session key rather than session_start event. Looks like session_start no longer correclty identifies all sessions. See https://measure.slack.com/archives/C03AE85U5/p1658244315268039
-- Merge and clean up dim_sessions & fct_sessions. Just consider it ga4__sessions and ga4__users.
 - Use Fivetran's `union_data` method (or something similar) to handle multiple, unioned GA4 exports. https://github.com/fivetran/dbt_xero_source/blob/main/models/tmp/stg_xero__account_tmp.sql
 
 ## Misc
