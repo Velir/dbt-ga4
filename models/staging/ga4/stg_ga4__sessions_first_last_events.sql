@@ -6,6 +6,7 @@ with events_first_last as (
         FIRST_VALUE(event_date_dt) OVER (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS first_event_date_dt,
         FIRST_VALUE(event_key) OVER (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS first_event_key,
         LAST_VALUE(event_key) OVER (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS last_event_key,
+        LAST_VALUE(event_timestamp) OVER (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS last_event_timestamp,
     from {{ref('stg_ga4__events')}}
 ),
 events_by_session_key as (
@@ -15,7 +16,8 @@ events_by_session_key as (
         first_event_timestamp,
         first_event_date_dt,
         first_event_key,
-        last_event_key
+        last_event_key,
+        last_event_timestamp
     from events_first_last
 )
 

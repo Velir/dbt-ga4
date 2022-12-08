@@ -56,12 +56,19 @@ with session_metrics as
         first_event_timestamp as session_start_timestamp,
         first_event_date_dt as session_start_date
     from {{ ref('stg_ga4__sessions_first_last_pageviews') }}
+),last_event_params as (
+    select
+        first_page_view_params.*,
+        last_event_timestamp as last_event_timestamp
+    from {{ ref('stg_ga4__sessions_first_last_events') }}
+    right join first_page_view_params using(session_key)
 ),
 include_session_properties as (
     select 
-        *
+        * ,
+        timestamp_diff(timestamp_micros(last_event_params.last_event_timestamp), timestamp_micros(last_event_params.session_start_timestamp), microsecond) as session_duration_micros
     from session_metrics
-    left join first_page_view_params using (session_key)
+    left join last_event_params using (session_key)
     {% if var('derived_session_properties', false) %}
     -- If derived session properties have been assigned as variables, join them on the session_key
     left join {{ref('stg_ga4__derived_session_properties')}} using (session_key)
