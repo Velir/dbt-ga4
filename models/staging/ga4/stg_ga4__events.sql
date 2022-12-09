@@ -54,11 +54,11 @@ detect_gclid as (
     select
         * except (medium, campaign),
         case
-            when page_location like '%gclid%' then "cpc"
+            when page_location like '%gclid%' and medium is null) then "cpc"
             else medium
         end as medium,
         case
-            when page_location like '%gclid%' then "(cpc)"
+            when page_location like '%gclid%' and campaign is null) then "(cpc)"
             else campaign
         end as campaign
     from include_page_key
