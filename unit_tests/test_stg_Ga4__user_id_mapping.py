@@ -12,7 +12,7 @@ c2,,105
 d1,,100
 """.lstrip()
 
-expected_csv = """last_seen_user_id,user_pseudo_id,last_seen_timestamp
+expected_csv = """last_seen_user_id,user_pseudo_id,last_seen_user_id_timestamp
 A,a1,101
 B,b1,102
 C,c1,103
