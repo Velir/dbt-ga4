@@ -45,13 +45,13 @@ join_conversions as (
     left join {{ ref('stg_ga4__page_conversions') }} using (page_key)
 )
 select
-    join_conversions.*  except(page_key),
+    join_conversions.*  except (page_key),
     ifnull(scroll.scroll_events, 0) as scroll_events
 from join_conversions
 left join scroll using (event_date_dt, hour, page_location, page_title)
 {% else %}
 select
-    page_view.* except(page_key),
+    page_view.* except (page_key),
     ifnull(scroll.scroll_events, 0) as scroll_events
 from page_view
 left join scroll using (event_date_dt, hour, page_location, page_title)
