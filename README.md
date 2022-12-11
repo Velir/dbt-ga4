@@ -69,7 +69,7 @@ packages:
 ```
 ## Required Variables
 
-This package assumes that you have an existing DBT project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded. Source data is located using the following variables which must be set in your `dbt_project.yml` file.
+This package assumes that you have an existing DBT project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded. Source data is defined using the following variables which must be set in `dbt_project.yml`.
 
 ```
 vars:
@@ -77,19 +77,8 @@ vars:
     project: "your_gcp_project"
     dataset: "your_ga4_dataset"
     start_date: "YYYYMMDD" # Earliest date to load
-    frequency: "daily" # daily|streaming|daily+streaming Match to the type of export configured in GA4; daily+streaming appends today's intraday data to daily data
+    frequency: "daily" # daily|streaming|daily+streaming. See 'Export Frequency' below.
 ```
-
-If you don't have any GA4 data of your own, you can connect to Google's public data set with the following settings:
-
-```
-vars:
-  project: "bigquery-public-data"
-  dataset: "ga4_obfuscated_sample_ecommerce"
-  start_date: "20210120"
-```
-
-More info about the GA4 obfuscated dataset here: https://support.google.com/analytics/answer/10937659?hl=en#zippy=%2Cin-this-article
 
 ## Optional Variables
 
