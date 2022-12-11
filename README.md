@@ -6,11 +6,10 @@ Features include:
 - Flattened models to access common events and event parameters such as `page_view`, `session_start`, and `purchase`
 - Conversion of sharded event tables into a single partitioned table
 - Incremental loading of GA4 data into your staging tables 
-- Session and user dimensional models with conversion counts
-- Easy access to query parameters such as GCLID and UTM params
-- Support for custom event parameters & custom user properties
+- Page, session and user dimensional models with conversion counts
+- Simple methods for accessing query parameters (like UTM params) or filtering query parameters (like click IDs)
+- Support for custom event parameters & user properties
 - Mapping from source/medium to default channel grouping
-- Ability to exclude query parameters (like `fbclid`) from page paths
 
 # Models
 
@@ -23,7 +22,7 @@ Features include:
 | stg_ga4__user_properties | Finds the most recent occurance of specified user_properties for each user |
 | stg_ga4__derived_user_properties | Finds the most recent occurance of specific event_params value and assigns them to a user's user_key. Derived user properties are specified as variables (see documentation below) |
 | stg_ga4__derived_session_properties | Finds the most recent occurance of specific event_params or user_properties value and assigns them to a session's session_key. Derived session properties are specified as variables (see documentation below) |
-| stg_ga4__session_conversions_daily | Produces daily counts of conversions per session. The lsit of conversion events to include is configurable (see documentation below) |
+| stg_ga4__session_conversions_daily | Produces daily counts of conversions per session. The list of conversion events to include is configurable (see documentation below) |
 | stg_ga4__sessions_traffic_sources | Finds the first source, medium, campaign, content, paid search term (from UTM tracking), and default channel grouping for each session |
 | dim_ga4__users | Dimension table for users which contains attributes such as first and last page viewed. Unique on `user_key` which is a hash of the `user_id` if it exists, otherwise it falls back to the `user_pseudo_id`.| 
 | dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and campaign data |
