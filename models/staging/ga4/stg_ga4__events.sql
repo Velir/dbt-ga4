@@ -1,6 +1,6 @@
 -- This staging model contains key creation and window functions. Keeping window functions outside of the base incremental model ensures that the incremental updates don't artificially limit the window partition sizes (ex: if a session spans 2 days, but only 1 day is in the incremental update)
 {% if not flags.FULL_REFRESH %}
-    {% set partitions_to_query = [] %}
+    {% set partitions_to_query = ['current_date'] %}
     {% for i in range(var('static_incremental_days', 1)) %}
         {% set partitions_to_query = partitions_to_query.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
     {% endfor %}
@@ -19,11 +19,14 @@ with base_events as (
 add_user_key as (
     select 
         *,
-        case
-            when user_id is not null then to_base64(md5(user_id))
-            when user_pseudo_id is not null then to_base64(md5(user_pseudo_id))
-            else null -- this case is reached when privacy settings are enabled
-        end as user_key
+        to_base64(md5(user_pseudo_id)) as user_key
+        -- in this implementation, sessions break when a user id is added or removed during a session
+        -- there is a fix in the main package, but implementing it here is a major task
+        --case
+        --    when user_id is not null then to_base64(md5(user_id))
+        --    when user_pseudo_id is not null then to_base64(md5(user_pseudo_id))
+        --    else null -- this case is reached when privacy settings are enabled
+        --end as user_key
     from base_events
 ), 
 -- Add unique keys for sessions and events
