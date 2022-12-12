@@ -4,22 +4,22 @@
 
 with first_last_event as (
     select
-        user_key,
-        FIRST_VALUE(event_key) OVER (PARTITION BY user_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS first_event,
-        LAST_VALUE(event_key) OVER (PARTITION BY user_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS last_event
+        user_pseudo_id,
+        FIRST_VALUE(event_key) OVER (PARTITION BY user_pseudo_id ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS first_event,
+        LAST_VALUE(event_key) OVER (PARTITION BY user_pseudo_id ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS last_event
     from {{ref('stg_ga4__events')}}
-    where user_key is not null --remove users with privacy settings enabled
+    where user_pseudo_id is not null --remove users with privacy settings enabled
 ),
-events_by_user_key as (
+events_by_user_pseudo_id as (
     select distinct
-        user_key,
+        user_pseudo_id,
         first_event,
         last_event
     from first_last_event
 ),
 events_joined as (
     select
-        events_by_user_key.*,
+        events_by_user_pseudo_id.*,
         events_first.geo_continent as first_geo_continent,
         events_first.geo_country as first_geo_country,
         events_first.geo_region as first_geo_region,
@@ -72,11 +72,11 @@ events_joined as (
         events_last.traffic_source_name as last_traffic_source_name,
         events_last.traffic_source_medium as last_traffic_source_medium,
         events_last.traffic_source_source as last_traffic_source_source,
-    from events_by_user_key
+    from events_by_user_pseudo_id
     left join {{ref('stg_ga4__events')}} events_first
-        on events_by_user_key.first_event = events_first.event_key
+        on events_by_user_pseudo_id.first_event = events_first.event_key
     left join {{ref('stg_ga4__events')}} events_last
-        on events_by_user_key.last_event = events_last.event_key
+        on events_by_user_pseudo_id.last_event = events_last.event_key
 )
 
 select * from events_joined
