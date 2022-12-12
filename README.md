@@ -6,11 +6,10 @@ Features include:
 - Flattened models to access common events and event parameters such as `page_view`, `session_start`, and `purchase`
 - Conversion of sharded event tables into a single partitioned table
 - Incremental loading of GA4 data into your staging tables 
-- Session and user dimensional models with conversion counts
-- Easy access to query parameters such as GCLID and UTM params
-- Support for custom event parameters & custom user properties
+- Page, session and user dimensional models with conversion counts
+- Simple methods for accessing query parameters (like UTM params) or filtering query parameters (like click IDs)
+- Support for custom event parameters & user properties
 - Mapping from source/medium to default channel grouping
-- Ability to exclude query parameters (like `fbclid`) from page paths
 
 # Models
 
@@ -23,7 +22,7 @@ Features include:
 | stg_ga4__user_properties | Finds the most recent occurance of specified user_properties for each user |
 | stg_ga4__derived_user_properties | Finds the most recent occurance of specific event_params value and assigns them to a user_pseudo_id. Derived user properties are specified as variables (see documentation below) |
 | stg_ga4__derived_session_properties | Finds the most recent occurance of specific event_params or user_properties value and assigns them to a session's session_key. Derived session properties are specified as variables (see documentation below) |
-| stg_ga4__session_conversions_daily | Produces daily counts of conversions per session. The lsit of conversion events to include is configurable (see documentation below) |
+| stg_ga4__session_conversions_daily | Produces daily counts of conversions per session. The list of conversion events to include is configurable (see documentation below) |
 | stg_ga4__sessions_traffic_sources | Finds the first source, medium, campaign, content, paid search term (from UTM tracking), and default channel grouping for each session |
 | dim_ga4__user_pseudo_ids | Dimension table for user devices as indicated by user_pseudo_ids. Contains attributes such as first and last page viewed.| 
 | dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and campaign data |
@@ -70,7 +69,7 @@ packages:
 ```
 ## Required Variables
 
-This package assumes that you have an existing DBT project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded. Source data is located using the following variables which must be set in your `dbt_project.yml` file.
+This package assumes that you have an existing DBT project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded. Source data is defined using the following variables which must be set in `dbt_project.yml`.
 
 ```
 vars:
@@ -78,19 +77,8 @@ vars:
     project: "your_gcp_project"
     dataset: "your_ga4_dataset"
     start_date: "YYYYMMDD" # Earliest date to load
-    frequency: "daily" # daily|streaming|daily+streaming Match to the type of export configured in GA4; daily+streaming appends today's intraday data to daily data
+    frequency: "daily" # daily|streaming|daily+streaming. See 'Export Frequency' below.
 ```
-
-If you don't have any GA4 data of your own, you can connect to Google's public data set with the following settings:
-
-```
-vars:
-  project: "bigquery-public-data"
-  dataset: "ga4_obfuscated_sample_ecommerce"
-  start_date: "20210120"
-```
-
-More info about the GA4 obfuscated dataset here: https://support.google.com/analytics/answer/10937659?hl=en#zippy=%2Cin-this-article
 
 ## Optional Variables
 
@@ -275,6 +263,6 @@ The easiest option is using OAuth with your Google Account. Summarized instructi
 ```
 gcloud auth application-default login --scopes=https://www.googleapis.com/auth/bigquery,https://www.googleapis.com/auth/iam.test
 ```
-# Integration Testing
+# Unit Testing
 
-This package uses `pytest` as a method of unit testing individual models. More details can be found in the [integration_tests/README.md](integration_tests) folder.
+This package uses `pytest` as a method of unit testing individual models. More details can be found in the [unit_tests/README.md](unit_tests) folder.

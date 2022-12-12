@@ -7,7 +7,7 @@ The dbt-ga4 package treats each model and macro as a 'unit' of code. If we fix t
 
 You'll need to install pytest, pytest-dotenv and create a `.env` file with a `BIGQUERY_PROJECT` key containing the name of your BigQuery project. An 'oauth' connection method is assumed for local development. 
 
-Installing pytest & pytest-dotenv can be done using the requirements.txt file. Navigate to the `integration_tests` folder and run 
+Installing pytest & pytest-dotenv can be done using the requirements.txt file. Navigate to the `unit_tests` folder and run 
 
 ```
 pip install -r requirements.txt
