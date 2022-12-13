@@ -1,4 +1,4 @@
--- Dimension table for sessions based on the session_start event.
+-- Dimension table for sessions based on the first event.
 with session_start_dims as (
     select 
         session_key,
@@ -32,7 +32,7 @@ with session_start_dims as (
         traffic_source_name,
         traffic_source_medium,
         traffic_source_source,
-    from {{ref('stg_ga4__sessions_first_session_start_event')}}
+    from {{ref('stg_ga4__sessions_first_event')}}
 ),
 join_traffic_source as (
     select 
