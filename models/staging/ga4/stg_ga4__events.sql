@@ -47,12 +47,6 @@ include_event_key as (
         to_base64(md5(CONCAT(CAST(session_key as STRING), CAST(session_event_number as STRING)))) as event_key -- Surrogate key for unique events
     from include_event_number
 ),
-include_page_key as (
-    select
-        include_event_key.*,
-        to_base64(md5(concat( cast(event_date_dt as string), page_location ))) as page_key
-    from include_event_key
-),
 detect_gclid as (
     select
         * except (medium, campaign),
@@ -64,7 +58,7 @@ detect_gclid as (
             when (page_location like '%gclid%' and campaign is null) then "(cpc)"
             else campaign
         end as campaign
-    from include_page_key
+    from include_event_key
 ),
 -- Remove specific query strings from page_location field
 remove_query_params as (
@@ -83,12 +77,18 @@ remove_query_params as (
         {% endif %}
     from detect_gclid
 ),
+include_page_key as (
+    select
+        include_event_key.*,
+        to_base64(md5(concat( cast(event_date_dt as string), page_location ))) as page_key
+    from remove_query_params
+),
 enrich_params as (
     select 
         *,
         {{extract_hostname_from_url('page_location')}} as page_hostname,
         {{extract_query_string_from_url('page_location')}} as page_query_string,
-    from remove_query_params
+    from include_page_key
 )
 
 
