@@ -24,8 +24,8 @@ Features include:
 | stg_ga4__derived_session_properties | Finds the most recent occurance of specific event_params or user_properties value and assigns them to a session's session_key. Derived session properties are specified as variables (see documentation below) |
 | stg_ga4__session_conversions_daily | Produces daily counts of conversions per session. The list of conversion events to include is configurable (see documentation below) |
 | stg_ga4__sessions_traffic_sources | Finds the first source, medium, campaign, content, paid search term (from UTM tracking), and default channel grouping for each session |
-| dim_ga4__user_pseudo_ids | Dimension table for user devices as indicated by user_pseudo_ids. Contains attributes such as first and last page viewed.| 
-| dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and campaign data |
+| dim_ga4__users | Dimension table for users which includes data from the first and last event produced by the user. Unique on user_key.| 
+| dim_ga4__sessions | Dimension table for sessions containing context useful for filtering(geography, device information, traffic source, default channel grouping). Each row represents a session. Unique on session_key.|
 | fct_ga4__pages | Fact table for pages which aggregates common page metrics by page_location, date, and hour. |
 | fct_ga4__sessions_daily | Fact table for session metrics, partitioned by date. A single session may span multiple rows given that sessions can span multiple days.  |
 | fct_ga4__sessions | Fact table that aggregates session metrics across days. This table is not partitioned, so be mindful of performance/cost when querying. |
@@ -36,7 +36,6 @@ Features include:
 |-----------|-------------|
 | ga4_source_categories.csv| Google's mapping between `source` and `source_category`. Downloaded from https://support.google.com/analytics/answer/9756891?hl=en |
 
-Be sure to run `dbt seed` before you run `dbt run`.
 
 # Installation & Configuration
 ## Install from DBT Package Hub
@@ -79,6 +78,8 @@ vars:
     start_date: "YYYYMMDD" # Earliest date to load
     frequency: "daily" # daily|streaming|daily+streaming. See 'Export Frequency' below.
 ```
+
+Be sure to run `dbt seed` before you run `dbt run`.
 
 ## Optional Variables
 
