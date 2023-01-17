@@ -5,7 +5,6 @@ with events as (
     select 
         page_key,
         event_name,
-        session_key,
         1 as event_count,
     from {{ref('stg_ga4__events')}}
 )
@@ -16,7 +15,6 @@ conversion_{{ce}} as (
     select
         page_key,
         sum(event_count) as conversion_count,
-        count(distinct session_key) as distinct_conversion_count
     from events
     where event_name = '{{ce}}'
     group by page_key
@@ -31,7 +29,6 @@ final_pivot as (
         page_key
         {% for ce in var('conversion_events',[]) %}
         , ifnull(conversion_{{ce}}.conversion_count,0) as {{ce}}_count
-        , ifnull(conversion_{{ce}}.distinct_conversion_count,0) as {{ce}}_count_distinct
         {% endfor %}
     from events
     {% for ce in var('conversion_events',[]) %}
