@@ -8,7 +8,6 @@ with events as (
         session_key,
         1 as event_count,
     from {{ref('stg_ga4__events')}}
-    group by 1,2,3
 )
 -- For loop that creates 1 cte per conversions, grouped by page_location
 {% for ce in var('conversion_events',[]) %}
