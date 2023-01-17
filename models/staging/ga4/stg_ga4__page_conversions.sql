@@ -5,8 +5,8 @@ with events as (
     select 
         page_key,
         event_name,
+        session_key,
         1 as event_count,
-        count(distinct session_key) as distinct_event_count
     from {{ref('stg_ga4__events')}}
     group by 1,2,3
 )
@@ -17,7 +17,7 @@ conversion_{{ce}} as (
     select
         page_key,
         sum(event_count) as conversion_count,
-        sum(distinct_event_count) as distinct_conversion_count
+        count(distinct session_key) as distinct_conversion_count
     from events
     where event_name = '{{ce}}'
     group by page_key

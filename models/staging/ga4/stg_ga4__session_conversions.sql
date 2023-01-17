@@ -36,7 +36,7 @@ final_pivot as (
         {% for ce in var('conversion_events',[]) %}
         , ifnull(conversion_{{ce}}.conversion_count,0) as {{ce}}_count
         , case
-            when ifnull(conversion_{{ce}}.conversion_count,0) is not null then 1
+            when conversion_{{ce}}.conversion_count is not null then 1
             else 0
         end as {{ce}}_count_distinct
         {% endfor %}
