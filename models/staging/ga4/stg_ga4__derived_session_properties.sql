@@ -1,6 +1,6 @@
 {{ config(
   enabled = true if var('derived_session_properties', false) else false,
-  materialized = "table"
+  materialized = "table" if target.name == "prod" else "view",
 ) }}
 
 -- Remove null session_keys (users with privacy enabled)

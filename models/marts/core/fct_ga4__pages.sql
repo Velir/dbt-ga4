@@ -1,16 +1,17 @@
-{{
-    config(
-        materialized = 'incremental',
-        incremental_strategy = 'insert_overwrite',
-        tags = ["incremental"],
-        partition_by={
-        "field": "event_date_dt",
-        "data_type": "date",
-        "granularity": "day"
-        }
-    )
-}}
-
+{% if target.name == "prod" %}
+    {{
+        config(
+            materialized = 'incremental',
+            incremental_strategy = 'insert_overwrite',
+            tags = ["incremental"],
+            partition_by={
+            "field": "event_date_dt",
+            "data_type": "date",
+            "granularity": "day"
+            }
+        )
+    }}
+{% endif %}
 with page_view as (
     select
         event_date_dt,

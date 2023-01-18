@@ -1,5 +1,5 @@
 {{
-    config(materialized = "table")
+    config(materialized = "table" if target.name == 'prod' else 'view')
 }}
 
 with first_last_event as (

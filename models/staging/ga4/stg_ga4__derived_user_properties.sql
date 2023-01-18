@@ -1,6 +1,6 @@
 {{ config(
   enabled = true if var('derived_user_properties', false) else false,
-  materialized = "table"
+  materialized = "table" if target.name == "prod" else "view",
 ) }}
 
 -- Remove null user_pseudo_id (users with privacy enabled)

@@ -1,6 +1,6 @@
 {{ config(
     enabled= var('conversion_events', false) != false,
-    materialized = 'incremental',
+    materialized = 'incremental' if target.name == 'prod' else 'view',
     incremental_strategy = 'insert_overwrite',
     tags = ["incremental"],
     partition_by={

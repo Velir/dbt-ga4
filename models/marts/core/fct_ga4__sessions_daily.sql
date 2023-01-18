@@ -1,15 +1,17 @@
-{{
-    config(
-        materialized = 'incremental',
-        incremental_strategy = 'insert_overwrite',
-        tags = ["incremental"],
-        partition_by={
-        "field": "session_partition_date",
-        "data_type": "date",
-        "granularity": "day"
-        }
-    )
-}}
+{% if target.name == "prod" %}
+    {{
+        config(
+            materialized = 'incremental',
+            incremental_strategy = 'insert_overwrite',
+            tags = ["incremental"],
+            partition_by={
+            "field": "session_partition_date",
+            "data_type": "date",
+            "granularity": "day"
+            }
+        )
+    }}
+{% endif %}
 
 with session_metrics as (
     select 
