@@ -51,4 +51,4 @@ models:
   ga4:
     +materialized: view
     marts:
-      +materialized: table
+      +materialized: "{{ 'table' if target.name == 'prod' else 'view' }}"
