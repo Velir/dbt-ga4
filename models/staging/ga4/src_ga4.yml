@@ -1,9 +1,8 @@
 version: 2
 
 sources:
-  - &ga4_base
-    name: ga4
-    database: "{{var('project')}}"  # Default to single-site config
+  - name: ga4
+    database: "{{var('project')}}" 
     schema: "{{var('dataset')}}" 
     tables:
       - name: events
@@ -12,11 +11,3 @@ sources:
       - name: events_intraday
         identifier: events_intraday_*
         description: Intraday events table which is optionally exported by GA4. Always contains events from the current day.
-
-{% if var(datasets) is not none  %}
-{% for ds in datasets %}
-  - <<: *ga4_base
-    name: ga4_"{{var('ds')}}" 
-    schema: "{{var('ds')}}" 
-{% endfor %}
-{% endif %}

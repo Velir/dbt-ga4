@@ -1,9 +1,12 @@
+{% set ds = '' %} -- This should match the *numeric* portion of the GA4 source dataset and needs to be configured separately for each dataset
+{% set enable_model = false %}
 {% set partitions_to_replace = ['current_date'] %}
 {% for i in range(var('static_incremental_days')) %}
     {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
 {% endfor %}
 {{
     config(
+        enabled = enable_model,
         materialized = 'incremental',
         incremental_strategy = 'insert_overwrite',
         partition_by={
@@ -14,30 +17,10 @@
         {% if var('frequency', 'daily') == 'daily+streaming' %} enabled = true {% else %} enabled = false {% endif %}
     )
 }}
-
-
-{% if var(va4_datasets) is not none  %}
-    {% for ds in va4_datasets %}
-        select
-            *
-        from {{ ref('base_ga4__multisite_events_intraday_'ds) }}
-        where event_date_dt >= {{var('start_date')}}
-        -- On sites configured for both streaming and batch, the intraday tables remain on days that go over the daily 1,000,000 event limit
-        -- To avoid reprocessing those tables, we need the below logic
-        {% if is_incremental() %}
-            {% if var('static_incremental_days', false ) %}
-                and event_date_dt in ({{ partitions_to_replace | join(',') }})
-            {% else %}
-                and event_date_dt  >= DATE_SUB(_dbt_max_partition, INTERVAL 1 DAY)
-            {% endif %}
-        {% endif %}
-        {% if not loop.last -%} union all {%- endif %}
-    {% endfor %}
-{% else %}
 with source as (
     select
         *
-    from {{ source('ga4', 'events_intraday') }}
+    from {{ source('ga4_'{{ ds }}, 'events_intraday') }}
     where cast( _table_suffix as int64) >= {{var('start_date')}}
     {% if is_incremental() %}
         {% if var('static_incremental_days', false ) %}
@@ -57,4 +40,3 @@ with source as (
 
     select * from renamed
     qualify row_number() over(partition by event_date_dt, stream_id, user_pseudo_id, ga_session_id, event_name, event_timestamp, to_json_string(event_params)) = 1
-{% endif %}
