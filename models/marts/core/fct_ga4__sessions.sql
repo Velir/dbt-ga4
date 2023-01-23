@@ -3,6 +3,7 @@
 select
     user_pseudo_id,
     session_key,
+    {% if var('ga4_datasets', false) %}stream_name,{% endif %}
     min(session_partition_min_timestamp) as session_start_timestamp,
     min(session_partition_date) as session_start_date,
     sum(session_partition_count_page_views) as count_pageviews,
@@ -16,5 +17,5 @@ select
         {% endfor %}
     {% endif %}
 from {{ref('fct_ga4__sessions_daily')}}
-group by 1,2
+group by 1,2{% if var('ga4_datasets', false) %},3{% endif %}
 

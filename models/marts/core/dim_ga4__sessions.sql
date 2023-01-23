@@ -20,6 +20,7 @@ with session_first_event as
         geo_sub_continent,
         geo_metro,
         stream_id,
+        {% if var('ga4_datasets', false) %}stream_name,{% endif %}
         platform,
         device_category,
         device_mobile_brand_name,
