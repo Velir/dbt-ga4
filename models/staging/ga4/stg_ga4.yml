@@ -64,29 +64,13 @@ models:
   - name: stg_ga4__event_items
     description: Flattens out the 'items' field for e-commerce events such as purchase and add_to_cart
   - name: stg_ga4__sessions_traffic_sources
-    description: Finds the first session source, medium and campaign and adds the default channel grouping information. Aggregated by session_key.
+    description: Finds the first session source, medium and campaign and adds the default channel grouping information. Uses the first non-null source value as the basis for selecting the event that will be used to assign source, medium, campaign, content, and term values. Aggregated by session_key.
     columns:
       - name: session_key
         tests:
           - unique
-      - name: session_source
-        description: source value of the first event of the session after session_start and first_visit
-        tests:
-          - not_null
-      - name: session_medium
-        description: medium value of the first event of the session after session_start and first_visit
-        tests:
-          - not_null
-      - name: session_campaign
-        description: campaign value of the first event of the session after session_start and first_visit
-        tests:
-          - not_null
-      - name: session_content
-        description: content value of the first event of the session after session_start and first_visit
-        tests:
-          - not_null
-      - name: session_term
-        description: term value of the first event of the session after session_start and first_visit
+      - name: source
+        description: First non-null source value of the session
         tests:
           - not_null
   - name: stg_ga4__user_id_mapping
