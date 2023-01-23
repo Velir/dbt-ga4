@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: dim_ga4__sessions
-    description: Dimension table for sessions containing context useful for filtering. Each row represents a session. Unique on session_key
+    description: Dimension table for sessions containing context useful for filtering such as acquisition source, medium, and campaign. Each row represents a session. Unique on session_key
     columns:
       - name: session_key
         tests:
