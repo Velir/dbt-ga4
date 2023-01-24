@@ -1,4 +1,4 @@
-{% set ds = '' %} -- This should match the *numeric* portion of the GA4 source dataset and needs to be configured separately for each dataset
+{% set ds = 'ga4_' %} -- This should match the *numeric* portion of the GA4 source dataset prefixed with 'ds_' and needs to be configured separately for each dataset
 {% set enable_model = false %}
 {% set partitions_to_replace = ['current_date'] %}
 {% for i in range(var('static_incremental_days')) %}
@@ -20,7 +20,7 @@
 with source as (
     select
         *
-    from {{ source('ga4_'{{ ds }}, 'events_intraday') }}
+    from {{ source(ds, 'events_intraday') }}
     where cast( _table_suffix as int64) >= {{var('start_date')}}
     {% if is_incremental() %}
         {% if var('static_incremental_days', false ) %}

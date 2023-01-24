@@ -43,7 +43,7 @@ version: 2
 sources:
   - name: ga4_111111111
     database: "{{var('project')}}" 
-    schema: 111111111 
+    schema: "analytics_111111111" 
     tables:
       - name: events
         identifier: events_* # Scan across all sharded event tables. Use the 'start_date' variable to limit this scan
@@ -61,7 +61,7 @@ version: 2
 sources:
   - name: ga4_111111111
     database: "{{var('project')}}" 
-    schema: 111111111 
+    schema: "analytics_111111111" 
     tables:
       - name: events
         identifier: events_* # Scan across all sharded event tables. Use the 'start_date' variable to limit this scan
@@ -71,7 +71,7 @@ sources:
         description: Intraday events table which is optionally exported by GA4. Always contains events from the current day.
   - name: ga4_222222222
     database: "{{var('project')}}" 
-    schema: 222222222
+    schema: "analytics_222222222"
     tables:
       - name: events
         identifier: events_* # Scan across all sharded event tables. Use the 'start_date' variable to limit this scan
@@ -81,7 +81,7 @@ sources:
         description: Intraday events table which is optionally exported by GA4. Always contains events from the current day.
   - name: ga4_333333333
     database: "{{var('project')}}" 
-    schema: 333333333
+    schema: "analytics_333333333"
     tables:
       - name: events
         identifier: events_* # Scan across all sharded event tables. Use the 'start_date' variable to limit this scan
@@ -96,6 +96,13 @@ sources:
 For each GA4 project, you will need to copy the `tpl_base_ga4__multisite_events_.sql` file into your **dbt project** and name it `base_ga4__multisite_events_111111111.sql` substituting the numeric portion of the file with the **GA4 project ID**.
 
 If you have the `frequency` variable set to 'daily+streaming' or you may want to set the frequency to 'daily+streaming' in the future, then you will also need to copy the `tpl_base_ga4__multisite_events_intraday_.sql` file into your **dbt project** and name it `base_ga4__multisite_events_intraday_111111111.sql` substituting the numeric portion of the file with the **GA4 project ID** in order for that setting to function.
+
+The first two lines of each SQL file will need to be modified. Enter your **GA4 project ID** (which should also be in the file name) as the value for the ds variable in line 1 and change line 2 to true.
+
+```
+{% set ds = '111111111' %} -- This should match the *numeric* portion of the GA4 source dataset and needs to be configured separately for each dataset
+{% set enable_model = true %}
+```
 
 ### Create a seed file and map `stream_id` values to user-friendly `stream_name` values
 
@@ -116,3 +123,6 @@ stream_id,stream_name
 ```
 The exact values used for `stream_name` are entirely up to you as long as they match a `stream_id` from your source datasets.
 
+The first line must match that given in the example.
+
+You will need to run `dbt seed` before you run the `dbt build` or `dbt run` commands.

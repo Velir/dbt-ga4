@@ -1,4 +1,4 @@
-{% set ds = '' %} -- This should match the *numeric* portion of the GA4 source dataset and needs to be configured separately for each dataset
+{% set ds = 'ga4_' %} -- This should match the *numeric* portion of the GA4 source dataset prefixed with 'ga4_' and needs to be configured separately for each dataset
 {% set enable_model = false %}
 {% set partitions_to_replace = ['current_date'] %}
 {% for i in range(var('static_incremental_days')) %}
@@ -20,10 +20,10 @@ with source as (
     select
     {{ base_select_source() }}
     {%  if var('frequency', 'daily') == 'streaming' %}
-        from {{ source('ga4_'{{ ds }}, 'events_intraday') }}
+        from {{ source(ds, 'events_intraday') }}
         where cast( _table_suffix as int64) >= {{var('start_date')}}
     {% else %}
-        from {{ source('ga4_'{{ ds }}, 'events') }}
+        from {{ source(ds, 'events') }}
         where _table_suffix not like '%intraday%'
         and cast( _table_suffix as int64) >= {{var('start_date')}}
     {% endif %}
