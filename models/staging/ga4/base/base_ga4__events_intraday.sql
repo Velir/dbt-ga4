@@ -4,7 +4,7 @@
     {% for ds in ga4_datasets %}
         select
             *
-        from {{ ref('base_ga4__multisite_events_intraday_'ds) }}
+        from {{ ref('base_ga4__multisite_events_intraday_'~ds) }}
         where event_date_dt >= {{var('start_date')}}
         -- On sites configured for both streaming and batch, the intraday tables remain on days that go over the daily 1,000,000 event limit
         -- To avoid reprocessing those tables, we need the below logic
