@@ -14,23 +14,6 @@
         {% endif %}
         {% if not loop.last -%} union all {%- endif %}
     {% endfor %}
-    {% else %}
-        {%  if var('frequency', 'daily') == 'streaming' %}
-            from {{ source( 'ga4' , 'events_intraday') }}
-            where cast( _table_suffix as int64) >= {{var('start_date')}}
-        {% else %}
-            from {{ source( 'ga4' , 'events') }}
-            where _table_suffix not like '%intraday%'
-            and cast( _table_suffix as int64) >= {{var('start_date')}}
-        {% endif %}
-    {% endif %}
-    {% if is_incremental() %}
-        {% if var('static_incremental_days', false ) %}
-            and event_date_dt in ({{ partitions_to_replace | join(',') }})
-        {% else %}
-            and event_date_dt  >= DATE_SUB(_dbt_max_partition, INTERVAL 1 DAY)
-        {% endif %}
-    {% endif %}
 {% else %}
 -- If multi-site is not configured, then we get the base settings
 --BigQuery does not cache wildcard queries that scan across sharded tables which means it's best to materialize the raw event data as a partitioned table so that future queries benefit from caching
