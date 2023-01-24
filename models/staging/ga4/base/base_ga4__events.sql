@@ -6,10 +6,10 @@
         select
             *
         {%  if var('frequency', 'daily') == 'streaming' %}
-            from {{ ref('base_ga4__multisite_events_intraday_'ds) }}
+            from {{ ref('base_ga4__multisite_events_intraday_'~ds) }}
             where event_date_dt >= {{var('start_date')}}
         {% else %}
-            from {{ ref('base_ga4__multisite_events_'ds) }}
+            from {{ ref('base_ga4__multisite_events_'~ds) }}
             where event_date_dt >= {{var('start_date')}}
         {% endif %}
         {% if not loop.last -%} union all {%- endif %}
