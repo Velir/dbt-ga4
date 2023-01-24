@@ -1,24 +1,9 @@
 {% set ds = 'ga4_' %} -- This should match the *numeric* portion of the GA4 source dataset prefixed with 'ga4_' and needs to be configured separately for each dataset
-{% set enable_model = false %}
-{% set partitions_to_replace = ['current_date'] %}
-{% for i in range(var('static_incremental_days')) %}
-    {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
-{% endfor %}
-{{
-    config(
-        enabled = enable_model,
-        materialized = 'incremental',
-        incremental_strategy = 'insert_overwrite',
-        partition_by={
-            "field": "event_date_dt",
-            "data_type": "date",
-        },
-        partitions = partitions_to_replace,
-    )
-}}
+{{ config(enabled=false) }}
+{{ ga4.incremental_header() }}
 with source as (
     select
-    {{ base_select_source() }}
+    {{ ga4.base_select_source() }}
     {%  if var('frequency', 'daily') == 'streaming' %}
         from {{ source(ds, 'events_intraday') }}
         where cast( _table_suffix as int64) >= {{var('start_date')}}
@@ -39,7 +24,7 @@ with source as (
 ),
 renamed as (
     select
-    {{ base_select_renamed() }}
+    {{ ga4.base_select_renamed() }}
     from source
 )
 

@@ -1,23 +1,7 @@
-{% set partitions_to_replace = ['current_date'] %}
-{% for i in range(var('static_incremental_days')) %}
-    {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
-{% endfor %}
-{{
-    config(
-        materialized = 'incremental',
-        incremental_strategy = 'insert_overwrite',
-        partition_by={
-            "field": "event_date_dt",
-            "data_type": "date",
-        },
-        partitions = partitions_to_replace,
-        {% if var('frequency', 'daily') == 'daily+streaming' %} enabled = true {% else %} enabled = false {% endif %}
-    )
-}}
+{{ ga4.incremental_header() }}
 
-
-{% if var(va4_datasets) is not none  %}
-    {% for ds in va4_datasets %}
+{% if var(ga4_datasets) is not none  %}
+    {% for ds in ga4_datasets %}
         select
             *
         from {{ ref('base_ga4__multisite_events_intraday_'ds) }}

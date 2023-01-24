@@ -97,11 +97,11 @@ For each GA4 project, you will need to copy the `tpl_base_ga4__multisite_events_
 
 If you have the `frequency` variable set to 'daily+streaming' or you may want to set the frequency to 'daily+streaming' in the future, then you will also need to copy the `tpl_base_ga4__multisite_events_intraday_.sql` file into your **dbt project** and name it `base_ga4__multisite_events_intraday_111111111.sql` substituting the numeric portion of the file with the **GA4 project ID** in order for that setting to function.
 
-The first two lines of each SQL file will need to be modified. Enter your **GA4 project ID** (which should also be in the file name) as the value for the ds variable in line 1 and change line 2 to true.
+The first two lines of each SQL file will need to be modified. Replace the numeric portion of the ds variable with your **GA4 project ID** (which should also be in the file name) in the value for the ds variable in line 1 and delete line 2.
 
 ```
-{% set ds = '111111111' %} -- This should match the *numeric* portion of the GA4 source dataset and needs to be configured separately for each dataset
-{% set enable_model = true %}
+{% set ds = 'ga_111111111' %} -- This should match the *numeric* portion of the GA4 source dataset and needs to be configured separately for each dataset
+{{ config( enabled=false ) }}
 ```
 
 ### Create a seed file and map `stream_id` values to user-friendly `stream_name` values

@@ -1,4 +1,4 @@
-{%- macro base_select_source() -%}
+{% macro base_select_source() %}
     parse_date('%Y%m%d',event_date) as event_date_dt,
     event_timestamp,
     event_name,
@@ -21,10 +21,10 @@
     platform,
     ecommerce,
     items,
-{%- endmacro -%}
+{% endmacro %}
 
 
-{%- macro base_select_renamed() -%}
+{% macro base_select_renamed() %}
     event_date_dt,
     event_timestamp,
     lower(replace(trim(event_name), " ", "_")) as event_name, -- Clean up all event names to be snake cased
@@ -97,4 +97,4 @@
         WHEN event_name = 'purchase' THEN 1
         ELSE 0
     END AS is_purchase
-{%- endmacro -%}
+{% endmacro %}
