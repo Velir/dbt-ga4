@@ -1,18 +1,17 @@
 {{ ga4.incremental_header() }}
 
-{% if var(ga4_datasets) is not none  %}
-    {% for ds in ga4_datasets %}
+{% if var('ga4_datasets') is defined  %}
+    {% for ds in var('ga4_datasets') %}
         select
             *
         from {{ ref('base_ga4__multisite_events_intraday_'~ds) }}
-        where event_date_dt >= {{var('start_date')}}
         -- On sites configured for both streaming and batch, the intraday tables remain on days that go over the daily 1,000,000 event limit
         -- To avoid reprocessing those tables, we need the below logic
         {% if is_incremental() %}
             {% if var('static_incremental_days', false ) %}
-                and event_date_dt in ({{ partitions_to_replace | join(',') }})
+                where event_date_dt in ({{ partitions_to_replace | join(',') }})
             {% else %}
-                and event_date_dt  >= DATE_SUB(_dbt_max_partition, INTERVAL 1 DAY)
+                where event_date_dt  >= DATE_SUB(_dbt_max_partition, INTERVAL 1 DAY)
             {% endif %}
         {% endif %}
         {% if not loop.last -%} union all {%- endif %}
