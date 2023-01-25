@@ -13,7 +13,7 @@
             "field": partition_by_field,
             "data_type": "date",
         },
-        partitions = partitions_to_replace,
+        {% if var('static_incremental_days', false) %} partitions = partitions_to_replace, {% endif %}
     )
 }}
 {% endmacro %}

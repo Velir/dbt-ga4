@@ -29,7 +29,7 @@ vars:
 
 Replace the numbers with the **GA4 project ID** which should also match the numeric portion of the source GA4 dataset name, 'analytics_111111111' for example.
 
-The default `dataset` variable will not do anything when the `ga4_datasets` variable is defined.
+The default `dataset` variable will not do anything when the `ga4_datasets` variable is defined. However, **the dbt parser will fail** if it detects a variable that is not defined, so you will need to have a defined `dataset` variable even though the package logic dictates that it will never be used.
 
 ### Override the dbt-ga4 package `src_ga4.yml` file locally in your project with multi-site configurations
 
