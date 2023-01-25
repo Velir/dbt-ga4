@@ -12,6 +12,15 @@
             from {{ ref('base_ga4__multisite_events_'~ds) }}
             where event_date_dt >= {{var('start_date')}}
         {% endif %}
+        {% if is_incremental() %}
+        {% if var('static_incremental_days', false ) %}
+                and parse_date('%Y%m%d', _TABLE_SUFFIX) in ({{ partitions_to_replace | join(',') }})
+        {% else %}
+                -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
+                -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
+                and parse_date('%Y%m%d',_TABLE_SUFFIX) >= _dbt_max_partition
+        {% endif %}
+    {% endif %}
         {% if not loop.last -%} union all {%- endif %}
     {% endfor %}
 {% else %}
