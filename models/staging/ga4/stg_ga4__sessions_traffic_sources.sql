@@ -15,7 +15,7 @@ with session_events as (
 set_default_channel_grouping as (
     select
         *,
-        {{ga4.default_channel_grouping('source','medium','source_category')}} as default_channel_grouping
+        {{default_channel_grouping('source','medium','source_category')}} as default_channel_grouping
     from session_events
 ),
 session_source as (
