@@ -266,3 +266,13 @@ gcloud auth application-default login --scopes=https://www.googleapis.com/auth/b
 # Unit Testing
 
 This package uses `pytest` as a method of unit testing individual models. More details can be found in the [unit_tests/README.md](unit_tests) folder.
+
+# Overriding Default Channel Groupings
+
+By default, this package maps traffic sources to channel groupings using the `macros/default_channel_grouping.sql` macro. This macro closely adheres to Googls recommended channel groupings documented here: https://support.google.com/analytics/answer/9756891?hl=en .
+
+Package users can override this macro and implement their own channel groupins by following these steps:
+- Create a macro in your project named `default__default_channel_grouping` that accepts the same 3 arguments: source, medium, source_category
+- Implement your custom logic within that macro. It may be easiest to first copy the code from the package macro and modify from there.
+
+Overriding the package's default channel mapping makes use of dbt's dispatch override capability documented here: https://docs.getdbt.com/reference/dbt-jinja-functions/dispatch#overriding-package-macros

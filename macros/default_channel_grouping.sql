@@ -4,7 +4,7 @@
 
 {% macro default_channel_grouping(source, medium, source_category) %}
   {{ return(adapter.dispatch('default_channel_grouping', 'ga4')(source, medium, source_category)) }}
-{%- endmacro %}
+{% endmacro %}
 
 {% macro default__default_channel_grouping(source, medium, source_category) %}
 case 
