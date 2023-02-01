@@ -250,6 +250,12 @@ vars:
   ga4:
     frequency:"daily+streaming"
 ```
+# Multi-site support
+This package supports multi-site functionality through a variety of project-level customizations and package-level configurations.
+
+Multi-site is an advanced features that requires a solid understanding dbt and SQL.
+
+See the `multisite.md` file in the `templates` folder for multi-site installation instructions.
 
 # Connecting to BigQuery
 
