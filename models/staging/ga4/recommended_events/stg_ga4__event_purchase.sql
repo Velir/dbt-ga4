@@ -18,7 +18,7 @@ with purchase_with_params as (
     {{ ga4.unnest_key('event_params', 'currency') }},
     {{ ga4.unnest_key('event_params', 'value', 'double_value') }},
     {{ ga4.unnest_key('event_params', 'tax', 'double_value') }},
-    {{ ga4.unnest_key('event_params', 'shipping', 'float_value') }},
+    {{ ga4.unnest_key('event_params', 'shipping', 'double_value') }},
     {{ ga4.unnest_key('event_params', 'affiliation') }}
     {% if var("default_custom_parameters", "none") != "none" %}
       {{ ga4.stage_custom_parameters( var("default_custom_parameters") )}}
