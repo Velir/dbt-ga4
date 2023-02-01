@@ -26,7 +26,7 @@ with page_view as (
         sum(engagement_time_msec) as total_time_on_page 
         
 from {{ref('stg_ga4__event_page_view')}}
-    group by 1,2,3,4,5{% if var('ga4_datasets', false) %},5{% endif %}
+    group by 1,2,3,4,5{% if var('ga4_datasets', false) %},6{% endif %}
 ), scroll as (
     select
         event_date_dt,

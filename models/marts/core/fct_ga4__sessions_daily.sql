@@ -45,6 +45,7 @@ with session_metrics as (
     join_metrics_and_conversions as (
         select 
             session_metrics.user_pseudo_id,
+            session_metrics.stream_name,
             session_metrics.session_partition_min_timestamp,
             session_metrics.session_partition_count_page_views,
             session_metrics.session_partition_count_purchases,
