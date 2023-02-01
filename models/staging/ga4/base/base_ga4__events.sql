@@ -10,8 +10,10 @@
             partition_by={
                 "field": "event_date_dt",
                 "data_type": "date",
+                "copy_partitions": true
             },
             partitions = partitions_to_replace,
+            
         )
     }}
 {% else %}
@@ -22,7 +24,9 @@
             partition_by={
                 "field": "event_date_dt",
                 "data_type": "date",
+                "copy_partitions": true
             },
+            
         )
     }}
 {% endif %}
