@@ -1,4 +1,31 @@
-{{ ga4.incremental_header() }}
+{% if var('static_incremental_days', false ) %}
+    {% set partitions_to_replace = [] %}
+    {% for i in range(var('static_incremental_days')) %}
+        {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
+    {% endfor %}
+    {{
+        config(
+            materialized = 'incremental',
+            incremental_strategy = 'insert_overwrite',
+            partition_by={
+                "field": "event_date_dt",
+                "data_type": "date",
+            },
+            partitions = partitions_to_replace,
+        )
+    }}
+{% else %}
+    {{
+        config(
+            materialized = 'incremental',
+            incremental_strategy = 'insert_overwrite',
+            partition_by={
+                "field": "event_date_dt",
+                "data_type": "date",
+            },
+        )
+    }}
+{% endif %}
 -- if the multi-site datasets variable is set, then we union the models in the datasets variable
 -- multi-site requires additional manual configuration beyond setting the datasets variable as detailed in the multi_site.md
 {% if var('ga4_datasets') is defined  %}
