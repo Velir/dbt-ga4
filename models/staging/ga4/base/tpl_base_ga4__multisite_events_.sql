@@ -1,7 +1,7 @@
 {% set ds = 'ga4_' %} -- This should match the *numeric* portion of the GA4 source dataset prefixed with 'ga4_' and needs to be configured separately for each dataset
 {% if var('ga4_datasets', false)  == false %}
     {{ config(enabled = 'false') }}
-{% else if var('static_incremental_days', false ) %}
+{% elif var('static_incremental_days', false ) %}
     {% set partitions_to_replace = [current_date] %}
     {% for i in range(var('static_incremental_days')) %}
         {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
