@@ -93,7 +93,7 @@ sources:
 
 ### Create and configure `base_ga4__multisite_events_*` models for each site
 
-For each GA4 project, you will need to copy the `tpl_base_ga4__multisite_events_.sql` file into your **dbt project** and name it `base_ga4__multisite_events_111111111.sql` substituting the numeric portion of the file with the **GA4 project ID**.
+For each GA4 project, you will need to copy the `tpl_base_ga4__multisite_events_.sql` file in the package's `/templates/` folder into your **dbt project** and name it `base_ga4__multisite_events_111111111.sql` substituting the numeric portion of the file with the **GA4 project ID**.
 
 If you have the `frequency` variable set to 'daily+streaming' or you may want to set the frequency to 'daily+streaming' in the future, then you will also need to copy the `tpl_base_ga4__multisite_events_intraday_.sql` file into your **dbt project** and name it `base_ga4__multisite_events_intraday_111111111.sql` substituting the numeric portion of the file with the **GA4 project ID** in order for that setting to function.
 
@@ -116,12 +116,12 @@ Your `ga4_friendly_stream_names.csv` file should look something like this.
 
 ```
 stream_id,stream_name
-0987654321, mysite web
-1234567890, mysite ios
-1122334455, mysite android
-0099887766, myothersite web
+'0987654321', mysite web
+'1234567890', mysite ios
+'1122334455', mysite android
+'0099887766', myothersite web
 ```
-The exact values used for `stream_name` are entirely up to you as long as they match a `stream_id` from your source datasets.
+The exact values used for `stream_name` are entirely up to you as long as they match a `stream_id` from your source datasets. The quotes are required for stream_id to match the data type in GA4.
 
 The first line must match that given in the example.
 
