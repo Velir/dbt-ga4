@@ -12,10 +12,14 @@ with base_events as (
         event_timestamp,
         campaign,
         source,
-        medium
+        medium,
+        event_name,
+        stream_id,
+        ga_session_id
     from {{ ref('base_ga4__events')}}
+    where (source is not null and medium is not null and campaign is not null)
     {% if not flags.FULL_REFRESH %}
-        where event_date_dt in ({{ partitions_to_query | join(',') }})
+        and event_date_dt in ({{ partitions_to_query | join(',') }})
     {% endif %}
     {% if var('frequency', 'daily') == 'daily+streaming' %}
     union all
@@ -35,7 +39,13 @@ add_user_key as (
         --    else null -- this case is reached when privacy settings are enabled
         --end as user_key
     from base_events
+),
+include_session_key as (
+    select 
+        *,
+        to_base64(md5(CONCAT(stream_id, CAST(user_key as STRING), cast(ga_session_id as STRING)))) as session_key -- Surrogate key to determine unique session across streams and users. Sessions do NOT reset after midnight in GA4
+    from add_user_key
 )
 
 
-select * from add_user_key
+select * from include_session_key
