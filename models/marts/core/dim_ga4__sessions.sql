@@ -8,6 +8,7 @@
         config(
             materialized = 'incremental',
             incremental_strategy = 'insert_overwrite',
+            schema = 'analytics',
             partition_by={
                 "field": "session_start_date",
                 "data_type": "date",
@@ -20,6 +21,7 @@
         config(
             materialized = 'incremental',
             incremental_strategy = 'insert_overwrite',
+            schema = 'analytics',
             partition_by={
                 "field": "session_start_date",
                 "data_type": "date",
@@ -35,6 +37,7 @@ with session_start_dims as (
         event_date_dt as session_start_date,
         page_location as landing_page,
         page_hostname as landing_page_hostname,
+        mv_region,
         geo_continent,
         geo_country,
         geo_region,
@@ -80,11 +83,12 @@ remove_dupes as
 join_traffic_source as (
     select 
         remove_dupes.*,
-        session_source as source,
-        session_medium as medium,
-        session_campaign as campaign,
+        source as source,
+        medium as medium,
+        campaign as campaign,
         default_channel_grouping as default_channel_grouping,
-        session_default_channel_grouping as session_default_channel_grouping
+        session_default_channel_grouping as session_default_channel_grouping,
+        mv_author_session_status
     from remove_dupes
     left join {{ref('stg_ga4__sessions_traffic_sources')}} using (session_key)
 )
