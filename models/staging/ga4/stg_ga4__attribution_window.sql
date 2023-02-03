@@ -13,6 +13,8 @@ with base_events as (
         campaign,
         source,
         medium,
+        content,
+        term,
         event_name,
         stream_id,
         ga_session_id
