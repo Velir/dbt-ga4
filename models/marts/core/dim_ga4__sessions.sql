@@ -86,8 +86,8 @@ join_traffic_source as (
         last_non_direct_source as source,
         last_non_direct_medium as medium,
         last_non_direct_campaign as campaign,
-        last_non_direct_default_channel_grouping as default_channel_grouping,
-        session_default_channel_grouping as session_default_channel_grouping,
+        last_non_direct_default_channel_grouping as last_non_direct_channel,
+        session_default_channel_grouping as default_channel_grouping,
         mv_author_session_status
     from remove_dupes
     left join {{ref('stg_ga4__sessions_traffic_sources')}} using (session_key)
