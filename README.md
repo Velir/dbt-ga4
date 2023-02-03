@@ -93,7 +93,7 @@ vars:
 ```
 ### Custom Parameters
 
-Within GA4, you can add custom parameters to any event. These custom parameters will be picked up by this package if they are defined as variables within your `dbt_project.yml` file using the following syntax:
+Within GA4, you can add custom parameters to any event. These custom parameters will be picked up by this package if they are defined as variables of **your project** within your `dbt_project.yml` file using the following syntax:
 
 ```
 [event name]_custom_parameters
@@ -105,7 +105,7 @@ For example:
 
 ```
 vars:
-  ga4:
+  <your_project>:
     page_view_custom_parameters:
       - name: "clean_event"
         value_type: "string_value"
@@ -117,7 +117,7 @@ You can optionally rename the output column:
 
 ```
 vars:
-  ga4:
+  <your_project>:
     page_view_custom_parameters:
       - name: "country_code"
         value_type: "int_value"
@@ -128,11 +128,12 @@ If there are custom parameters you need on all events, you can define defaults u
 
 ```
 vars:
-  ga4:
+  <your_project>:
     default_custom_parameters:
       - name: "country_code"
         value_type: "int_value"
 ```
+>Note: as _<your_project>_ you must use the value that You associated to the key **name:** (in dbt_project.yml)
 
 ### User Properties
 
