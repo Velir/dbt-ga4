@@ -41,7 +41,7 @@ session_source as (
     from last_non_direct_source
     WINDOW session_window AS (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
 
-)
+),
 mv_custom as (
   select
         *,
