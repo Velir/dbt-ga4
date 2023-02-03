@@ -6,6 +6,8 @@ with session_events as (
         lower(source) as source,
         medium,
         campaign,
+        content,
+        term,
         source_category
     from {{ref('stg_ga4__attribution_window')}}
     left join {{ref('ga4_source_categories')}} using (source)
