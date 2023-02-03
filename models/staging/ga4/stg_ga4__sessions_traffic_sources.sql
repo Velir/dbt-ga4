@@ -21,7 +21,7 @@ set_default_channel_grouping as (
         {{ga4.default_channel_grouping('source','medium','source_category')}} as default_channel_grouping
     from session_events
 ),
-session_source as (
+last_non_direct_source as (
     select    
         session_key,
         COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN source END) IGNORE NULLS) OVER (session_window), '(direct)') AS source,
@@ -33,6 +33,23 @@ session_source as (
         COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN COALESCE(default_channel_grouping, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS default_channel_grouping
     from set_default_channel_grouping
     WINDOW session_window AS (PARTITION BY user_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+),
+session_source as (
+    select
+        *,
+        COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN COALESCE(default_channel_grouping, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS default_channel_grouping
+    from last_non_direct_source
+    WINDOW session_window AS (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+
+)
+mv_custom as (
+  select
+        *,
+        case
+            when session_default_channel_grouping in ('Affiliates','Paid Search', 'Paid Video', 'Display', 'Cross-network', 'Paid Social', 'Paid Other', 'Paid Shopping', 'Audio','Email','Mobile Push Notifications', 'Other', 'SMS') then 'Paid'
+            else 'Organic'
+        end as mv_author_session_status,
+  from session_source
 )
 
-select distinct  * from session_source
+select distinct  * from mv_custom
