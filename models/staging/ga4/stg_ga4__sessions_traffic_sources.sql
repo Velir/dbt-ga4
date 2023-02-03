@@ -1,6 +1,7 @@
 with session_events as (
     select 
         session_key,
+        user_key,
         event_timestamp,
         lower(source) as source,
         medium,
@@ -19,13 +20,17 @@ set_default_channel_grouping as (
     from session_events
 ),
 session_source as (
-  select    
-    session_key,
-    ifnull( first_value( source ignore nulls ) over (partition by user_key order by unix_micros(timestamp_micros(event_timestamp)) range between 30 preceding and current row), '(direct)') as session_source,
-    ifnull( first_value( medium ignore nulls ) over (partition by user_key order by unix_micros(timestamp_micros(event_timestamp)) range between 30 preceding and current row), '(none)') as session_medium,
-    ifnull( first_value( campaign ignore nulls ) over (partition by user_key order by unix_micros(timestamp_micros(event_timestamp)) range between 30 preceding and current row), '(direct)') as session_campaign,
-    ifnull( first_value( nullif(default_channel_grouping, 'Direct' ) ignore nulls ) over (partition by user_key order by unix_micros(timestamp_micros(event_timestamp)) range between 30 preceding and current row), 'Direct') as default_channel_grouping
-  from set_default_channel_grouping
+    select    
+        session_key,
+        COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN source END) IGNORE NULLS) OVER (session_window), '(direct)') AS source,
+        COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN COALESCE(medium, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS medium,
+        COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN COALESCE(source_category, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS source_category,
+        COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN COALESCE(campaign, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS campaign,
+        COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN COALESCE(content, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS content,
+        COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN COALESCE(term, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS term,
+        COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN COALESCE(default_channel_grouping, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS default_channel_grouping
+    from set_default_channel_grouping
+    WINDOW session_window AS (PARTITION BY user_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
 )
 
 select distinct  * from session_source
