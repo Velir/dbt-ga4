@@ -83,10 +83,10 @@ remove_dupes as
 join_traffic_source as (
     select 
         remove_dupes.*,
-        source as source,
-        medium as medium,
-        campaign as campaign,
-        default_channel_grouping as default_channel_grouping,
+        last_non_direct_source as source,
+        last_non_direct_medium as medium,
+        last_non_direct_campaign as campaign,
+        last_non_direct_default_channel_grouping as default_channel_grouping,
         session_default_channel_grouping as session_default_channel_grouping,
         mv_author_session_status
     from remove_dupes
