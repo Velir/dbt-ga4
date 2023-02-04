@@ -40,7 +40,7 @@ Be sure to run `dbt seed` before you run `dbt run`.
 
 # Installation & Configuration
 ## Install from DBT Package Hub
-Add the following to your `packages.yml` file:
+To pull the latest stable release along with minor updates, add the following to your `packages.yml` file:
 
 ```
 packages:
@@ -48,14 +48,13 @@ packages:
     version: [">=2.0.0", "<2.2.0"]
 ```
 
-## Install From GitHub
+## Install From main branch on GitHub
 
-Add the following to your `packages.yml` file:
+To install the latest code (may be unstable), add the following to your `packages.yml` file:
 
 ```
 packages:
   - git: "https://github.com/Velir/dbt-ga4.git"
-    revision: 2.0.0
 ```
 
 ## Install From Local Directory
