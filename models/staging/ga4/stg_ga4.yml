@@ -36,11 +36,13 @@ models:
         tests: 
           - unique
   - name: stg_ga4__events
-    description: Staging model that generates keys for users, sessions, and events
+    description: Staging model that generates keys for users, sessions, and events. Also parses URLs to remove query string params as defined in project config. 
     columns:
       - name: event_key
         tests:
           - unique
+      - name: page_path
+        description: This field contains the page_location with the query string portion removed. Uses macro remove_query_string
   - name: stg_ga4__event_scroll
     description: Staging model containing only 'scroll' events. Includes the 'percent_scrolled' parameter.
   - name: stg_ga4__derived_user_properties
