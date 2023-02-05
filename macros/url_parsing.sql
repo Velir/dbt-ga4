@@ -9,3 +9,7 @@
 {% macro remove_query_parameters(url, parameters)%}
 REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE({{url}}, '(\\?|&)({{ parameters|join("|") }})=[^&]*', '\\1'), '\\?&+', '?'), '&+', '&'), '\\?$|&$', '')
 {% endmacro %}
+
+{% macro remove_query_string(url) %}
+REGEXP_REPLACE({{url}}, '\\?.*', '')
+{% endmacro %}
