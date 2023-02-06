@@ -10,6 +10,6 @@
 REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE({{url}}, '(\\?|&)({{ parameters|join("|") }})=[^&]*', '\\1'), '\\?&+', '?'), '&+', '&'), '\\?$|&$', '')
 {% endmacro %}
 
-{% macro remove_query_string(url) %}
-REGEXP_REPLACE({{url}}, '\\?.*', '')
+{% macro extract_page_path(url) %}
+REGEXP_EXTRACT({{url}}, '(?:\\w+:)?\\/\\/[^\\/]+([^?#]+)')
 {% endmacro %}
