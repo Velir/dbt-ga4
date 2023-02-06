@@ -10,6 +10,7 @@ with session_first_event as
  session_start_dims as (
     select 
         session_key,
+        page_path as landing_page_path,
         page_location as landing_page,
         page_hostname as landing_page_hostname,
         page_referrer as landing_page_referrer,
