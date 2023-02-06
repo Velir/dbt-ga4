@@ -3,7 +3,10 @@
 -- source_category Excel file can be downloaded from the above link and may change over time
 
 {% macro default_channel_grouping(source, medium, source_category) %}
+  {{ return(adapter.dispatch('default_channel_grouping', 'ga4')(source, medium, source_category)) }}
+{% endmacro %}
 
+{% macro default__default_channel_grouping(source, medium, source_category) %}
 case 
   when {{source}} is null and {{medium}} is null 
     then 'Direct'
