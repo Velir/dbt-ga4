@@ -1,19 +1,19 @@
 import pytest
 from dbt.tests.util import read_file,check_relations_equal,run_dbt
 
-mock_base_ga4__events_json = """
+analytics_000000000 = """
 {"event_date": "20230206", "event_timestamp": "1675704514198480", "event_name": "page_view", "event_params": [{ "key": "ga_session_id", "value": { "string_value": null, "int_value" : 1675704510, "float_value": null,"double_value": null } }], "stream_id":"000" }
 {"event_date": "20230206", "event_timestamp": "1675704514438900", "event_name": "page_view", "event_params": [{ "key": "ga_session_id", "value": { "string_value": null, "int_value" : 1675704510, "float_value": null,"double_value": null } }], "stream_id":"000" }
 {"event_date": "20230206", "event_timestamp": "1675704514198990", "event_name": "page_view", "event_params": [{ "key": "ga_session_id", "value": { "string_value": null, "int_value" : 1675704980, "float_value": null,"double_value": null } }], "stream_id":"000" }
 """.lstrip()
 
-mock_multi_site_1_base_ga4__events_json = """
+analytics_111111111 = """
 {"event_date": "20230206", "event_timestamp": "1675704514198481", "event_name": "page_view", "event_params": [{ "key": "ga_session_id", "value": { "string_value": null, "int_value" : 1675704511, "float_value": null,"double_value": null } }], "stream_id":"100" }
 {"event_date": "20230206", "event_timestamp": "1675704514438901", "event_name": "page_view", "event_params": [{ "key": "ga_session_id", "value": { "string_value": null, "int_value" : 1675704511, "float_value": null,"double_value": null } }], "stream_id":"100" }
 {"event_date": "20230206", "event_timestamp": "1675704514198991", "event_name": "page_view", "event_params": [{ "key": "ga_session_id", "value": { "string_value": null, "int_value" : 1675704981, "float_value": null,"double_value": null } }], "stream_id":"100" }
 """.lstrip()
 
-mock_multi_site_2_base_ga4__events_json = """
+analytics_222222222 = """
 {"event_date": "20230206", "event_timestamp": "1675704514198482", "event_name": "page_view", "event_params": [{ "key": "ga_session_id", "value": { "string_value": null, "int_value" : 1675704512, "float_value": null,"double_value": null } }], "stream_id":"200" }
 {"event_date": "20230206", "event_timestamp": "1675704514438902", "event_name": "page_view", "event_params": [{ "key": "ga_session_id", "value": { "string_value": null, "int_value" : 1675704512, "float_value": null,"double_value": null } }], "stream_id":"200" }
 {"event_date": "20230206", "event_timestamp": "1675704514198992", "event_name": "page_view", "event_params": [{ "key": "ga_session_id", "value": { "string_value": null, "int_value" : 1675704982, "float_value": null,"double_value": null } }], "stream_id":"200" }
@@ -41,17 +41,17 @@ sources:
   - name: fixture
     schema: "{{ target.schema }}"
     tables:
-      - name: mock_base_ga4__events_json
+      - name: analytics_000000000
 sources:
   - name: fixture
     schema: "{{ target.schema }}"
     tables:
-      - name: mock_multi_site_1_base_ga4__events_json
+      - name: analytics_111111111
 sources:
   - name: fixture
     schema: "{{ target.schema }}"
     tables:
-      - name: mock_multi_site_2_base_ga4__events_json
+      - name: analytics_222222222
 """
 
 class TestBaseGa4SingleSite():
@@ -67,18 +67,21 @@ class TestBaseGa4SingleSite():
     def models(self):
         return {
             "config.yml": models__config_yml,
+            "events_intraday.sql" :  analytics_000000000,
+            "actual.sql" : read_file('../models/staging/ga4/base/base_ga4__events.sql'),
         }
 
     # repoint 'source()' calls to mocks (seeds or models)
     def mock_source(self):
         return {
-            "analytics_000000000": "mock_base_ga4__events_json",
+            "analytics_000000000": analytics_000000000,
         }
     # everything that goes in the "macros"
     @pytest.fixture(scope="class")
     def macros(self):
         return {
             "base_select.sql": read_file('../macros/base_select.sql'),
+            "unnest_key.sql": read_file('../macros/unnest_key.sql'),
         }
 
     def upload_json_fixture(self, project, file_name, json, table_name):
@@ -97,7 +100,7 @@ class TestBaseGa4SingleSite():
         )
 
     def test_mock_run_and_check(self, project):
-        self.upload_json_fixture(project, "source.json", mock_base_ga4__events_json, "mock_base_ga4__events_json" )
+        self.upload_json_fixture(project, "source.json", analytics_000000000, "events_intraday" )
         run_dbt(["build", "--vars", "dataset: 'analytics_000000000'"])
         #breakpoint()
         check_relations_equal(project.adapter, ["actual", "single_site_expected_csv"])
