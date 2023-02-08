@@ -2,6 +2,7 @@
    select *,
       {{ ga4.unnest_key('event_params', 'entrances',  'int_value') }},
       {{ ga4.unnest_key('event_params', 'value', 'float_value') }},
+      timestamp_diff(timestamp_micros(lead(event_timestamp) over (partition by session_key order by event_timestamp)), timestamp_micros(event_timestamp), second) as time_on_page,
       case when split(split(page_location,'/')[safe_ordinal(4)],'?')[safe_ordinal(1)] = '' then null else concat('/',split(split(page_location,'/')[safe_ordinal(4)],'?')[safe_ordinal(1)]) end as pagepath_level_1,
       case when split(split(page_location,'/')[safe_ordinal(5)],'?')[safe_ordinal(1)] = '' then null else concat('/',split(split(page_location,'/')[safe_ordinal(5)],'?')[safe_ordinal(1)]) end as pagepath_level_2,
       case when split(split(page_location,'/')[safe_ordinal(6)],'?')[safe_ordinal(1)] = '' then null else concat('/',split(split(page_location,'/')[safe_ordinal(6)],'?')[safe_ordinal(1)]) end as pagepath_level_3,
