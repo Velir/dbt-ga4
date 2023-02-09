@@ -23,7 +23,8 @@ with page_view as (
         count(distinct user_pseudo_id ) as distinct_user_pseudo_ids,
         sum( if(ga_session_number = 1,1,0)) as new_user_pseudo_ids,
         sum(entrances) as entrances,
-        avg(page_engagement_time) as average_engagement_time
+        sum(page_engagement_time) as total_engagement_time,
+        countif(page_engagement_time is not null) as average_engagement_time_denominator
 from {{ref('stg_ga4__event_page_view')}}
     group by 1,2,3,4,5,6
 ), scroll as (
