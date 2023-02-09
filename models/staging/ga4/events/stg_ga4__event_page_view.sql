@@ -15,6 +15,15 @@
       {% endif %}
  from {{ref('stg_ga4__events')}}    
  where event_name = 'page_view'
+),
+engagement as (
+  select
+    engagement_key,
+    sum(engagement_time_msec) as page_engagement_time
+  from {{ ref('stg_ga4__events') }}
+  group by engagement_key
 )
 
-select * from page_view_with_params
+select * except(engagement_key)
+from page_view_with_params
+left join engagement using(engagement_key)
