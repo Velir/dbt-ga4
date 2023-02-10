@@ -19,14 +19,21 @@ with page_view as (
         page_key,
         page_path,
         page_title,  -- would like to move this to dim_ga4__pages but need to think how to handle page_title changing over time
+        page_engagement_key,
         count(event_name) as page_views,
         count(distinct user_pseudo_id ) as distinct_user_pseudo_ids,
         sum( if(ga_session_number = 1,1,0)) as new_user_pseudo_ids,
         sum(entrances) as entrances,
+from {{ref('stg_ga4__event_page_view')}}
+    group by 1,2,3,4,5,6,7
+), page_engagement as (
+    select
+        page_view.* except(page_engagement_key),
         sum(page_engagement_time) as total_engagement_time,
         countif(page_engagement_time is not null) as average_engagement_time_denominator
-from {{ref('stg_ga4__event_page_view')}}
-    group by 1,2,3,4,5,6
+    from {{ ref('stg_ga4__page_engaged_time') }}
+    right join page_view using (page_engagement_key)
+    group by 1,2,3,4,5,6,7,8,9,10
 ), scroll as (
     select
         event_date_dt,
@@ -42,7 +49,7 @@ from {{ref('stg_ga4__event_page_view')}}
 join_conversions as (
     select 
         *
-    from page_view
+    from page_engagement
     left join {{ ref('stg_ga4__page_conversions') }} using (page_key)
 )
 select
@@ -52,8 +59,8 @@ from join_conversions
 left join scroll using (event_date_dt, hour, page_location, page_title)
 {% else %}
 select
-    page_view.* except (page_key),
+    page_engagement.* except (page_key),
     ifnull(scroll.scroll_events, 0) as scroll_events
-from page_view
+from page_engagement
 left join scroll using (event_date_dt, hour, page_location, page_title)
 {% endif %}
