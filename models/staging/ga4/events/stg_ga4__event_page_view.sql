@@ -33,12 +33,15 @@ last_pageview_joined as (
 ),
 session_params as (
   select
-    last_pageview_joined.*,
+    last_pageview_joined.* except(source,medium, campaign),
     last_non_direct_source,
     last_non_direct_medium,
     last_non_direct_campaign,
-    last_non_direct_default_channel_grouping,
-    session_default_channel_grouping,
+    last_non_direct_channel,
+    source,
+    medium,
+    campaign,
+    default_channel_grouping,
     mv_author_session_status
   from {{ref('stg_ga4__sessions_traffic_sources')}}
   right join last_pageview_joined using(session_key)
