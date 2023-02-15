@@ -83,4 +83,5 @@ models:
         tests:
           - not_null
           - unique
-
+  - name: stg_ga4__scroll_90_pct
+    description: Determines whether an individual page_location during an individual's session triggered a >=90 scroll or not.
