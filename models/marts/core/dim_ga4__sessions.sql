@@ -74,7 +74,6 @@ with session_start_dims as (
         {% endif %}
     {% endif %}
 ),
--- Arbitrarily pull the first session_start event to remove duplicates
 remove_dupes as 
 (
     select * from session_start_dims
@@ -85,6 +84,7 @@ join_traffic_source as (
         *
     from remove_dupes
     left join {{ref('stg_ga4__sessions_traffic_sources')}} using (session_key)
+    left join {{ ref ('stg_ga4__last_non_direct_attribution')}} using (session_key)
 )
 
 select * from join_traffic_source
