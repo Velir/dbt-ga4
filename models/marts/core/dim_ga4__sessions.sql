@@ -38,6 +38,8 @@ with session_first_event as
         device_web_info_browser,
         device_web_info_browser_version,
         device_web_info_hostname,
+        session_number,
+        session_number = 1 as is_first_session,
         traffic_source_name,
         traffic_source_medium,
         traffic_source_source,
