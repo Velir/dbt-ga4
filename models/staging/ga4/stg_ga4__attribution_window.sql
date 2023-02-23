@@ -1,8 +1,5 @@
 -- This staging model contains key creation and window functions. Keeping window functions outside of the base incremental model ensures that the incremental updates don't artificially limit the window partition sizes (ex: if a session spans 2 days, but only 1 day is in the incremental update)
 {% if not flags.FULL_REFRESH %}
-    {% set min_partition_to_query = 'date_sub(current_date, interval '+ (var("attribution_window", 30) + var("static_incremental_days", 1)  ) +' day )' %}
-{% endif %}
-{% if not flags.FULL_REFRESH %}
     {% set partitions_to_query = ['current_date'] %}
     {% for i in range(var("attribution_window", 30) + var("static_incremental_days", 1)) %}
         {% set partitions_to_query = partitions_to_query.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
