@@ -23,9 +23,9 @@ Features include:
 | stg_ga4__derived_user_properties | Finds the most recent occurance of specific event_params value and assigns them to a user_pseudo_id. Derived user properties are specified as variables (see documentation below) |
 | stg_ga4__derived_session_properties | Finds the most recent occurance of specific event_params or user_properties value and assigns them to a session's session_key. Derived session properties are specified as variables (see documentation below) |
 | stg_ga4__session_conversions_daily | Produces daily counts of conversions per session. The list of conversion events to include is configurable (see documentation below) |
-| stg_ga4__sessions_traffic_sources | Finds the first source, medium, campaign, content, paid search term (from UTM tracking), and default channel grouping for each session |
+| stg_ga4__sessions_traffic_sources | Finds the first source, medium, campaign, content, paid search term (from UTM tracking), and default channel grouping for each session. |
 | dim_ga4__user_pseudo_ids | Dimension table for user devices as indicated by user_pseudo_ids. Contains attributes such as first and last page viewed.| 
-| dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and campaign data |
+| dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and acquisition data |
 | fct_ga4__pages | Fact table for pages which aggregates common page metrics by page_location, date, and hour. |
 | fct_ga4__sessions_daily | Fact table for session metrics, partitioned by date. A single session may span multiple rows given that sessions can span multiple days.  |
 | fct_ga4__sessions | Fact table that aggregates session metrics across days. This table is not partitioned, so be mindful of performance/cost when querying. |
@@ -40,7 +40,7 @@ Be sure to run `dbt seed` before you run `dbt run`.
 
 # Installation & Configuration
 ## Install from DBT Package Hub
-Add the following to your `packages.yml` file:
+To pull the latest stable release along with minor updates, add the following to your `packages.yml` file:
 
 ```
 packages:
@@ -48,14 +48,13 @@ packages:
     version: [">=2.0.0", "<2.2.0"]
 ```
 
-## Install From GitHub
+## Install From main branch on GitHub
 
-Add the following to your `packages.yml` file:
+To install the latest code (may be unstable), add the following to your `packages.yml` file:
 
 ```
 packages:
   - git: "https://github.com/Velir/dbt-ga4.git"
-    revision: 2.0.0
 ```
 
 ## Install From Local Directory
@@ -266,3 +265,13 @@ gcloud auth application-default login --scopes=https://www.googleapis.com/auth/b
 # Unit Testing
 
 This package uses `pytest` as a method of unit testing individual models. More details can be found in the [unit_tests/README.md](unit_tests) folder.
+
+# Overriding Default Channel Groupings
+
+By default, this package maps traffic sources to channel groupings using the `macros/default_channel_grouping.sql` macro. This macro closely adheres to Googls recommended channel groupings documented here: https://support.google.com/analytics/answer/9756891?hl=en .
+
+Package users can override this macro and implement their own channel groupings by following these steps:
+- Create a macro in your project named `default__default_channel_grouping` that accepts the same 3 arguments: source, medium, source_category
+- Implement your custom logic within that macro. It may be easiest to first copy the code from the package macro and modify from there.
+
+Overriding the package's default channel mapping makes use of dbt's dispatch override capability documented here: https://docs.getdbt.com/reference/dbt-jinja-functions/dispatch#overriding-package-macros
