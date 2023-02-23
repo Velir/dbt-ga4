@@ -45,7 +45,7 @@ session_params as (
 last_non_direct as (
   select 
     *
-  from {{ref('stt_ga4__last_non_direct_attribution')}}
+  from {{ref('stg_ga4__last_non_direct_attribution')}}
   right join session_params using(session_key)
 )
 
