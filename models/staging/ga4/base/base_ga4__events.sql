@@ -128,7 +128,7 @@ renamed as (
         items,
         {{ ga4.unnest_key('event_params', 'ga_session_id', 'int_value') }},
         {{ ga4.unnest_key('event_params', 'page_location') }},
-        {{ ga4.unnest_key('event_params', 'ga_session_number',  'int_value') }},
+        {{ ga4.unnest_key('event_params', 'ga_session_number',  'int_value', 'session_number') }},
         {{ ga4.unnest_key('event_params', 'session_engaged',  'int_value') }},
         {{ ga4.unnest_key('event_params', 'engagement_time_msec', 'int_value') }},
         {{ ga4.unnest_key('event_params', 'page_title') }},
