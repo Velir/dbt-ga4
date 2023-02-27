@@ -11,6 +11,8 @@ with session_events as (
     from {{ref('stg_ga4__events')}}
     left join {{ref('ga4_source_categories')}} using (source)
     where session_key is not null
+    and event_name != 'session_start'
+    and event_name != 'first_visit'
    ),
 set_default_channel_grouping as (
     select
