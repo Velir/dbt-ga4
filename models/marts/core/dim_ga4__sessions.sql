@@ -81,7 +81,21 @@ remove_dupes as
 ),
 join_traffic_source as (
     select 
-        *
+        remove_dupes.*,
+        source,
+        medium,
+        source_category,
+        campaign,
+        content,
+        term,
+        default_channel_grouping,
+        last_non_direct_source,
+        last_non_direct_medium,
+        last_non_direct_source_category,
+        last_non_direct_campaign,
+        last_non_direct_content,
+        last_non_direct_term,
+        last_non_direct_channel
     from remove_dupes
     left join {{ref('stg_ga4__sessions_traffic_sources')}} using (session_key)
     left join {{ ref ('stg_ga4__last_non_direct_attribution')}} using (session_key)

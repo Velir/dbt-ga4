@@ -17,7 +17,7 @@
 ),
 last_pageview_joined as (
   select 
-    page_view_with_params.* except(load_time),
+    page_view_with_params.* except(load_time, source,medium, campaign),
     case
         when load_time < 0 then null
         when load_time > 100000 then null
@@ -33,7 +33,7 @@ last_pageview_joined as (
 ),
 session_params as (
   select
-    last_pageview_joined.* except(source,medium, campaign),
+    last_pageview_joined.* ,
     source,
     medium,
     campaign,
