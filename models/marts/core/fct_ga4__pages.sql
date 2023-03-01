@@ -22,7 +22,7 @@ with page_view as (
         page_title,  -- would like to move this to dim_ga4__pages but need to think how to handle page_title changing over time
         count(event_name) as page_views,
         count(distinct user_pseudo_id ) as distinct_user_pseudo_ids,
-        sum( if(ga_session_number = 1,1,0)) as new_user_pseudo_ids,
+        sum( if(session_number = 1,1,0)) as new_user_pseudo_ids,
         sum(entrances) as entrances,
         sum(engagement_time_msec) as total_time_on_page 
         
