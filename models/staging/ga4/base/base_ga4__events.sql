@@ -1,30 +1,38 @@
-{% if var('static_incremental_days', false ) %}
-    {% set partitions_to_replace = [] %}
-    {% for i in range(var('static_incremental_days')) %}
-        {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
-    {% endfor %}
-    {{
-        config(
-            materialized = 'incremental',
-            incremental_strategy = 'insert_overwrite',
-            partition_by={
-                "field": "event_date_dt",
-                "data_type": "date",
-            },
-            partitions = partitions_to_replace,
-            cluster_by=['event_name']
-        )
-    }}
+{% if target.name == 'prod' %}
+    {% if var('static_incremental_days', false ) %}
+        {% set partitions_to_replace = [] %}
+        {% for i in range(var('static_incremental_days')) %}
+            {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
+        {% endfor %}
+        {{
+            config(
+                materialized = 'incremental',
+                incremental_strategy = 'insert_overwrite',
+                partition_by={
+                    "field": "event_date_dt",
+                    "data_type": "date",
+                },
+                partitions = partitions_to_replace,
+                cluster_by=['event_name']
+            )
+        }}
+    {% else %}
+        {{
+            config(
+                materialized = 'incremental',
+                incremental_strategy = 'insert_overwrite',
+                partition_by={
+                    "field": "event_date_dt",
+                    "data_type": "date",
+                },
+                cluster_by=['event_name']
+            )
+        }}
+    {% endif %}
 {% else %}
     {{
         config(
-            materialized = 'incremental',
-            incremental_strategy = 'insert_overwrite',
-            partition_by={
-                "field": "event_date_dt",
-                "data_type": "date",
-            },
-            cluster_by=['event_name']
+            materialized = 'view'
         )
     }}
 {% endif %}
@@ -55,11 +63,15 @@ with source as (
         items,
     {%  if var('frequency', 'daily') == 'streaming' %}
         from {{ source('ga4', 'events_intraday') }}
-        where cast( _table_suffix as int64) >= {{var('start_date')}}
+        where cast( _TABLE_SUFFIX as int64) >= {{var('start_date')}}
     {% else %}
         from {{ source('ga4', 'events') }}
-        where _table_suffix not like '%intraday%'
-        and cast( _table_suffix as int64) >= {{var('start_date')}}
+        where _TABLE_SUFFIX not like '%intraday%'
+        {% if target.name == 'prod' %}
+            and cast(_TABLE_SUFFIX as int64) >= {{var('start_date')}}
+        {% else %} 
+            and _TABLE_SUFFIX >= format_date('%Y%m%d', date_sub(current_date(), interval 3 day))
+        {% endif %}
     {% endif %}
     {% if is_incremental() %}
 
@@ -68,7 +80,7 @@ with source as (
         {% else %}
             -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
             -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
-            and parse_date('%Y%m%d',_TABLE_SUFFIX) >= _dbt_max_partition
+            and parse_date('%Y%m%d', _TABLE_SUFFIX) >= _dbt_max_partition
         {% endif %}
     {% endif %}
 ),
