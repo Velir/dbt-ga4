@@ -13,6 +13,18 @@ Features include:
 
 # Models
 
+## Final
+
+| model | description |
+|-------|-------------|
+| dim_ga4__user_pseudo_ids | Dimension table for user devices as indicated by user_pseudo_ids. Contains attributes such as first and last page viewed.| 
+| dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and acquisition data |
+| fct_ga4__pages | Fact table for pages which aggregates common page metrics by page_location, date, and hour. |
+| fct_ga4__sessions_daily | Fact table for session metrics, partitioned by date. A single session may span multiple rows given that sessions can span multiple days.  |
+| fct_ga4__sessions | Fact table that aggregates session metrics across days. This table is not partitioned, so be mindful of performance/cost when querying. |
+
+## Staging
+
 | model | description |
 |-------|-------------|
 | stg_ga4__events | Contains cleaned event data that is enhanced with useful event and session keys. |
@@ -24,11 +36,6 @@ Features include:
 | stg_ga4__derived_session_properties | Finds the most recent occurance of specific event_params or user_properties value and assigns them to a session's session_key. Derived session properties are specified as variables (see documentation below) |
 | stg_ga4__session_conversions_daily | Produces daily counts of conversions per session. The list of conversion events to include is configurable (see documentation below) |
 | stg_ga4__sessions_traffic_sources | Finds the first source, medium, campaign, content, paid search term (from UTM tracking), and default channel grouping for each session. |
-| dim_ga4__user_pseudo_ids | Dimension table for user devices as indicated by user_pseudo_ids. Contains attributes such as first and last page viewed.| 
-| dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and acquisition data |
-| fct_ga4__pages | Fact table for pages which aggregates common page metrics by page_location, date, and hour. |
-| fct_ga4__sessions_daily | Fact table for session metrics, partitioned by date. A single session may span multiple rows given that sessions can span multiple days.  |
-| fct_ga4__sessions | Fact table that aggregates session metrics across days. This table is not partitioned, so be mindful of performance/cost when querying. |
 
 # Seeds
 
