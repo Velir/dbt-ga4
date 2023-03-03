@@ -2,15 +2,15 @@ version: 2
 
 models:
   - name: dim_ga4__sessions
-    description: Dimension table for sessions containing context useful for filtering such as acquisition source, medium, and campaign. Each row represents a session. Unique on session_key
+    description: Dimension table for sessions containing context useful for filtering. Each row represents a session. Unique on session_key
     columns:
       - name: session_key
         tests:
           - unique
-  - name: dim_ga4__user_pseudo_ids
-    description: Dimension table for user devices (user_pseudo_id) which includes data from the first and last event produced. Unique on user_pseudo_id
+  - name: dim_ga4__users
+    description: Dimension table for users which includes data from the first and last event produced by the user. Unique on user_key
     columns:
-      - name: user_pseudo_id
+      - name: user_key
         tests:
           - unique
   - name: fct_ga4__sessions
@@ -27,15 +27,3 @@ models:
           - unique
   - name: fct_ga4__pages
     description: Incremental model with page metrics such as visits, users, new_users, entrances and exits as well as configurable conversion counts. Each row is grouped by page_location, event_date_dt, and hour.
-  - name: fct_ga4__user_pseudo_ids
-    description: Fact table with aggregate metrics at the level of the user's device (as indicated by the user_pseudo_id). Metrics are aggregated from fct_ga4__sessions.
-    columns:
-      - name: user_pseudo_id
-        tests: 
-          - unique
-  - name: fct_ga4__user_ids
-    description: Fact table with aggregate metrics at the level of the user_id when one is present, otherwise at the device level (as indicated by the user_pseudo_id). Metrics are aggregated from fct_ga4__user_pseudo_ids.
-    columns:
-      - name: user_id_or_user_pseudo_id
-        tests: 
-          - unique

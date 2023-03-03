@@ -19,7 +19,6 @@ with session_metrics as (
         min(event_date_dt) as session_partition_date, -- Used only as a method of partitioning sessions within this incremental table. Does not represent the true session start date
         min(event_timestamp) as session_partition_min_timestamp,
         countif(event_name = 'page_view') as session_partition_count_page_views,
-        countif(event_name = 'purchase') as session_partition_count_purchases,
         sum(event_value_in_usd) as session_partition_sum_event_value_in_usd,
         ifnull(max(session_engaged), 0) as session_partition_max_session_engaged,
         sum(engagement_time_msec) as session_partition_sum_engagement_time_msec
@@ -46,7 +45,6 @@ with session_metrics as (
             session_metrics.user_pseudo_id,
             session_metrics.session_partition_min_timestamp,
             session_metrics.session_partition_count_page_views,
-            session_metrics.session_partition_count_purchases,
             session_metrics.session_partition_sum_event_value_in_usd,
             session_metrics.session_partition_max_session_engaged,
             session_metrics.session_partition_sum_engagement_time_msec,

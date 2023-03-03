@@ -12,7 +12,6 @@
                 "data_type": "date",
             },
             partitions = partitions_to_replace,
-            cluster_by=['event_name']
         )
     }}
 {% else %}
@@ -24,7 +23,6 @@
                 "field": "event_date_dt",
                 "data_type": "date",
             },
-            cluster_by=['event_name']
         )
     }}
 {% endif %}
@@ -41,7 +39,7 @@ with source as (
         event_server_timestamp_offset,
         user_id,
         user_pseudo_id,
-        privacy_info,
+        privacy_info,   
         user_properties,
         user_first_touch_timestamp,
         user_ltv,
@@ -128,11 +126,8 @@ renamed as (
         items,
         {{ ga4.unnest_key('event_params', 'ga_session_id', 'int_value') }},
         {{ ga4.unnest_key('event_params', 'page_location') }},
-        {{ ga4.unnest_key('event_params', 'ga_session_number',  'int_value', 'session_number') }},
-        COALESCE(
-            (SELECT value.int_value FROM unnest(event_params) WHERE key = "session_engaged"),
-            (CASE WHEN (SELECT value.string_value FROM unnest(event_params) WHERE key = "session_engaged") = "1" THEN 1 END)
-        ) as session_engaged,
+        {{ ga4.unnest_key('event_params', 'ga_session_number',  'int_value') }},
+        (case when (SELECT value.string_value FROM unnest(event_params) WHERE key = "session_engaged") = "1" then 1 end) as session_engaged,
         {{ ga4.unnest_key('event_params', 'engagement_time_msec', 'int_value') }},
         {{ ga4.unnest_key('event_params', 'page_title') }},
         {{ ga4.unnest_key('event_params', 'page_referrer') }},

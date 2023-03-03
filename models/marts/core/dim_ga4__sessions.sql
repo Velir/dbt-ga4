@@ -1,16 +1,7 @@
--- Dimension table for sessions based on the first event that isn't session_start or first_visit.
-with session_first_event as 
-(
-    select *
-    from {{ref('stg_ga4__events')}}
-    where event_name != 'first_visit' 
-    and event_name != 'session_start'
-    qualify row_number() over(partition by session_key order by event_timestamp) = 1
-),
- session_start_dims as (
+-- Dimension table for sessions based on the session_start event.
+with session_start_dims as (
     select 
         session_key,
-        page_path as landing_page_path,
         page_location as landing_page,
         page_hostname as landing_page_hostname,
         page_referrer as landing_page_referrer,
@@ -38,25 +29,22 @@ with session_first_event as
         device_web_info_browser,
         device_web_info_browser_version,
         device_web_info_hostname,
-        session_number,
-        session_number = 1 as is_first_session,
         traffic_source_name,
         traffic_source_medium,
         traffic_source_source,
-    from session_first_event
+    from {{ref('stg_ga4__sessions_first_session_start_event')}}
 ),
 join_traffic_source as (
     select 
         session_start_dims.*,
-        sessions_traffic_sources.source,
-        sessions_traffic_sources.medium,
-        sessions_traffic_sources.campaign,
-        sessions_traffic_sources.content,
-        sessions_traffic_sources.term,
-        sessions_traffic_sources.default_channel_grouping,
-        sessions_traffic_sources.source_category
+        session_source as source,
+        session_medium as medium,
+        session_campaign as campaign,
+        session_content as content,
+        session_term as term,
+        session_default_channel_grouping as default_channel_grouping
     from session_start_dims
-    left join {{ref('stg_ga4__sessions_traffic_sources')}} sessions_traffic_sources using (session_key)
+    left join {{ref('stg_ga4__sessions_traffic_sources')}} using (session_key)
 ),
 include_session_properties as (
     select 
