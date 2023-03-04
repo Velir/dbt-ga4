@@ -3,6 +3,11 @@ version: 2
 models:  
   - name: base_ga4__events
     description: Base events model that pulls all fields from raw data. Resulting table is partitioned on event_date and is useful in that BQ queries can be cached against this table, but not against wildcard searches from the original tables which are sharded on date. Some light transformation and renaming beyond the base events model. Adds surrogate keys for sessions and events
+    columns:
+      - name: event_date_dt
+        description: Date of the event. Time zone is set to the time zone configured in the GA4 property. 
+      - name: event_timestamp
+        description: Timestamp indicating when the event's batch was received (as opposed to when the event actually occurred).  Time zone is set to the time zone configured in the GA4 property. 
   - name: base_ga4__events_intraday
     description: Base model for intraday events that will be unioned to the past events stored in the incremental model. 
   - name: stg_ga4__event_to_query_string_params
