@@ -18,7 +18,11 @@ with base_events as (
         event_name,
         stream_id,
         ga_session_id
+    {% if var('frequency', 'daily') == 'streaming' %}
+    from {{ ref('base_ga4__events_intraday')}}
+    {% else %}
     from {{ ref('base_ga4__events')}}
+    {% endif %}
     {% if not flags.FULL_REFRESH %}
         where event_date_dt in ({{ partitions_to_query | join(',') }})
     {% endif %}
