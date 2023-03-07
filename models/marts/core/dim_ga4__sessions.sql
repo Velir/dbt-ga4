@@ -33,6 +33,7 @@
 with session_start_dims as (
     select 
         session_key,
+        user_key,
         ga_session_number,
         event_date_dt as session_start_date,
         page_location as landing_page,
@@ -82,13 +83,13 @@ remove_dupes as
 join_traffic_source as (
     select 
         remove_dupes.*,
-        source,
-        medium,
-        source_category,
-        campaign,
-        content,
-        term,
-        default_channel_grouping,
+        session_source,
+        session_medium,
+        session_source_category,
+        session_campaign,
+        session_content,
+        session_term,
+        session_channel,
         last_non_direct_source,
         last_non_direct_medium,
         last_non_direct_source_category,
