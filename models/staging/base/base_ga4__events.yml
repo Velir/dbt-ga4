@@ -5,14 +5,15 @@ models:
     description: >
       Base events model that pulls all fields from raw data. Resulting table is partitioned on event_date_dt which 
       is useful in that BQ queries can be cached against this table, but not against wildcard searches from the original sharded tables. 
-      Some light transformation and renaming beyond the base events model. 
-      Adds surrogate keys for sessions and events
+      This model handels some light transformation and renaming beyond the base events model. 
+      Events are deduped by looking for duplicate event and event parameter payloads. 
+      More documentation here: https://support.google.com/analytics/answer/7029846
     columns:
       - name: event_date_dt
         description: Date of the event converted to Date type. Time zone is the time zone configured in the GA4 property. 
       - name: event_timestamp
         description: >
-          Timestamp indicating when the event's batch was received (as opposed to when the event actually occurred).  
+          Timestamp (in microseconds) indicating when the event's batch was received (as opposed to when the event actually occurred).  
           Time zone is technically UTC, but in a practical sense it is set to the time zone configured in the GA4 property. 
       - name: user_campaign
         description: >
@@ -36,3 +37,11 @@ models:
         description: Contain's the campaign associated with the event (typically derived from utm_content)
       - name: event_term
         description: Contain's the campaign associated with the event (typically derived from utm_term)
+      - name: stream_id
+        description: The numeric ID of the data stream from which the event originated.
+      - name: platform
+        description: The data stream platform (Web, IOS or Android) from which the event originated.
+      - name: privacy_info_analytics_storage
+        description: 	Whether Analytics storage is enabled for the user. Possible values are Yes, No, Unset
+      - name: privacy_info_ads_storage
+        description: Whether ad targeting is enabled for a user. Possible values are Yes, No, Unset
