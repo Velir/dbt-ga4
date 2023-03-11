@@ -18,7 +18,7 @@ C,C2022-01-01,2022-01-01,0
 A,A2022-01-02,2022-01-02,1
 """.lstrip()
 
-actual = read_file('../models/staging/ga4/stg_ga4__session_conversions_daily.sql')
+actual = read_file('../models/staging/stg_ga4__session_conversions_daily.sql')
 
 class TestUsersFirstLastEvents():
     # everything that goes in the "seeds" directory (= CSV format)

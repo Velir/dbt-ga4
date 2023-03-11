@@ -12,7 +12,7 @@ expected_csv = """user_id,event_name,event_timestamp,user_pseudo_id,ga_session_i
 user_id_1,pageview,12345,user_pseudo_id_1,ga_session_id_1,stream_id_1,google,c/nWU/GWhlWiLU0S6R/rwg==,9fDgaCrbd4ieAj1QpcWDjw==,70B/o+ww2nOTa32ASF/ulw==,organic,(organic),http://www.website.com/?foo=bar,http://www.cnn.com/,http://www.website.com/?foo=bar,http://www.cnn.com/,website.com,foo=bar
 """
 
-actual = read_file('../models/staging/ga4/stg_ga4__events.sql')
+actual = read_file('../models/staging/stg_ga4__events.sql')
 
 class TestStgEvents():
     # everything that goes in the "seeds" directory (= CSV format)

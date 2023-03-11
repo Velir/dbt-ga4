@@ -15,7 +15,7 @@ bbb,param1,
 ccc,param1,
 """.lstrip()
 
-actual = read_file('../models/staging/ga4/stg_ga4__event_to_query_string_params.sql').replace(
+actual = read_file('../models/staging/stg_ga4__event_to_query_string_params.sql').replace(
     "ref('stg_ga4__events')",
     "ref('params')"
 )

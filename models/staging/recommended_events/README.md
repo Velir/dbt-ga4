@@ -12,10 +12,9 @@ This is how you would enable the purchase event.
 models:
   ga4:
     staging:
-      ga4:
-        recommended_events:
-          stg_ga4__event_purchase:
-            +enabled: true
+      recommended_events:
+        stg_ga4__event_purchase:
+          +enabled: true
 ```
 
 This is how you would enable all recommended events:
@@ -24,9 +23,8 @@ This is how you would enable all recommended events:
 models:
   ga4:
     staging:
-      ga4:
-        recommended_events:
-            +enabled: true
+      recommended_events:
+          +enabled: true
 ```
 
 Not all recommended events have been implemented. If you need a specific event, please consider creating a pull request with the model that you need in the [dbt-ga4 GitHub repository](https://github.com/Velir/dbt-ga4).

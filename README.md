@@ -209,7 +209,7 @@ vars:
 
 ### GA4 Recommended Events
 
-See the README file at /dbt_packages/models/staging/ga4/recommended_events for instructions on enabling [Google's recommended events](https://support.google.com/analytics/answer/9267735?hl=en).
+See the README file at /dbt_packages/models/staging/recommended_events for instructions on enabling [Google's recommended events](https://support.google.com/analytics/answer/9267735?hl=en).
 
 ### Conversion Events
 

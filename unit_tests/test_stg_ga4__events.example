@@ -22,7 +22,7 @@ sources:
       - name: EXPECTED_OUTPUT
 """
 
-actual = read_file('../models/staging/ga4/stg_ga4__events.sql').replace(
+actual = read_file('../models/staging/stg_ga4__events.sql').replace(
     "ref('base_ga4__events')",
     "source('fixture', 'SOURCE_JSON')"
 )

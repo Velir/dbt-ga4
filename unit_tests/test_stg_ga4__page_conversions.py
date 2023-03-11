@@ -13,7 +13,7 @@ A,2
 B,1
 """.lstrip()
 
-actual = read_file('../models/staging/ga4/stg_ga4__page_conversions.sql')
+actual = read_file('../models/staging/stg_ga4__page_conversions.sql')
 
 class TestPageConversions():
     # everything that goes in the "seeds" directory (= CSV format)

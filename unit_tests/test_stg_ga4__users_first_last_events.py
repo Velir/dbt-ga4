@@ -11,7 +11,7 @@ expected_csv = """user_pseudo_id,first_event,last_event,first_geo_continent,firs
 IX+OyYJBgjwqML19GB/XIQ==,H06dLW6OhNJJ6SoEPFsSyg==,gt1SoAtrxDv33uDGwVeMVA==,Asia,India,Maharashtra,Mumbai,Southern Asia,(not set),desktop,Google,Chrome,,,Windows,Windows 10,,,en-us,No,,,,Chrome,104.0.0.0,www.velir.com,,,,USA,Massachusetts,Maharashtra,Mumbai,Southern Asia,(not set),mobile,Google,Chrome,,,Windows,Windows 10,,,en-us,No,,,,Chrome,104.0.0.0,www.velir.com,,,
 """.lstrip()
 
-actual = read_file('../models/staging/ga4/stg_ga4__user_pseudo_id_first_last_events.sql')
+actual = read_file('../models/staging/stg_ga4__user_pseudo_id_first_last_events.sql')
 
 class TestUsersFirstLastEvents():
     # everything that goes in the "seeds" directory (= CSV format)
