@@ -14,7 +14,7 @@ models:
         description: >
           Timestamp indicating when the event's batch was received (as opposed to when the event actually occurred).  
           Time zone is technically UTC, but in a practical sense it is set to the time zone configured in the GA4 property. 
-      - name: user_campaign_name
+      - name: user_campaign
         description: >
           Contains the initial campaign name that brought the user to the property. This has been renamed from traffic_source.name.
           From Google's documentation: Name of the marketing campaign that first acquired the user. This field is not populated in intraday tables.
@@ -26,3 +26,13 @@ models:
         description: Contains the initial source that brought the user to the property. This has been renamed from traffic_source.source.
       - name: session_id
         description: Unique identifier for the user's session. This is not guaranteed unique across users. Renamed from ga_session_id
+      - name: event_campaign
+        description: Contain's the campaign associated with the event (typically derived from utm_campaign)
+      - name: event_source
+        description: Contain's the source associated with the event (typically derived from utm_source)
+      - name: event_medium
+        description: Contain's the campaign associated with the event (typically derived from utm_medium)
+      - name: event_content
+        description: Contain's the campaign associated with the event (typically derived from utm_content)
+      - name: event_term
+        description: Contain's the campaign associated with the event (typically derived from utm_term)

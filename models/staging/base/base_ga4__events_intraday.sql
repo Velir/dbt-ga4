@@ -82,7 +82,7 @@ renamed as (
         app_info.install_store as app_info_install_store,
         app_info.firebase_app_id as app_info_firebase_app_id,
         app_info.install_source as app_info_install_source,
-        traffic_source.name as user_campaign_name,
+        traffic_source.name as user_campaign,
         traffic_source.medium as user_medium,
         traffic_source.source as user_source,
         stream_id,
@@ -99,11 +99,11 @@ renamed as (
         {{ ga4.unnest_key('event_params', 'engagement_time_msec', 'int_value') }},
         {{ ga4.unnest_key('event_params', 'page_title') }},
         {{ ga4.unnest_key('event_params', 'page_referrer') }},
-        {{ ga4.unnest_key('event_params', 'source') }},
-        {{ ga4.unnest_key('event_params', 'medium') }},
-        {{ ga4.unnest_key('event_params', 'campaign') }},
-        {{ ga4.unnest_key('event_params', 'content') }},
-        {{ ga4.unnest_key('event_params', 'term') }},
+        {{ ga4.unnest_key('event_params', 'source', 'string_value', 'event_source') }},
+        {{ ga4.unnest_key('event_params', 'medium', 'string_value', 'event_medium') }},
+        {{ ga4.unnest_key('event_params', 'campaign', 'string_value', 'event_campaign') }},
+        {{ ga4.unnest_key('event_params', 'content', 'string_value', 'event_content') }},
+        {{ ga4.unnest_key('event_params', 'term', 'string_value', 'event_term') }},
         CASE 
             WHEN event_name = 'page_view' THEN 1
             ELSE 0
