@@ -275,3 +275,13 @@ Package users can override this macro and implement their own channel groupings 
 - Implement your custom logic within that macro. It may be easiest to first copy the code from the package macro and modify from there.
 
 Overriding the package's default channel mapping makes use of dbt's dispatch override capability documented here: https://docs.getdbt.com/reference/dbt-jinja-functions/dispatch#overriding-package-macros
+
+# Multi-Property Support
+
+Multiple GA4 properties are supported by listing out the project IDs in the `property_ids` variable as follows;
+
+```
+property_ids: [11111111, 22222222, 33333333]
+```
+
+The `dataset` variable should be set to a target dataset that will contain copies of each event shard from each property. The `combine_property_data` macro will run as a pre-hook to `base_ga4_events` and copy shards to the target dataset based on the `static_incremental_days` variable. 
