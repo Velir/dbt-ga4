@@ -1,0 +1,6 @@
+version: 2
+
+models:  
+  - name: stg_ga4__event_to_query_string_params
+    description: This model pivots the query string parameters contained within the event's page_location field to become rows. Each row is a single parameter/value combination contained in a single event's query string.
+ 

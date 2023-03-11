@@ -1,0 +1,5 @@
+version: 2
+
+models:
+  - name: stg_ga4__event_session_start
+    description: Events filtered to only show 'session_start' event. Unnests common event parameters into separate columns. 
