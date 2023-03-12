@@ -6,7 +6,8 @@ with first_last_event as (
     select
         user_pseudo_id,
         FIRST_VALUE(event_key) OVER (PARTITION BY user_pseudo_id ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS first_event,
-        LAST_VALUE(event_key) OVER (PARTITION BY user_pseudo_id ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS last_event
+        LAST_VALUE(event_key) OVER (PARTITION BY user_pseudo_id ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS last_event,
+        stream_id
     from {{ref('stg_ga4__events')}}
     where user_pseudo_id is not null --remove users with privacy settings enabled
 ),
@@ -14,7 +15,8 @@ events_by_user_pseudo_id as (
     select distinct
         user_pseudo_id,
         first_event,
-        last_event
+        last_event,
+        stream_id
     from first_last_event
 ),
 events_joined as (
