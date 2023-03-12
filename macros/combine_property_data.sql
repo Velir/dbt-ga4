@@ -20,7 +20,7 @@
     {% else %}
         {%- for property_id in var('property_ids') -%}
             {%- set schema_name = "analytics_" + property_id|string -%}
-            {%- set relations = dbt_utils.get_relations_by_pattern(schema_name, 'events_%') -%}
+            {%- set relations = dbt_utils.get_relations_by_pattern(schema_name, table_pattern='events_%', exclude='events_intraday_%') -%}
             {% for relation in relations %}
                 {%- set relation_suffix = relation.identifier|replace('events_', '') -%}
                 {%- if relation_suffix|int >= var('start_date')|int -%}
