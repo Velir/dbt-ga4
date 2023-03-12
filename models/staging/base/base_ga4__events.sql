@@ -5,7 +5,7 @@
     {% endfor %}
     {{
         config(
-            pre_hook="{{ combine_property_data() }}",
+            pre_hook="{{ combine_property_data() }}" if var('property_ids', false) else "",
             materialized = 'incremental',
             incremental_strategy = 'insert_overwrite',
             partition_by={
