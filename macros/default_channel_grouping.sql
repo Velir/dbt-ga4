@@ -50,6 +50,8 @@ case
     then 'Audio'
   when {{medium}} = 'sms'
     then 'SMS'
+  when REGEXP_CONTAINS({{medium}}, r"(mobile|notification|push$)") or {{source}} = 'firebase'
+    then 'Push Notifications'
   else '(Other)' 
 end 
 
