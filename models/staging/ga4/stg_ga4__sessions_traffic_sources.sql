@@ -32,7 +32,7 @@ session_source as (
         COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN COALESCE(campaign, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS session_campaign,
         COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN COALESCE(content, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS session_content,
         COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN COALESCE(term, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS session_term,
-        COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN COALESCE(default_channel_grouping, 'Direct') END) IGNORE NULLS) OVER (session_window), 'Direct') AS session_channel_grouping,
+        COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN COALESCE(default_channel_grouping, 'Direct') END) IGNORE NULLS) OVER (session_window), 'Direct') AS session_channel,
         FIRST_VALUE(event_timestamp IGNORE NULLS) OVER (session_window) AS session_start_timestamp,
     from set_default_channel_grouping
     WINDOW session_window AS (PARTITION BY session_key ORDER BY event_timestamp ASC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
@@ -41,7 +41,7 @@ mv_custom as (
   select
         *,
         case
-            when default_channel_grouping in ('Affiliates','Paid Search', 'Paid Video', 'Display', 'Cross-network', 'Paid Social', 'Paid Other', 'Paid Shopping', 'Audio','Email','Mobile Push Notifications', 'Other', 'SMS') then 'Paid'
+            when session_channel in ('Affiliates','Paid Search', 'Paid Video', 'Display', 'Cross-network', 'Paid Social', 'Paid Other', 'Paid Shopping', 'Audio','Email','Mobile Push Notifications', 'Other', 'SMS') then 'Paid'
             else 'Organic'
         end as mv_author_session_status,
   from session_source
