@@ -5,6 +5,7 @@
     {% endfor %}
     {{
         config(
+            pre_hook="{{ combine_property_data() }}" if var('property_ids', false) else "",
             materialized = 'incremental',
             incremental_strategy = 'insert_overwrite',
             partition_by={
@@ -64,11 +65,11 @@ with source as (
     {% if is_incremental() %}
 
         {% if var('static_incremental_days', false ) %}
-            and parse_date('%Y%m%d', _TABLE_SUFFIX) in ({{ partitions_to_replace | join(',') }})
+            and parse_date('%Y%m%d', left(_TABLE_SUFFIX, 8)) in ({{ partitions_to_replace | join(',') }})
         {% else %}
             -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
             -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
-            and parse_date('%Y%m%d',_TABLE_SUFFIX) >= _dbt_max_partition
+            and parse_date('%Y%m%d',left(_TABLE_SUFFIX, 8)) >= _dbt_max_partition
         {% endif %}
     {% endif %}
 ),

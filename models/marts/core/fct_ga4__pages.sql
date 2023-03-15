@@ -14,6 +14,7 @@
 with page_view as (
     select
         event_date_dt,
+        stream_id,
         extract( hour from (select  timestamp_micros(event_timestamp))) as hour,
         page_location,  -- includes query string parameters not listed in query_parameter_exclusions variable
         page_key,
@@ -26,7 +27,7 @@ with page_view as (
         sum(engagement_time_msec) as total_time_on_page 
         
 from {{ref('stg_ga4__event_page_view')}}
-    group by 1,2,3,4,5,6
+    group by 1,2,3,4,5,6,7
 ), scroll as (
     select
         event_date_dt,
