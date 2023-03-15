@@ -1,0 +1,9 @@
+version: 2
+
+models:  
+  - name: stg_ga4__derived_user_properties
+    description: Optional model that will pull out the most recent instance of a particular event parameter for each device (user_pseudo_id). Later used in the dim_ga4__user_pseudo_id dimension table.
+    columns:
+      - name: user_pseudo_id
+        tests:
+          - unique  

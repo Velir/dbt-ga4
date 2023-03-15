@@ -82,14 +82,14 @@ renamed as (
         app_info.install_store as app_info_install_store,
         app_info.firebase_app_id as app_info_firebase_app_id,
         app_info.install_source as app_info_install_source,
-        traffic_source.name as traffic_source_name,
-        traffic_source.medium as traffic_source_medium,
-        traffic_source.source as traffic_source_source,
+        traffic_source.name as user_campaign,
+        traffic_source.medium as user_medium,
+        traffic_source.source as user_source,
         stream_id,
         platform,
         ecommerce,
         items,
-        {{ ga4.unnest_key('event_params', 'ga_session_id', 'int_value') }},
+        {{ ga4.unnest_key('event_params', 'ga_session_id', 'int_value', 'session_id') }},
         {{ ga4.unnest_key('event_params', 'page_location') }},
         COALESCE(
             (SELECT value.int_value FROM unnest(event_params) WHERE key = "session_engaged"),
@@ -99,11 +99,11 @@ renamed as (
         {{ ga4.unnest_key('event_params', 'engagement_time_msec', 'int_value') }},
         {{ ga4.unnest_key('event_params', 'page_title') }},
         {{ ga4.unnest_key('event_params', 'page_referrer') }},
-        {{ ga4.unnest_key('event_params', 'source') }},
-        {{ ga4.unnest_key('event_params', 'medium') }},
-        {{ ga4.unnest_key('event_params', 'campaign') }},
-        {{ ga4.unnest_key('event_params', 'content') }},
-        {{ ga4.unnest_key('event_params', 'term') }},
+        {{ ga4.unnest_key('event_params', 'source', 'string_value', 'event_source') }},
+        {{ ga4.unnest_key('event_params', 'medium', 'string_value', 'event_medium') }},
+        {{ ga4.unnest_key('event_params', 'campaign', 'string_value', 'event_campaign') }},
+        {{ ga4.unnest_key('event_params', 'content', 'string_value', 'event_content') }},
+        {{ ga4.unnest_key('event_params', 'term', 'string_value', 'event_term') }},
         CASE 
             WHEN event_name = 'page_view' THEN 1
             ELSE 0
@@ -116,4 +116,4 @@ renamed as (
 )
 
 select * from renamed
-qualify row_number() over(partition by event_date_dt, stream_id, user_pseudo_id, ga_session_id, event_name, event_timestamp, to_json_string(event_params)) = 1
+qualify row_number() over(partition by event_date_dt, stream_id, user_pseudo_id, session_id, event_name, event_timestamp, to_json_string(event_params)) = 1

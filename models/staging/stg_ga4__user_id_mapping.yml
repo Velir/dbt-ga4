@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_ga4__user_id_mapping
+    description: Mapping table that contains the latest association between user_pseudo_id and user_id. Unique on user_pseudo_id
+    columns:
+      - name: user_pseudo_id
+        description: Device ID obtained from GA4
+        tests:
+          - not_null
+          - unique
+
