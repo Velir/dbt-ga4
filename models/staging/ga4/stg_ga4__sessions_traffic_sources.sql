@@ -1,12 +1,15 @@
 with session_events as (
     select 
         session_key,
+        user_key,
         event_timestamp,
         lower(source) as source,
         medium,
         campaign,
+        content,
+        term,
         source_category
-    from {{ref('stg_ga4__events')}}
+    from {{ref('stg_ga4__attribution_window')}}
     left join {{ref('ga4_source_categories')}} using (source)
     --exclude the events session_start and first_visit because they are triggered first but never contain source, medium, campaign values
     where not ( event_name = "session_start" or event_name = "first_visit")
@@ -19,26 +22,29 @@ set_default_channel_grouping as (
     from session_events
 ),
 session_source as (
-    select    
+    select distinct
         session_key,
-
-        (case
-          when FIRST_VALUE(source) OVER (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) is null then "(direct)"
-          else FIRST_VALUE(source) OVER (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) end
-        ) as session_source,
-
-        (case 
-          when FIRST_VALUE(medium) OVER (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) is null then "(none)"
-          else FIRST_VALUE(medium) OVER (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) end
-        ) as session_medium,
-
-        (case 
-          when FIRST_VALUE(campaign) OVER (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) is null then "(direct)"
-          else FIRST_VALUE(campaign) OVER (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) end
-        ) as session_campaign,
-
-        FIRST_VALUE(default_channel_grouping) OVER (PARTITION BY session_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS session_default_channel_grouping
+        user_key,
+        -- if a user_id is added mid-session, the source gets populated as direct so we ignore direct and null source but defaults to direct/none
+        COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN source END) IGNORE NULLS) OVER (session_window), '(direct)') AS session_source, 
+        COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN COALESCE(medium, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS session_medium,
+        COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN COALESCE(source_category, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS session_source_category,
+        COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN COALESCE(campaign, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS session_campaign,
+        COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN COALESCE(content, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS session_content,
+        COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN COALESCE(term, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS session_term,
+        COALESCE(FIRST_VALUE((CASE WHEN source <> '(direct)' THEN COALESCE(default_channel_grouping, 'Direct') END) IGNORE NULLS) OVER (session_window), 'Direct') AS session_channel,
+        FIRST_VALUE(event_timestamp IGNORE NULLS) OVER (session_window) AS session_start_timestamp,
     from set_default_channel_grouping
+    WINDOW session_window AS (PARTITION BY session_key ORDER BY event_timestamp ASC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+),
+mv_custom as (
+  select
+        *,
+        case
+            when session_channel in ('Affiliates','Paid Search', 'Paid Video', 'Display', 'Cross-network', 'Paid Social', 'Paid Other', 'Paid Shopping', 'Audio','Email','Mobile Push Notifications', 'Other', 'SMS') then 'Paid'
+            else 'Organic'
+        end as mv_author_session_status,
+  from session_source
 )
 
-select distinct  * from session_source
+select * from mv_custom

@@ -23,4 +23,4 @@ page_views_joined as (
         on page_views_by_user_key.last_page_view_event_key = last_page_view.event_key
 )
 
-select * from page_views_joined
+select distinct * from page_views_joined

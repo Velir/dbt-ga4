@@ -17,7 +17,12 @@
 ),
 last_pageview_joined as (
   select 
-    page_view_with_params.*,
+    page_view_with_params.* except(load_time, source,medium, campaign),
+    case
+        when load_time < 0 then null
+        when load_time > 100000 then null
+        else load_time
+    end as load_time,
     case
       when first_last_pageview_session.last_page_view_event_key is null then null
       else 1
@@ -25,6 +30,23 @@ last_pageview_joined as (
   from page_view_with_params
     left join {{ref('stg_ga4__sessions_first_last_pageviews')}} first_last_pageview_session
       on page_view_with_params.event_key = first_last_pageview_session.last_page_view_event_key
+),
+session_params as (
+  select
+    last_pageview_joined.* ,
+    source,
+    medium,
+    campaign,
+    default_channel_grouping,
+    mv_author_session_status
+  from {{ref('stg_ga4__sessions_traffic_sources')}}
+  right join last_pageview_joined using(session_key)
+),
+last_non_direct as (
+  select 
+    *
+  from {{ref('stg_ga4__last_non_direct_attribution')}}
+  right join session_params using(session_key)
 )
 
-select * from last_pageview_joined
+select * from session_params

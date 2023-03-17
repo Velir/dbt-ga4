@@ -8,6 +8,7 @@
         config(
             materialized = 'incremental',
             incremental_strategy = 'insert_overwrite',
+            schema = 'analytics',
             partition_by={
                 "field": "session_start_date",
                 "data_type": "date",
@@ -20,6 +21,7 @@
         config(
             materialized = 'incremental',
             incremental_strategy = 'insert_overwrite',
+            schema = 'analytics',
             partition_by={
                 "field": "session_start_date",
                 "data_type": "date",
@@ -31,10 +33,12 @@
 with session_start_dims as (
     select 
         session_key,
+        user_key,
         ga_session_number,
         event_date_dt as session_start_date,
         page_location as landing_page,
         page_hostname as landing_page_hostname,
+        mv_region,
         geo_continent,
         geo_country,
         geo_region,
@@ -71,7 +75,6 @@ with session_start_dims as (
         {% endif %}
     {% endif %}
 ),
--- Arbitrarily pull the first session_start event to remove duplicates
 remove_dupes as 
 (
     select * from session_start_dims
@@ -80,12 +83,23 @@ remove_dupes as
 join_traffic_source as (
     select 
         remove_dupes.*,
-        session_source as source,
-        session_medium as medium,
-        session_campaign as campaign,
-        session_default_channel_grouping as default_channel_grouping
+        session_source,
+        session_medium,
+        session_source_category,
+        session_campaign,
+        session_content,
+        session_term,
+        session_channel,
+        last_non_direct_source,
+        last_non_direct_medium,
+        last_non_direct_source_category,
+        last_non_direct_campaign,
+        last_non_direct_content,
+        last_non_direct_term,
+        last_non_direct_channel
     from remove_dupes
     left join {{ref('stg_ga4__sessions_traffic_sources')}} using (session_key)
+    left join {{ ref ('stg_ga4__last_non_direct_attribution')}} using (session_key)
 )
 
 select * from join_traffic_source
