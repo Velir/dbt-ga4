@@ -29,8 +29,8 @@ from {{ref('stg_ga4__event_page_view')}}
 ), page_engagement as (
     select
         page_view.* except(page_engagement_key),
-        sum(page_engagement_time) as total_engagement_time,
-        countif(page_engagement_time is not null) as average_engagement_time_denominator
+        sum(page_engagement_time_msec) as total_engagement_time_msec,
+        sum( page_engagement_denominator) as avg_engagement_time_denominator
     from {{ ref('stg_ga4__page_engaged_time') }}
     right join page_view using (page_engagement_key)
     group by 1,2,3,4,5,6,7,8,9,10
