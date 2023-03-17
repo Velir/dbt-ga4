@@ -19,7 +19,7 @@ C,c1,103
 C,c2,104
 """.lstrip()
 
-actual = read_file('../models/staging/ga4/stg_ga4__user_id_mapping.sql')
+actual = read_file('../models/staging/stg_ga4__user_id_mapping.sql')
 
 class TestUserIdMapping():
     # everything that goes in the "seeds" directory (= CSV format)

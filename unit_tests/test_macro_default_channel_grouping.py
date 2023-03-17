@@ -14,6 +14,8 @@ cn.bing.com,
 43things.com,
 alibaba,
 alibaba,cpc
+,push
+firebase,
 ,
 """.lstrip()
 
@@ -29,6 +31,8 @@ Organic Search
 Organic Social
 Organic Shopping
 Paid Shopping
+Push Notifications
+Push Notifications
 Direct
 """.lstrip()
 

@@ -42,7 +42,7 @@ class TestDerivedUserProperties():
         return {
             "config.yml": models__config_yml,
             "stg_ga4__events.sql": "select * from {{source('fixture','mock_stg_ga4__events_json')}}",
-            "actual.sql": read_file('../models/staging/ga4/stg_ga4__derived_user_properties.sql')
+            "actual.sql": read_file('../models/staging/stg_ga4__derived_user_properties.sql')
         }
 
     # everything that goes in the "macros"

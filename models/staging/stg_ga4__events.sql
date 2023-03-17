@@ -11,7 +11,7 @@ with base_events as (
 include_session_key as (
     select 
         *,
-        to_base64(md5(CONCAT(stream_id, user_pseudo_id, CAST(ga_session_id as STRING)))) as session_key -- Surrogate key to determine unique session across streams and users. Sessions do NOT reset after midnight in GA4
+        to_base64(md5(CONCAT(stream_id, user_pseudo_id, CAST(session_id as STRING)))) as session_key -- Surrogate key to determine unique session across streams and users. Sessions do NOT reset after midnight in GA4
     from base_events
 ),
 -- Add a key that combines session key and date. Useful when working with session table within date-partitioned tables
@@ -30,19 +30,19 @@ include_event_key as (
 ),
 detect_gclid as (
     select
-        * except (source, medium, campaign),
+        * except (event_source, event_medium, event_campaign),
         case
-            when (page_location like '%gclid%' and source is null) then "google"
-            else source
-        end as source,
+            when (page_location like '%gclid%' and event_source is null) then "google"
+            else event_source
+        end as event_source,
         case
-            when (page_location like '%gclid%' and medium is null) then "cpc"
-            else medium
-        end as medium,
+            when (page_location like '%gclid%' and event_medium is null) then "cpc"
+            else event_medium
+        end as event_medium,
         case
-            when (page_location like '%gclid%' and campaign is null) then "(cpc)"
-            else campaign
-        end as campaign
+            when (page_location like '%gclid%' and event_campaign is null) then "(cpc)"
+            else event_campaign
+        end as event_campaign
     from include_event_key
 ),
 -- Remove specific query strings from page_location field

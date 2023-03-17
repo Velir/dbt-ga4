@@ -1,14 +1,35 @@
-{% if var('frequency', 'daily') == 'daily+streaming' %}
-    {{ config(
-    enabled = true 
-    ) }}
+{% if var('static_incremental_days', false ) %}
+    {% set partitions_to_replace = [] %}
+    {% for i in range(var('static_incremental_days')) %}
+        {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
+    {% endfor %}
+    {{
+        config(
+            pre_hook="{{ combine_property_data() }}" if var('property_ids', false) else "",
+            materialized = 'incremental',
+            incremental_strategy = 'insert_overwrite',
+            partition_by={
+                "field": "event_date_dt",
+                "data_type": "date",
+            },
+            partitions = partitions_to_replace,
+            cluster_by=['event_name']
+        )
+    }}
 {% else %}
-    {{ config(
-    enabled = false 
-    ) }}
+    {{
+        config(
+            materialized = 'incremental',
+            incremental_strategy = 'insert_overwrite',
+            partition_by={
+                "field": "event_date_dt",
+                "data_type": "date",
+            },
+            cluster_by=['event_name']
+        )
+    }}
 {% endif %}
-
--- This model will be unioned with `base_ga4__events` which means that their columns must match
+--BigQuery does not cache wildcard queries that scan across sharded tables which means it's best to materialize the raw event data as a partitioned table so that future queries benefit from caching
 with source as (
     select 
         parse_date('%Y%m%d',event_date) as event_date_dt,
@@ -33,7 +54,24 @@ with source as (
         platform,
         ecommerce,
         items,
-    from {{ source('ga4', 'events_intraday') }}
+    {%  if var('frequency', 'daily') == 'streaming' %}
+        from {{ source('ga4', 'events_intraday') }}
+        where cast( _table_suffix as int64) >= {{var('start_date')}}
+    {% else %}
+        from {{ source('ga4', 'events') }}
+        where _table_suffix not like '%intraday%'
+        and cast( _table_suffix as int64) >= {{var('start_date')}}
+    {% endif %}
+    {% if is_incremental() %}
+
+        {% if var('static_incremental_days', false ) %}
+            and parse_date('%Y%m%d', left(_TABLE_SUFFIX, 8)) in ({{ partitions_to_replace | join(',') }})
+        {% else %}
+            -- Incrementally add new events. Filters on _TABLE_SUFFIX using the max event_date_dt value found in {{this}}
+            -- See https://docs.getdbt.com/reference/resource-configs/bigquery-configs#the-insert_overwrite-strategy
+            and parse_date('%Y%m%d',left(_TABLE_SUFFIX, 8)) >= _dbt_max_partition
+        {% endif %}
+    {% endif %}
 ),
 renamed as (
     select 
@@ -82,25 +120,28 @@ renamed as (
         app_info.install_store as app_info_install_store,
         app_info.firebase_app_id as app_info_firebase_app_id,
         app_info.install_source as app_info_install_source,
-        traffic_source.name as traffic_source_name,
-        traffic_source.medium as traffic_source_medium,
-        traffic_source.source as traffic_source_source,
+        traffic_source.name as user_campaign,
+        traffic_source.medium as user_medium,
+        traffic_source.source as user_source,
         stream_id,
         platform,
         ecommerce,
         items,
-        {{ ga4.unnest_key('event_params', 'ga_session_id', 'int_value') }},
+        {{ ga4.unnest_key('event_params', 'ga_session_id', 'int_value', 'session_id') }},
         {{ ga4.unnest_key('event_params', 'page_location') }},
-        {{ ga4.unnest_key('event_params', 'ga_session_number',  'int_value') }},
-        (case when (SELECT value.string_value FROM unnest(event_params) WHERE key = "session_engaged") = "1" then 1 end) as session_engaged,
+        {{ ga4.unnest_key('event_params', 'ga_session_number',  'int_value', 'session_number') }},
+        COALESCE(
+            (SELECT value.int_value FROM unnest(event_params) WHERE key = "session_engaged"),
+            (CASE WHEN (SELECT value.string_value FROM unnest(event_params) WHERE key = "session_engaged") = "1" THEN 1 END)
+        ) as session_engaged,
         {{ ga4.unnest_key('event_params', 'engagement_time_msec', 'int_value') }},
         {{ ga4.unnest_key('event_params', 'page_title') }},
         {{ ga4.unnest_key('event_params', 'page_referrer') }},
-        {{ ga4.unnest_key('event_params', 'source') }},
-        {{ ga4.unnest_key('event_params', 'medium') }},
-        {{ ga4.unnest_key('event_params', 'campaign') }},
-        {{ ga4.unnest_key('event_params', 'content') }},
-        {{ ga4.unnest_key('event_params', 'term') }},
+        {{ ga4.unnest_key('event_params', 'source', 'lower_string_value', 'event_source') }},
+        {{ ga4.unnest_key('event_params', 'medium', 'lower_string_value', 'event_medium') }},
+        {{ ga4.unnest_key('event_params', 'campaign', 'lower_string_value', 'event_campaign') }},
+        {{ ga4.unnest_key('event_params', 'content', 'lower_string_value', 'event_content') }},
+        {{ ga4.unnest_key('event_params', 'term', 'lower_string_value', 'event_term') }},
         CASE 
             WHEN event_name = 'page_view' THEN 1
             ELSE 0
@@ -113,4 +154,4 @@ renamed as (
 )
 
 select * from renamed
-qualify row_number() over(partition by event_date_dt, stream_id, user_pseudo_id, ga_session_id, event_name, event_timestamp, to_json_string(event_params)) = 1
+qualify row_number() over(partition by event_date_dt, stream_id, user_pseudo_id, session_id, event_name, event_timestamp, to_json_string(event_params)) = 1

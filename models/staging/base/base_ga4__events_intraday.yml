@@ -1,0 +1,6 @@
+version: 2
+
+models:  
+  - name: base_ga4__events_intraday
+    description: Base model for intraday events. Used when the 'frequency' variable is set to either 'streaming' or 'daily+streaming'. Columns should match 1:1 with base_ga4__events and are documented there.
+  

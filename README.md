@@ -45,7 +45,7 @@ To pull the latest stable release along with minor updates, add the following to
 ```
 packages:
   - package: Velir/ga4
-    version: [">=2.0.0", "<2.2.0"]
+    version: [">=3.0.0", "<3.2.0"]
 ```
 
 ## Install From main branch on GitHub
@@ -209,7 +209,7 @@ vars:
 
 ### GA4 Recommended Events
 
-See the README file at /dbt_packages/models/staging/ga4/recommended_events for instructions on enabling [Google's recommended events](https://support.google.com/analytics/answer/9267735?hl=en).
+See the README file at /dbt_packages/models/staging/recommended_events for instructions on enabling [Google's recommended events](https://support.google.com/analytics/answer/9267735?hl=en).
 
 ### Conversion Events
 
@@ -275,3 +275,13 @@ Package users can override this macro and implement their own channel groupings 
 - Implement your custom logic within that macro. It may be easiest to first copy the code from the package macro and modify from there.
 
 Overriding the package's default channel mapping makes use of dbt's dispatch override capability documented here: https://docs.getdbt.com/reference/dbt-jinja-functions/dispatch#overriding-package-macros
+
+# Multi-Property Support
+
+Multiple GA4 properties are supported by listing out the project IDs in the `property_ids` variable as follows;
+
+```
+property_ids: [11111111, 22222222, 33333333]
+```
+
+The `dataset` variable should be set to a target dataset that will contain copies of each event shard from each property. The `combine_property_data` macro will run as a pre-hook to `base_ga4_events` and copy shards to the target dataset based on the `static_incremental_days` variable. 
