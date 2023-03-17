@@ -42,6 +42,6 @@ models:
       - name: platform
         description: The data stream platform (Web, IOS or Android) from which the event originated.
       - name: privacy_info_analytics_storage
-        description: 	Whether Analytics storage is enabled for the user. Possible values are Yes, No, Unset
+        description: Whether Analytics storage is enabled for the user. Possible values are Yes, No, Unset
       - name: privacy_info_ads_storage
         description: Whether ad targeting is enabled for a user. Possible values are Yes, No, Unset
