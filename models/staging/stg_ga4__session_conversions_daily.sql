@@ -2,6 +2,7 @@
     enabled= var('conversion_events', false) != false,
     materialized = 'incremental',
     incremental_strategy = 'insert_overwrite',
+    on_schema_change='sync_all_columns',
     tags = ["incremental"],
     partition_by={
     "field": "session_partition_date",

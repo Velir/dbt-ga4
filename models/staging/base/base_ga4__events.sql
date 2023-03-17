@@ -8,6 +8,7 @@
             pre_hook="{{ combine_property_data() }}" if var('property_ids', false) else "",
             materialized = 'incremental',
             incremental_strategy = 'insert_overwrite',
+            on_schema_change='sync_all_columns',
             partition_by={
                 "field": "event_date_dt",
                 "data_type": "date",
