@@ -229,11 +229,10 @@ Custom events can be generated in your project using the `create_custom_event` m
 {{ ga4.create_custom_event('my_custom_event') }}
 ```
 
-Note, however, that any event-specific custom parameters or default custom parameters must be defined in your project's variable space. So if you project is named "jaffleshop", the following variable configuration will be used for the `my_custom_event` model:
+Note, however, that any event-specific custom parameters or default custom parameters must be defined in the global variable space as shown below:
 
 ```
 vars:
-  jaffleshop:
     default_custom_parameters:
       - name: "some_parameter"
         value_type: "string_value"
