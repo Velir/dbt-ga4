@@ -20,6 +20,7 @@ with page_view as (
         page_key,
         page_path,
         page_title,  -- would like to move this to dim_ga4__pages but need to think how to handle page_title changing over time
+        {% if var('ga4.stream_names', false) %}stream_name,{% endif %}
         count(event_name) as page_views,
         count(distinct user_pseudo_id ) as distinct_user_pseudo_ids,
         sum( if(session_number = 1,1,0)) as new_user_pseudo_ids,
@@ -27,7 +28,7 @@ with page_view as (
         sum(engagement_time_msec) as total_time_on_page 
         
 from {{ref('stg_ga4__event_page_view')}}
-    group by 1,2,3,4,5,6,7
+    group by 1,2,3,4,5,6,7{% if var('ga4.stream_names', false) %},8{% endif %}
 ), scroll as (
     select
         event_date_dt,

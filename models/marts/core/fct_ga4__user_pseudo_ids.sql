@@ -1,6 +1,7 @@
 select
     user_pseudo_id,
     stream_id,
+    {% if var('ga4.stream_names', false) %}stream_name,{% endif %}
     min(session_start_timestamp) as first_seen_timestamp,
     min(session_start_date) as first_seen_start_date,
     sum(count_pageviews) as count_pageviews,
@@ -15,5 +16,4 @@ select
         {% endfor %}
     {% endif %}
 from {{ref('fct_ga4__sessions')}}
-group by 1,2
-
+group by 1,2 {% if var('ga4.stream_names', false) %},3{% endif %}
