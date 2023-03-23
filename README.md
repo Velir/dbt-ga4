@@ -281,7 +281,21 @@ Overriding the package's default channel mapping makes use of dbt's dispatch ove
 Multiple GA4 properties are supported by listing out the project IDs in the `property_ids` variable as follows;
 
 ```
-property_ids: [11111111, 22222222, 33333333]
+vars:
+  ga4:
+    property_ids: [11111111, 22222222, 33333333]
 ```
 
 The `dataset` variable should be set to a target dataset that will contain copies of each event shard from each property. The `combine_property_data` macro will run as a pre-hook to `base_ga4_events` and copy shards to the target dataset based on the `static_incremental_days` variable. 
+
+# Friendly Stream Names
+
+When working with either a multi-property installation or a property with multiple streams, the data separates out data from different streams using stream IDs that are not in any way user friendly. Use the `stream_names` setting to assign user-friendly stream names to user IDs.
+
+```
+vars:
+  ga4:
+    stream_names: [ [123456, "your_first_chosen_stream_name"],[123456, "your_second_chosen_stream_name"]  ]
+```
+
+Setting a stream name will add the friendly stream names to all supported models. Stream IDs found in the data that don't match any `stream_id` value will default to their stream ID as the `stream_name`.

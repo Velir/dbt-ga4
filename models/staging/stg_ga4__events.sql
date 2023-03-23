@@ -76,4 +76,12 @@ page_key as (
         (concat( cast(event_date_dt as string), cast(EXTRACT(HOUR FROM TIMESTAMP_MICROS(event_timestamp)) as string), page_location )) as page_key
     from enrich_params
 )
+{% if var('ga4.stream_names', false) %}
+    select
+        page_key.*,
+        friendly.stream_name
+        from {{ ref('stg_ga4__friendly_stream_names') }} as friendly 
+        right join page_key using(stream_id)
+{% else %}
 select * from page_key
+{% endif %}
