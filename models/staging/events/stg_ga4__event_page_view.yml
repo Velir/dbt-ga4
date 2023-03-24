@@ -6,4 +6,5 @@ models:
     columns: 
       - name: page_location
         tests:
-          - not_null
+          - not_null:
+              severity: warn

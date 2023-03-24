@@ -10,6 +10,8 @@ with session_first_event as
  session_start_dims as (
     select 
         session_key,
+        event_date_dt as session_start_date,
+        event_timestamp as session_start_timestamp,
         page_path as landing_page_path,
         page_location as landing_page,
         page_hostname as landing_page_hostname,

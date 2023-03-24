@@ -1,0 +1,19 @@
+version: 2
+
+models:  
+  - name: fct_ga4__sessions_daily
+    description: >
+      Incremental fact table with metrics related to daily session partitions.
+    columns:
+      - name: session_partition_key
+        description: >
+          Unique key assigned to session partitions which are daily partitions of a session. In GA4, sessions can span multiple days. 
+          To improve query performance, it's easier to work with 'session partitions' which can be filtered/partitioned by date.
+        tests:
+          - unique
+      - name: session_key
+        description: >
+          Unique key assigned to sessions. Sessions can span multiple dates/partitions. 
+      - name: session_partition_date
+        description: >
+          Date associated with the session_partition_key. Used to partition the table. Filter on this column to optimize query cost and performance. 

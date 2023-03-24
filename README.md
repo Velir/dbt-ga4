@@ -25,7 +25,8 @@ Features include:
 | stg_ga4__session_conversions_daily | Produces daily counts of conversions per session. The list of conversion events to include is configurable (see documentation below) |
 | stg_ga4__sessions_traffic_sources | Finds the first source, medium, campaign, content, paid search term (from UTM tracking), and default channel grouping for each session. |
 | dim_ga4__user_pseudo_ids | Dimension table for user devices as indicated by user_pseudo_ids. Contains attributes such as first and last page viewed.| 
-| dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and acquisition data |
+| dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and acquisition data. Can be expensive to run on large installs (see `dim_ga4__sessions_daily`) |
+| dim_ga4__sessions_daily | Query-optimized session dimension table that is incremental and partitioned on date. Assumes that each partition is contained within a single day |
 | fct_ga4__pages | Fact table for pages which aggregates common page metrics by page_location, date, and hour. |
 | fct_ga4__sessions_daily | Fact table for session metrics, partitioned by date. A single session may span multiple rows given that sessions can span multiple days.  |
 | fct_ga4__sessions | Fact table that aggregates session metrics across days. This table is not partitioned, so be mindful of performance/cost when querying. |
@@ -268,7 +269,7 @@ This package uses `pytest` as a method of unit testing individual models. More d
 
 # Overriding Default Channel Groupings
 
-By default, this package maps traffic sources to channel groupings using the `macros/default_channel_grouping.sql` macro. This macro closely adheres to Googls recommended channel groupings documented here: https://support.google.com/analytics/answer/9756891?hl=en .
+By default, this package maps traffic sources to channel groupings using the `macros/default_channel_grouping.sql` macro. This macro closely adheres to Google's recommended channel groupings documented here: https://support.google.com/analytics/answer/9756891?hl=en .
 
 Package users can override this macro and implement their own channel groupings by following these steps:
 - Create a macro in your project named `default__default_channel_grouping` that accepts the same 3 arguments: source, medium, source_category
@@ -278,10 +279,25 @@ Overriding the package's default channel mapping makes use of dbt's dispatch ove
 
 # Multi-Property Support
 
-Multiple GA4 properties are supported by listing out the project IDs in the `property_ids` variable as follows;
+Multiple GA4 properties are supported by listing out the project IDs in the `property_ids` variable. In this scenario, the `static_incremental_days` variable is required and the `dataset` variable will define the target dataset where source data will be copied.
 
 ```
-property_ids: [11111111, 22222222, 33333333]
+vars:
+  ga4:
+    property_ids: [11111111, 22222222, 33333333]
+    static_incremental_days: 3
+    dataset: "my_combined_dataset"
 ```
 
-The `dataset` variable should be set to a target dataset that will contain copies of each event shard from each property. The `combine_property_data` macro will run as a pre-hook to `base_ga4_events` and copy shards to the target dataset based on the `static_incremental_days` variable. 
+With these variables set, the `combine_property_data` macro will run as a pre-hook to `base_ga4_events` and clone shards to the target dataset.  The number of days' worth of data to clone during incremental runs will be based on the `static_incremental_days` variable. 
+
+Jobs that run a large number of clone operations are prone to timing out. As a result, it is recommended that you increase the query timeout if you need to backfill or full-refresh the table, when first setting up or when the base model gets modified. Otherwise, it is best to prevent the base model from rebuilding on full refreshes unless needed to minimize timeouts.
+
+```
+models:
+  ga4:
+    staging:
+      base:
+        base_ga4__events:
+          +full_refresh: false
+```
