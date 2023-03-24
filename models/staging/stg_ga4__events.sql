@@ -73,7 +73,7 @@ enrich_params as (
 page_key as (
     select
         *,
-        (concat( cast(event_date_dt as string), cast(EXTRACT(HOUR FROM TIMESTAMP_MICROS(event_timestamp)) as string), page_location )) as page_key,
+        (concat( cast(event_date_dt as string), page_location )) as page_key,
         case
             when event_name = 'page_view' then to_base64(md5(concat(session_key, page_referrer)))
             else to_base64(md5(concat(session_key, page_location)))
