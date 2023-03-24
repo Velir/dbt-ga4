@@ -282,20 +282,27 @@ Multiple GA4 properties are supported by listing out the project IDs in the `pro
 
 ```
 vars:
-  ga4:
-    property_ids: [11111111, 22222222, 33333333]
+  property_ids: [11111111, 22222222, 33333333]
 ```
 
 The `dataset` variable should be set to a target dataset that will contain copies of each event shard from each property. The `combine_property_data` macro will run as a pre-hook to `base_ga4_events` and copy shards to the target dataset based on the `static_incremental_days` variable. 
 
 # Friendly Stream Names
 
-When working with either a multi-property installation or a property with multiple streams, the data separates out data from different streams using stream IDs that are not in any way user friendly. Use the `stream_names` setting to assign user-friendly stream names to user IDs.
+When working with either a multi-property installation or a property with multiple streams, the data separates out data from different streams using stream IDs that are not in any way user friendly. Create a `seed_ga4__friendly_stream_names.csv` file and map your stream IDs to stream names as shown below.
+
+```
+stream_id,stream_name
+'1234567890', 'brand website'
+'7890123456', 'brand ios app'
+```
+
+For the stream renaming to take effect, you will also have to add the `ga4.rename_streams` to your `dbt_project.yml` file and set it to 'true'.
 
 ```
 vars:
   ga4:
-    stream_names: [ [123456, "your_first_chosen_stream_name"],[123456, "your_second_chosen_stream_name"]  ]
+    rename_streams: true
 ```
 
 Setting a stream name will add the friendly stream names to all supported models. Stream IDs found in the data that don't match any `stream_id` value will default to their stream ID as the `stream_name`.

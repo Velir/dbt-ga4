@@ -80,7 +80,7 @@ page_key as (
         end as page_engagement_key
     from enrich_params
 )
-{% if var('ga4.stream_names', false) %}
+{% if var('ga4.rename_streams', false) %}
     select
         page_key.*,
         friendly.stream_name
