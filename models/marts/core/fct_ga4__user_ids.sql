@@ -14,7 +14,7 @@ with user_id_mapped as (
 select
     user_id_or_user_pseudo_id,
     stream_id,
-    {% if var('ga4.rename_streams', false) %}stream_name,{% endif %}
+    {% if var('rename_streams', false) %}stream_name,{% endif %}
     max(is_user_id) as is_user_id,
     min(first_seen_timestamp) as first_seen_timestamp,
     min(first_seen_start_date) as first_seen_start_date,
@@ -30,5 +30,5 @@ select
         {% endfor %}
     {% endif %}
 from user_id_mapped
-group by 1,2 {% if var('ga4.rename_streams', false) %},3{% endif %}
+group by 1,2 {% if var('rename_streams', false) %},3{% endif %}
 

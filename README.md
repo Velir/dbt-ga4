@@ -297,7 +297,7 @@ stream_id,stream_name
 '7890123456', 'brand ios app'
 ```
 
-For the stream renaming to take effect, you will also have to add the `ga4.rename_streams` to your `dbt_project.yml` file and set it to 'true'.
+For the stream renaming to take effect, you will also have to add the `rename_streams` to your `dbt_project.yml` file and set it to 'true'.
 
 ```
 vars:
