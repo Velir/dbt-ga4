@@ -84,7 +84,7 @@ page_key as (
     select
         page_key.*,
         friendly.stream_name
-        from {{ ref('stg_ga4__friendly_stream_names') }} as friendly 
+        from {{ ref('seed_ga4__friendly_stream_names') }} as friendly 
         right join page_key using(stream_id)
 {% else %}
 select * from page_key

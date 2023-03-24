@@ -32,7 +32,7 @@
 --BigQuery does not cache wildcard queries that scan across sharded tables which means it's best to materialize the raw event data as a partitioned table so that future queries benefit from caching
 with source as (
     select 
-        {{ ga4.base_select_source }}
+        {{ ga4.base_select_source() }}
     {%  if var('frequency', 'daily') == 'streaming' %}
         from {{ source('ga4', 'events_intraday') }}
         where cast( _table_suffix as int64) >= {{var('start_date')}}
@@ -54,7 +54,7 @@ with source as (
 ),
 renamed as (
     select 
-        {{ ga4.base_select_renamed }}
+        {{ ga4.base_select_renamed() }}
     from source
 )
 

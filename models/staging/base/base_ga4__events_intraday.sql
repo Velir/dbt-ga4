@@ -11,12 +11,12 @@
 -- This model will be unioned with `base_ga4__events` which means that their columns must match
 with source as (
     select 
-        {{ ga4.base_select_source }}
+        {{ ga4.base_select_source() }}
     from {{ source('ga4', 'events_intraday') }}
 ),
 renamed as (
     select 
-        {{ ga4.base_select_renamed }}
+        {{ ga4.base_select_renamed() }}
     from source
 )
 

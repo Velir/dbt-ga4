@@ -3,7 +3,7 @@
     create schema if not exists `{{var('project')}}.{{var('dataset')}}`;
 
     -- If is_incremental, then use static_incremental_days variable to find earliest shard to copy
-    {% if is_incremental() %}
+    {% if not flags.FULL_REFRESH %}
         {% set earliest_shard_to_retrieve = (modules.datetime.date.today() - modules.datetime.timedelta(days=var('static_incremental_days')))|string|replace("-", "") %}
         
         {%- for property_id in var('property_ids') -%}
