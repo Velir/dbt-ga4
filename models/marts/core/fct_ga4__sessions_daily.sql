@@ -47,6 +47,7 @@ with session_metrics as (
         select 
             session_metrics.user_pseudo_id,
             session_metrics.stream_id,
+            {% if var('rename_streams', false) %}session_metrics.stream_name,{% endif %}
             session_metrics.session_partition_min_timestamp,
             session_metrics.session_partition_count_page_views,
             session_metrics.session_partition_count_purchases,

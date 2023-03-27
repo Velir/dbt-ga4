@@ -34,7 +34,7 @@ with page_view as (
         sum( page_engagement_denominator) as avg_engagement_time_denominator
     from {{ ref('stg_ga4__page_engaged_time') }}
     right join page_view using (page_engagement_key)
-    group by 1,2,3,4,5,6,7,8,9,10
+    group by 1,2,3,4,5,6,7,8,9,10{% if var('rename_streams', false) %},11{% endif %}
 ), scroll as (
     select
         event_date_dt,
