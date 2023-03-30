@@ -1,4 +1,8 @@
 {% macro base_select_source() %}
+    {{ return(adapter.dispatch('base_select_source', 'ga4')()) }}
+{% endmacro %}
+
+{% macro default__base_select_source() %}
     parse_date('%Y%m%d',event_date) as event_date_dt,
     event_timestamp,
     event_name,
@@ -23,8 +27,11 @@
     items,
 {% endmacro %}
 
-
 {% macro base_select_renamed() %}
+    {{ return(adapter.dispatch('base_select_renamed', 'ga4')()) }}
+{% endmacro %}
+
+{% macro default__base_select_renamed() %}
     event_date_dt,
     event_timestamp,
     lower(replace(trim(event_name), " ", "_")) as event_name, -- Clean up all event names to be snake cased
