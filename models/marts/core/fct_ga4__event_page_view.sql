@@ -59,7 +59,9 @@ select
     entrances,
     exits,
     load_time,
-    article_pubdate
+    article_pubdate,
+    ga_session_number,
+    page_engagement_key
 from {{ ref('stg_ga4__event_page_view') }}
 {% if is_incremental() %}
     {% if var('static_incremental_days', 1 ) %}

@@ -6,7 +6,10 @@
     {% endfor %}
 {% endif %}
 with base_events as (
-    select * from {{ ref('base_ga4__events')}}
+    select 
+        *,
+        {{ ga4.unnest_key('event_params', 'content_type') }} 
+    from {{ ref('base_ga4__events')}}
     {% if not flags.FULL_REFRESH %}
         where event_date_dt in ({{ partitions_to_query | join(',') }})
     {% endif %}
@@ -19,14 +22,11 @@ with base_events as (
 add_user_key as (
     select 
         *,
-        to_base64(md5(user_pseudo_id)) as user_key
-        -- in this implementation, sessions break when a user id is added or removed during a session
-        -- there is a fix in the main package, but implementing it here is a major task
-        --case
-        --    when user_id is not null then to_base64(md5(user_id))
-        --    when user_pseudo_id is not null then to_base64(md5(user_pseudo_id))
-        --    else null -- this case is reached when privacy settings are enabled
-        --end as user_key
+        case
+            when user_id is not null then to_base64(md5(user_id))
+            when user_pseudo_id is not null then to_base64(md5(user_pseudo_id))
+            else null -- this case is reached when privacy settings are enabled
+        end as user_key
     from base_events
 ), 
 -- Add unique keys for sessions and events
@@ -47,6 +47,16 @@ include_event_key as (
         to_base64(md5(CONCAT(CAST(session_key as STRING), CAST(session_event_number as STRING)))) as event_key -- Surrogate key for unique events
     from include_event_number
 ),
+include_page_key as (
+    select
+        include_event_key.*,
+        to_base64(md5(concat( cast(event_date_dt as string), page_location ))) as page_key,
+        case
+            when event_name = 'page_view' then to_base64(md5(concat(session_key, page_referrer)))
+            else to_base64(md5(concat(session_key, page_location)))
+        end as page_engagement_key
+    from include_event_key
+),
 detect_gclid as (
     select
         * except (medium, campaign),
@@ -58,7 +68,7 @@ detect_gclid as (
             when (page_location like '%gclid%' and campaign is null) then "(cpc)"
             else campaign
         end as campaign
-    from include_event_key
+    from include_page_key
 ),
 -- Remove specific query strings from page_location field
 remove_query_params as (
@@ -69,31 +79,29 @@ remove_query_params as (
         page_referrer as original_page_referrer,
         -- If there are query parameters to exclude, exclude them using regex
         {% if var('query_parameter_exclusions',none) is not none %}
-        {{remove_query_parameters('page_location',var('query_parameter_exclusions'))}} as page_location,
-        {{remove_query_parameters('page_referrer',var('query_parameter_exclusions'))}} as page_referrer
+        {{ga4.remove_query_parameters('page_location',var('query_parameter_exclusions'))}} as page_location,
+        {{ga4.remove_query_parameters('page_referrer',var('query_parameter_exclusions'))}} as page_referrer
         {% else %}
         page_location,
         page_referrer
         {% endif %}
     from detect_gclid
 ),
-include_page_key as (
-    select
-        include_event_key.*,
-        to_base64(md5(concat( cast(event_date_dt as string), page_location ))) as page_key,
-        case
-            when event_name = 'page_view' then to_base64(md5(concat(session_key, page_referrer)))
-            else to_base64(md5(concat(session_key, page_location)))
-        end as page_engagement_key        
-    from remove_query_params
-),
 enrich_params as (
     select 
-        *,
-        {{extract_hostname_from_url('page_location')}} as page_hostname,
-        {{extract_query_string_from_url('page_location')}} as page_query_string,
-    from include_page_key
+        * except(event_name),
+        {{ga4.extract_hostname_from_url('page_location')}} as page_hostname,
+        {{ga4.extract_query_string_from_url('page_location')}} as page_query_string,
+        case
+            when geo_country = 'United States' then 'US'
+            else 'Global'
+        end as mv_region,
+        case
+            when event_name = 'page_view' and content_type = "piano_modal" then 'modal_page_view'
+            when event_name = 'modal_pageview' then 'modal_page_view'
+            else event_name
+        end as event_name,
+
+    from remove_query_params
 )
-
-
-select * from enrich_params
+select * except(content_type) from enrich_params

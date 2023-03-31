@@ -1,4 +1,4 @@
- with page_view_with_params as (
+with page_view_with_params as (
    select * except(page_engagement_key),
       {{ ga4.unnest_key('event_params', 'value', 'float_value') }},
       lag(page_location, 1) over (partition by (session_key) order by event_timestamp asc) as session_previous_page,
@@ -18,12 +18,13 @@
 ),
 last_pageview_joined as (
   select 
-    page_view_with_params.* except(load_time, source,medium, campaign),
+    page_view_with_params.* except(load_time, article_pubdate),
     case
         when load_time < 0 then null
         when load_time > 100000 then null
         else load_time
     end as load_time,
+    safe_cast(article_pubdate as date) as article_pubdate,
     case
       when first_last_pageview_session.last_page_view_event_key is null then null
       else 1
@@ -34,20 +35,14 @@ last_pageview_joined as (
 ),
 session_params as (
   select
-    last_pageview_joined.* ,
-    source,
-    medium,
-    campaign,
-    default_channel_grouping,
+    last_pageview_joined.*,
+    session_source,
+    session_medium,
+    session_campaign,
+    session_channel,
     mv_author_session_status
   from {{ref('stg_ga4__sessions_traffic_sources')}}
   right join last_pageview_joined using(session_key)
-),
-last_non_direct as (
-  select 
-    *
-  from {{ref('stg_ga4__last_non_direct_attribution')}}
-  right join session_params using(session_key)
 )
 
 select * from session_params

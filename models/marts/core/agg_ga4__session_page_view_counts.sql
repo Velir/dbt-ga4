@@ -11,9 +11,9 @@
     unique_key=['event_date_dt', 'mv_region', 'session_page_view_counts']
 )
 }}
-with pv as (
+with ses as (
     select
-        event_date_dt,
+        session_start_date as event_date_dt,
         mv_region,
         case
             when count_page_views = 1 then 'one pv session'
@@ -24,10 +24,10 @@ with pv as (
             when count_page_views > 5 then 'six+ pv session'
             else null
         end as session_page_view_counts,
-        count(mv_author_session_status) as page_views,
-        countif(mv_author_session_status = 'Organic') as organic_page_views
-    from {{ref('fct_ga4__event_page_view')}}
-    where event_date_dt in ({{ partitions_to_replace | join(',') }})
+        sum(count_page_views) as page_views,
+        sum( case when mv_author_session_status = 'Organic' then count_page_views else 0 end) as organic_page_views
+    from {{ref('dim_ga4__sessions')}}
+    where session_start_date in ({{ partitions_to_replace | join(',') }})
     group by event_date_dt, mv_region, session_page_view_counts
 )
-select * from pv
+select * from ses

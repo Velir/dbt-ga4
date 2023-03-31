@@ -20,8 +20,8 @@ with ses as (
         sum(purchase_count) as purchases,
         sum(award_application_count) as award_applications,
         sum(event_registration_count) as event_registrations,
-        sum(engagement_time_msec) as total_engagement_time_msec,
-        countif(count_page_views = 1) as one_page_view_sessions
+        sum(sum_engagement_time_msec) as total_engagement_time_msec,
+        countif(count_page_views = 1) as one_page_view_sessions,
         sum(session_engaged) as engaged_sessions,
     from {{ref('dim_ga4__sessions')}}
     where session_start_date in ({{ partitions_to_replace | join(',') }})
@@ -36,7 +36,7 @@ pg as (
         sum(load_time) as total_load_time_msec,
         countif(load_time is not null) as avg_load_time_denominator
     from {{ref('fct_ga4__event_page_view')}}
-    where event_date_dt in where event_date_dt in ({{ partitions_to_replace | join(',') }})
+    where event_date_dt in ({{ partitions_to_replace | join(',') }})
     group by event_date_dt, mv_region
 )
 select

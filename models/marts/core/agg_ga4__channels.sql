@@ -8,18 +8,18 @@
 
 {{config(
     materialized='incremental',
-    unique_key=['event_date_dt', 'mv_region', 'channel']
+    unique_key=['event_date_dt', 'mv_region', 'session_channel']
 )
 }}
-with pv as (
+with ses as (
     select
-        event_date_dt,
+        session_start_date as event_date_dt,
         mv_region,
-        channel,
-        count(content_topic) as page_views,
+        session_channel,
+        count(mv_author_session_status) as page_views,
         countif(mv_author_session_status = 'Organic') as organic_page_views
-    from {{ref('fct_ga4__event_page_view')}}
-    where event_date_dt in ({{ partitions_to_replace | join(',') }})
-    group by event_date_dt, mv_region, channel
+    from {{ref('dim_ga4__sessions')}}
+    where session_start_date in ({{ partitions_to_replace | join(',') }})
+    group by event_date_dt, mv_region, session_channel
 )
-select * from pv
+select * from ses

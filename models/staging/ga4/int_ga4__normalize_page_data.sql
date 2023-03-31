@@ -18,7 +18,7 @@ from (
     content_topic,
     content_group,
     article_id,
-    article_pubdate
+    article_pubdate,
     row_number() over (partition by page_location order by count(page_title) desc) rn
     from {{ref('fct_ga4__event_page_view')}}
     {% if is_incremental() %}
@@ -26,6 +26,6 @@ from (
             where event_date_dt in ({{ partitions_to_replace | join(',') }})
         {% endif %}
     {% endif %}
-    group by 1,2,3,4,5,6
+    group by 1,2,3,4,5,6,7
 )
 where rn = 1

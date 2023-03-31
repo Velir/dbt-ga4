@@ -29,6 +29,7 @@
 with normalize as (
     select
         page_title,
+        page_location,
         author,
         content_topic,
         content_group,
@@ -41,6 +42,7 @@ pv as (
         event_date_dt,
         page_location,
         mv_region,
+        page_engagement_key,
         count(page_location) as page_views,
         countif(mv_author_session_status = 'Organic') as organic_page_views,
         count(distinct user_key) as users,
@@ -54,17 +56,18 @@ pv as (
             where event_date_dt in ({{ partitions_to_replace | join(',') }})
         {% endif %}
     {% endif %}
-    group by 1,2,3
+    group by 1,2,3,4
 ), page_engagement as (
     select
         page_engagement_key,
         sum(page_engagement_time_msec) as total_engagement_time_msec,
         sum(page_engagement_denominator) as avg_engagement_time_denominator
     from {{ ref('stg_ga4__page_engaged_time') }}
+    group by 1
 
 )
 select
     * except(page_engagement_key)
 from pv
 left join normalize using (page_location)
-left join page_engagement using page_engagement_key
+left join page_engagement using (page_engagement_key)

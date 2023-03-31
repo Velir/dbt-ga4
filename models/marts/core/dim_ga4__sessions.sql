@@ -73,7 +73,7 @@ with session_first_event as
 ),
 session_metrics as (
     select
-        session_first_event.*
+        session_key,
         countif(event_name = 'page_view') as count_page_views,
         sum(event_value_in_usd) as sum_event_value_in_usd,
         ifnull(max(session_engaged), 0) as session_engaged,
@@ -84,13 +84,13 @@ session_metrics as (
             where event_date_dt in ({{ partitions_to_replace | join(',') }})
         {% endif %}
     {% endif %}
-    group by 1,
-    left join session_first_event using (session_key)
+    group by 1
 ),
 
 join_traffic_source as (
     select 
         session_metrics.*,
+        session_first_event.* except(session_key),
         session_source,
         session_medium,
         session_source_category,
@@ -107,6 +107,7 @@ join_traffic_source as (
         last_non_direct_term,
         last_non_direct_channel
     from session_metrics
+    left join session_first_event using (session_key)
     left join {{ref('stg_ga4__sessions_traffic_sources')}} using (session_key)
     left join {{ ref ('stg_ga4__last_non_direct_attribution')}} using (session_key)
 )
@@ -122,5 +123,3 @@ join_conversions as (
 )
 select * from join_conversions
 {% endif %}
-
-select * from join_traffic_source
