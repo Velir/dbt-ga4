@@ -268,7 +268,7 @@ This package uses `pytest` as a method of unit testing individual models. More d
 
 # Overriding Default Channel Groupings
 
-By default, this package maps traffic sources to channel groupings using the `macros/default_channel_grouping.sql` macro. This macro closely adheres to Googls recommended channel groupings documented here: https://support.google.com/analytics/answer/9756891?hl=en .
+By default, this package maps traffic sources to channel groupings using the `macros/default_channel_grouping.sql` macro. This macro closely adheres to Google's recommended channel groupings documented here: https://support.google.com/analytics/answer/9756891?hl=en .
 
 Package users can override this macro and implement their own channel groupings by following these steps:
 - Create a macro in your project named `default__default_channel_grouping` that accepts the same 3 arguments: source, medium, source_category
