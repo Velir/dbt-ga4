@@ -80,7 +80,11 @@ remove_query_params as (
 include_page_key as (
     select
         include_event_key.*,
-        to_base64(md5(concat( cast(event_date_dt as string), page_location ))) as page_key
+        to_base64(md5(concat( cast(event_date_dt as string), page_location ))) as page_key,
+        case
+            when event_name = 'page_view' then to_base64(md5(concat(session_key, page_referrer)))
+            else to_base64(md5(concat(session_key, page_location)))
+        end as page_engagement_key        
     from remove_query_params
 ),
 enrich_params as (

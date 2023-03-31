@@ -46,7 +46,6 @@ pv as (
         count(distinct user_key) as users,
         sum( if(ga_session_number = 1,1,0)) as new_users,
         sum(entrances) as entrances,
-        sum(engagement_time_msec) as total_time_on_page, -- this is wrong
         sum(load_time) as total_load_time,
         count(load_time) as avg_load_time_denominator
     from {{ref('fct_ga4__event_page_view')}}
@@ -56,8 +55,16 @@ pv as (
         {% endif %}
     {% endif %}
     group by 1,2,3
+), page_engagement as (
+    select
+        page_engagement_key,
+        sum(page_engagement_time_msec) as total_engagement_time_msec,
+        sum(page_engagement_denominator) as avg_engagement_time_denominator
+    from {{ ref('stg_ga4__page_engaged_time') }}
+
 )
 select
-    *
+    * except(page_engagement_key)
 from pv
 left join normalize using (page_location)
+left join page_engagement using page_engagement_key
