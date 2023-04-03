@@ -16,13 +16,18 @@ with ses as (
         session_start_date as event_date_dt,
         mv_region,
         count(distinct session_key) as sessions,
+        countif( mv_author_session_status = 'Organic' ) as organic_sessions,
+        countif( ga_session_number > 1  ) as returning_sessions,
+        countif( mv_author_session_status = 'Organic' and ga_session_number > 1) as organic_returning_sessions,
         count(distinct user_key) as users,
+        count( distinct  (case when mv_author_session_status = 'Organic' then user_key end ) as organic_users,
         sum(purchase_count) as purchases,
         sum(award_application_count) as award_applications,
         sum(event_registration_count) as event_registrations,
         sum(sum_engagement_time_msec) as total_engagement_time_msec,
         countif(count_page_views = 1) as one_page_view_sessions,
         sum(session_engaged) as engaged_sessions,
+        sum( case when mv_author_session_status = 'Organic' then session_engaged end ) as organic_engaged_sessions,
     from {{ref('dim_ga4__sessions')}}
     where session_start_date in ({{ partitions_to_replace | join(',') }})
     group by event_date_dt, mv_region

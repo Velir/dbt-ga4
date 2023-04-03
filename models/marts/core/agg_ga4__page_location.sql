@@ -42,14 +42,15 @@ pv as (
         event_date_dt,
         page_location,
         mv_region,
-        page_engagement_key,
         count(page_location) as page_views,
         countif(mv_author_session_status = 'Organic') as organic_page_views,
         count(distinct user_key) as users,
         sum( if(ga_session_number = 1,1,0)) as new_users,
         sum(entrances) as entrances,
         sum(load_time) as total_load_time,
-        count(load_time) as avg_load_time_denominator
+        count(load_time) as avg_load_time_denominator,
+        sum(total_engagement_time_msec) as total_engagement_time_msec,
+        sum(avg_engagement_time_denominator) as avg_engagement_time_denominator
     from {{ref('fct_ga4__event_page_view')}}
     {% if is_incremental() %} -- 
         {% if var('static_incremental_days', 1 ) %}
@@ -57,17 +58,8 @@ pv as (
         {% endif %}
     {% endif %}
     group by 1,2,3,4
-), page_engagement as (
-    select
-        page_engagement_key,
-        sum(page_engagement_time_msec) as total_engagement_time_msec,
-        sum(page_engagement_denominator) as avg_engagement_time_denominator
-    from {{ ref('stg_ga4__page_engaged_time') }}
-    group by 1
-
 )
 select
-    * except(page_engagement_key)
+    *
 from pv
 left join normalize using (page_location)
-left join page_engagement using (page_engagement_key)
