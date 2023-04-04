@@ -61,6 +61,7 @@ detect_gclid as (
     select
         * except (medium, campaign),
         case
+            when (page_location like '%gclid%' and source = 'jungroup') then "display"
             when (page_location like '%gclid%' and medium is null) then "cpc"
             else medium
         end as medium,

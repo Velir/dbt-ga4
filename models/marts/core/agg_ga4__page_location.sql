@@ -57,7 +57,7 @@ pv as (
             where event_date_dt in ({{ partitions_to_replace | join(',') }})
         {% endif %}
     {% endif %}
-    group by 1,2,3,4
+    group by 1,2,3
 )
 select
     *
