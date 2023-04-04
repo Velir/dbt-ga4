@@ -30,4 +30,4 @@ with ses as (
     where session_start_date in ({{ partitions_to_replace | join(',') }})
     group by event_date_dt, mv_region, session_page_view_counts
 )
-select * from ses
+select * from ses where session_page_view_counts is not null
