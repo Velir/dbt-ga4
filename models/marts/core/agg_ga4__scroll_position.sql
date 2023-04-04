@@ -33,7 +33,7 @@ with pg as (
         event_date_dt,
         mv_region,
         scroll_position,
-        sum(count_page_views) as page_views,
+        count(mv_author_session_status) as page_views,
         sum(case when mv_author_session_status = 'Organic' then count_page_views end) as organic_page_views
     from {{ref('fct_ga4__event_page_view')}}
     {% if is_incremental() %}
