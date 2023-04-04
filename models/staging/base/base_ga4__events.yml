@@ -5,7 +5,7 @@ models:
     description: >
       Base events model that pulls all fields from raw data. Resulting table is partitioned on event_date_dt which 
       is useful in that BQ queries can be cached against this table, but not against wildcard searches from the original sharded tables. 
-      This model handels some light transformation and renaming beyond the base events model. 
+      This model handles some light transformation and renaming beyond the base events model. 
       Events are deduped by looking for duplicate event and event parameter payloads. 
       More documentation here: https://support.google.com/analytics/answer/7029846
     columns:
