@@ -39,7 +39,7 @@ with ses as (
     from {{ref('dim_ga4__sessions')}}
     {% if is_incremental() %}
         {% if var('static_incremental_days', 1 ) %}
-            where event_date_dt in ({{ partitions_to_replace | join(',') }})
+            where session_start_date in ({{ partitions_to_replace | join(',') }})
         {% endif %}
     {% endif %}
     group by event_date_dt, mv_region, session_source, session_medium
