@@ -19,7 +19,7 @@ from (
         content_group,
         article_id,
         article_pubdate,
-        row_number() over (partition by page_location order by count(page_title) desc) rn
+        row_number() over (partition by page_location order by count(author) desc) rn
     from {{ref('fct_ga4__event_page_view')}}
     {% if is_incremental() %}
         {% if var('static_incremental_days', 1 ) %}
