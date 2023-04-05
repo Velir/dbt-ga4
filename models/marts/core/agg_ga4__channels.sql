@@ -19,7 +19,11 @@ with ses as (
         count(mv_author_session_status) as page_views,
         countif(mv_author_session_status = 'Organic') as organic_page_views
     from {{ref('dim_ga4__sessions')}}
-    where session_start_date in ({{ partitions_to_replace | join(',') }})
+    {% if is_incremental() %} -- 
+        {% if var('static_incremental_days', 1 ) %}
+            where session_start_date in ({{ partitions_to_replace | join(',') }})
+        {% endif %}
+    {% endif %}
     group by event_date_dt, mv_region, session_channel
 )
 select * from ses

@@ -29,7 +29,11 @@ with ses as (
         sum(session_engaged) as engaged_sessions,
         sum( case when mv_author_session_status = 'Organic' then session_engaged end ) as organic_engaged_sessions,
     from {{ref('dim_ga4__sessions')}}
-    where session_start_date in ({{ partitions_to_replace | join(',') }})
+    {% if is_incremental() %} -- 
+        {% if var('static_incremental_days', 1 ) %}
+            where session_start_date in ({{ partitions_to_replace | join(',') }})
+        {% endif %}
+    {% endif %}
     group by event_date_dt, mv_region
 ), 
 pg as (
@@ -41,7 +45,11 @@ pg as (
         sum(load_time) as total_load_time_msec,
         countif(load_time is not null) as avg_load_time_denominator
     from {{ref('fct_ga4__event_page_view')}}
-    where event_date_dt in ({{ partitions_to_replace | join(',') }})
+    {% if is_incremental() %} -- 
+        {% if var('static_incremental_days', 1 ) %}
+            where event_date_dt in ({{ partitions_to_replace | join(',') }})
+        {% endif %}
+    {% endif %}
     group by event_date_dt, mv_region
 )
 select

@@ -19,7 +19,11 @@ with pv as (
         count(content_topic) as page_views,
         countif(mv_author_session_status = 'Organic') as organic_page_views
     from {{ref('fct_ga4__event_page_view')}}
-    where event_date_dt in ({{ partitions_to_replace | join(',') }})
+    {% if is_incremental() %} -- 
+        {% if var('static_incremental_days', 1 ) %}
+            where event_date_dt in ({{ partitions_to_replace | join(',') }})
+        {% endif %}
+    {% endif %}
     group by event_date_dt, mv_region, content_topic
 )
 select * from pv

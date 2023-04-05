@@ -27,7 +27,11 @@ with ses as (
         sum(count_page_views) as page_views,
         sum( case when mv_author_session_status = 'Organic' then count_page_views else 0 end) as organic_page_views
     from {{ref('dim_ga4__sessions')}}
-    where session_start_date in ({{ partitions_to_replace | join(',') }})
+    {% if is_incremental() %} -- 
+        {% if var('static_incremental_days', 1 ) %}
+            where session_start_date in ({{ partitions_to_replace | join(',') }})
+        {% endif %}
+    {% endif %}
     group by event_date_dt, mv_region, session_page_view_counts
 )
 select * from ses where session_page_view_counts is not null
