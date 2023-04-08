@@ -9,7 +9,7 @@
             incremental_strategy = 'insert_overwrite',
             tags = ["incremental"],
             partition_by={
-                "field": "session_start_date",
+                "field": "session_partition_date",
                 "data_type": "date",
                 "granularity": "day"
             },
@@ -23,7 +23,7 @@
             incremental_strategy = 'insert_overwrite',
             tags = ["incremental"],
             partition_by={
-                "field": "session_start_date",
+                "field": "session_partition_date",
                 "data_type": "date",
                 "granularity": "day"
             }
@@ -34,7 +34,7 @@
 with session_events as (
     select 
         session_partition_key,
-        event_date_dt as session_start_date,
+        event_date_dt as session_partition_date,
         event_timestamp,
         events.event_source,
         event_medium,
@@ -65,7 +65,7 @@ set_default_channel_grouping as (
 session_source as (
     select    
         session_partition_key,
-        session_start_date,
+        session_partition_date,
         COALESCE(FIRST_VALUE((CASE WHEN event_source <> '(direct)' THEN event_source END) IGNORE NULLS) OVER (session_window), '(direct)') AS session_source,
         COALESCE(FIRST_VALUE((CASE WHEN event_source <> '(direct)' THEN COALESCE(event_medium, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS session_medium,
         COALESCE(FIRST_VALUE((CASE WHEN event_source <> '(direct)' THEN COALESCE(source_category, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS session_source_category,

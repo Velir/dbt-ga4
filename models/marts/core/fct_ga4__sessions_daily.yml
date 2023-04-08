@@ -1,0 +1,10 @@
+version: 2
+
+models:  
+  - name: fct_ga4__sessions_daily
+    description: >
+      Incremental fact table with metrics related to daily session partitions.
+    columns:
+      - name: session_partition_key
+        tests:
+          - unique  

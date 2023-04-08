@@ -3,7 +3,7 @@ version: 2
 models:  
   - name: stg_ga4__sessions_traffic_sources_daily
     description: >
-      Incremental model that finds the source of each session daily partition. Also adds the default channel grouping information. 
+      Incremental model that finds the acquisition source of each session day partition. 
       Uses the first non-null source value as the basis for selecting the event that will be used to assign source, medium, campaign, content, and term values. 
       The session_start and first_visit events are ignored for this purpose as they contain no acquisition data. 
       Aggregated by session_partition_key.

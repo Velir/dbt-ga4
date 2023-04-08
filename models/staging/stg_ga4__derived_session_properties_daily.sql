@@ -10,7 +10,7 @@
             incremental_strategy = 'insert_overwrite',
             tags = ["incremental"],
             partition_by={
-                "field": "session_start_date",
+                "field": "session_partition_date",
                 "data_type": "date",
                 "granularity": "day"
             },
@@ -25,7 +25,7 @@
             incremental_strategy = 'insert_overwrite',
             tags = ["incremental"],
             partition_by={
-                "field": "session_start_date",
+                "field": "session_partition_date",
                 "data_type": "date",
                 "granularity": "day"
             }
@@ -37,7 +37,7 @@ with unnest_event_params as
 (
     select 
         session_partition_key
-        ,event_date_dt as session_start_date
+        ,event_date_dt as session_partition_date
         ,event_timestamp
         {% for sp in var('derived_session_properties', []) %}
             {% if sp.user_property %}
@@ -60,7 +60,7 @@ with unnest_event_params as
 
 SELECT DISTINCT
     session_partition_key
-    ,session_start_date
+    ,session_partition_date
     {% for sp in var('derived_session_properties', []) %}
         , LAST_VALUE({{ sp.user_property | default(sp.event_parameter) }} IGNORE NULLS) OVER (session_window) AS {{ sp.session_property_name }}
     {% endfor %}
