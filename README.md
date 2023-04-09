@@ -25,7 +25,8 @@ Features include:
 | stg_ga4__session_conversions_daily | Produces daily counts of conversions per session. The list of conversion events to include is configurable (see documentation below) |
 | stg_ga4__sessions_traffic_sources | Finds the first source, medium, campaign, content, paid search term (from UTM tracking), and default channel grouping for each session. |
 | dim_ga4__user_pseudo_ids | Dimension table for user devices as indicated by user_pseudo_ids. Contains attributes such as first and last page viewed.| 
-| dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and acquisition data |
+| dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and acquisition data. Can be expensive to run on large installs (see `dim_ga4__sessions_daily`) |
+| dim_ga4__sessions_daily | Query-optimized session dimension table that is incremental and partitioned on date. Assumes that each partition is contained within a single day |
 | fct_ga4__pages | Fact table for pages which aggregates common page metrics by page_location, date, and hour. |
 | fct_ga4__sessions_daily | Fact table for session metrics, partitioned by date. A single session may span multiple rows given that sessions can span multiple days.  |
 | fct_ga4__sessions | Fact table that aggregates session metrics across days. This table is not partitioned, so be mindful of performance/cost when querying. |
