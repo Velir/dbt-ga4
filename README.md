@@ -278,20 +278,18 @@ Overriding the package's default channel mapping makes use of dbt's dispatch ove
 
 # Multi-Property Support
 
-Multiple GA4 properties are supported by listing out the project IDs in the `property_ids` variable as follows;
+Multiple GA4 properties are supported by listing out the project IDs in the `property_ids` variable. Requires that `static_incremental_days` be set as well.
 
 ```
 vars:
-  property_ids: [11111111, 22222222, 33333333]
+  ga4:
+    property_ids: [11111111, 22222222, 33333333]
+    static_incremental_days: 3
 ```
 
-In a multi-site implementation, the `dataset` variable should be set to a target dataset that will contain copies of each event shard from each property. It need not match an existing property ID. The `combine_property_data` macro will run as a pre-hook to `base_ga4_events` and clone shards to the target dataset based on the `static_incremental_days` variable. 
+In a multi-site implementation, the `dataset` variable should be set to a target dataset that will contain copies of each event shard from each property. The `combine_property_data` macro will run as a pre-hook to `base_ga4_events` and clone shards to the target dataset.  The number of days' worth of data to clone during incremental runs will be based on the `static_incremental_days` variable. 
 
-Jobs that run a large number of clone operations are prone to timing out. 
-
-As a result, it is recommended that you increase the query timeout if you need to backfill or full-refresh the table, when first setting up or when the base model gets modified.  
-
-Otherwise, it is best to prevent the base model from rebuilding on full refreshes unless needed to minimize timeouts.
+Jobs that run a large number of clone operations are prone to timing out. As a result, it is recommended that you increase the query timeout if you need to backfill or full-refresh the table, when first setting up or when the base model gets modified. Otherwise, it is best to prevent the base model from rebuilding on full refreshes unless needed to minimize timeouts.
 
 ```
 models:
