@@ -8,7 +8,8 @@
 
 {{config(
     materialized='incremental',
-    unique_key=['event_date_dt', 'mv_region']
+    unique_key=['event_date_dt', 'mv_region'],
+    cluster_by= ['event_date_dt']
 )
 }}
 with ses as (

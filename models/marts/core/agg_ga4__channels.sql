@@ -8,7 +8,8 @@
 
 {{config(
     materialized='incremental',
-    unique_key=['event_date_dt', 'mv_region', 'session_channel']
+    unique_key=['event_date_dt', 'mv_region', 'session_channel'],
+    cluster_by= ['event_date_dt']
 )
 }}
 with ses as (
@@ -26,4 +27,4 @@ with ses as (
     {% endif %}
     group by event_date_dt, mv_region, session_channel
 )
-select * from ses
+select * from ses where event_date_dt is not null

@@ -59,7 +59,7 @@ pv as (
     {% endif %}
     group by 1,2,3
 )
-select
+select distinct
     *
 from pv
 left join normalize using (page_location)

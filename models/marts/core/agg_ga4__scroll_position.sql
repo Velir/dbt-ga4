@@ -43,4 +43,4 @@ with pg as (
     {% endif %}
     group by event_date_dt, mv_region, scroll_position
 )
-select * from pg
+select distinct * from pg

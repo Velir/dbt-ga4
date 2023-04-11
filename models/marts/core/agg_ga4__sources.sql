@@ -44,4 +44,4 @@ with ses as (
     {% endif %}
     group by event_date_dt, mv_region, session_source, session_medium
 )
-select * from ses
+select distinct * from ses where event_date_dt is not null

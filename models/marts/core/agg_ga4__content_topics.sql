@@ -8,7 +8,8 @@
 
 {{config(
     materialized='incremental',
-    unique_key=['event_date_dt', 'mv_region', 'content_topic']
+    unique_key=['event_date_dt', 'mv_region', 'content_topic'],
+    cluster_by= ['event_date_dt']
 )
 }}
 with pv as (
@@ -16,7 +17,7 @@ with pv as (
         event_date_dt,
         mv_region,
         content_topic,
-        count(content_topic) as page_views,
+        count(mv_author_session_status) as page_views,
         countif(mv_author_session_status = 'Organic') as organic_page_views
     from {{ref('fct_ga4__event_page_view')}}
     {% if is_incremental() %} -- 
@@ -26,4 +27,4 @@ with pv as (
     {% endif %}
     group by event_date_dt, mv_region, content_topic
 )
-select * from pv
+select distinct * from pv where event_date_dt is not null
