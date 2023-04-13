@@ -42,7 +42,7 @@ pv as (
         event_date_dt,
         page_location,
         mv_region,
-        count(page_location) as page_views,
+        count(*) as page_views,
         countif(mv_author_session_status = 'Organic') as organic_page_views,
         count(distinct user_key) as users,
         sum( if(ga_session_number = 1,1,0)) as new_users,
