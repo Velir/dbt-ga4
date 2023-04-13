@@ -89,8 +89,8 @@ session_metrics as (
 
 join_traffic_source as (
     select 
-        session_metrics.*,
-        session_first_event.* except(session_key),
+        session_first_event.*,
+        session_metrics.* except(session_key),
         session_source,
         session_medium,
         session_source_category,
@@ -106,8 +106,8 @@ join_traffic_source as (
         last_non_direct_content,
         last_non_direct_term,
         last_non_direct_channel
-    from session_metrics
-    left join session_first_event using (session_key)
+    from session_first_event
+    left join session_metrics using (session_key)
     left join {{ref('stg_ga4__sessions_traffic_sources')}} using (session_key)
     left join {{ ref ('stg_ga4__last_non_direct_attribution')}} using (session_key)
 )
