@@ -12,19 +12,26 @@
     cluster_by= ['event_date_dt']
 )
 }}
-with pv as (
+with normalize as (
+    select
+        page_location,
+        content_topic,
+    from {{ref('int_ga4__normalize_page_data')}}
+),
+pv as (
     select
         event_date_dt,
+        normalize.content_topic,
         mv_region,
-        content_topic,
-        count(mv_author_session_status) as page_views,
-        countif(mv_author_session_status = 'Organic') as organic_page_views
+        count(*) as page_views,
+        countif(mv_author_session_status = 'Organic') as organic_page_views,
     from {{ref('fct_ga4__event_page_view')}}
+    left join normalize using (page_location)
     {% if is_incremental() %} -- 
         {% if var('static_incremental_days', 1 ) %}
             where event_date_dt in ({{ partitions_to_replace | join(',') }})
         {% endif %}
     {% endif %}
-    group by event_date_dt, mv_region, content_topic
+    group by 1,2,3
 )
 select distinct * from pv where event_date_dt is not null
