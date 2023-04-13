@@ -222,6 +222,26 @@ vars:
     conversion_events:['purchase','download']
 ```
 
+# Custom Events
+
+Custom events can be generated in your project using the `create_custom_event` macro. Simply create a new model in your project and enter the following:
+
+```
+{{ ga4.create_custom_event('my_custom_event') }}
+```
+
+Note, however, that any event-specific custom parameters or default custom parameters must be defined in the global variable space as shown below:
+
+```
+vars:
+    default_custom_parameters:
+      - name: "some_parameter"
+        value_type: "string_value"
+    my_custom_event_custom_parameters:
+      - name: "some_other_parameter"
+        value_type: "string_value"
+```
+
 # Incremental Loading of Event Data (and how to handle late-arriving hits)
 
 By default, GA4 exports data into sharded event tables that use the event date as the table suffix in the format of `events_YYYYMMDD` or `events_intraday_YYYYMMDD`. This package incrementally loads data from these tables into `base_ga4__events` which is partitioned on date. There are two incremental loading strategies available:
