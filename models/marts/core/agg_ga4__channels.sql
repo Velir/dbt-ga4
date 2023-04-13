@@ -17,8 +17,8 @@ with ses as (
         session_start_date as event_date_dt,
         mv_region,
         session_channel,
-        count(mv_author_session_status) as page_views,
-        countif(mv_author_session_status = 'Organic') as organic_page_views
+        sum(count_page_views) as page_views,
+        sum(case when mv_author_session_status = 'Organic' then count_page_views else 0 end) as organic_page_views
     from {{ref('dim_ga4__sessions')}}
     {% if is_incremental() %} -- 
         {% if var('static_incremental_days', 1 ) %}
