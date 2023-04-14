@@ -36,6 +36,7 @@ with session_metrics as (
         session_key,
         session_partition_key,
         client_key,
+        stream_id,
         min(event_date_dt) as session_partition_date, -- Date of the session partition, does not represent the true session start date which, in GA4, can span multiple days
         min(event_timestamp) as session_partition_min_timestamp,
         countif(event_name = 'page_view') as session_partition_count_page_views,
@@ -52,7 +53,7 @@ with session_metrics as (
             and event_date_dt >= _dbt_max_partition
         {% endif %}
     {% endif %}
-    group by 1,2,3
+    group by 1,2,3,4
 )
 {% if var('conversion_events', false) == false %}
     select * from session_metrics
@@ -72,6 +73,7 @@ with session_metrics as (
     join_metrics_and_conversions as (
         select 
             session_metrics.client_key,
+            session_metrics.stream_id,
             session_metrics.session_partition_min_timestamp,
             session_metrics.session_partition_count_page_views,
             session_metrics.session_partition_count_purchases,
