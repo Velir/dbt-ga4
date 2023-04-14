@@ -1,5 +1,5 @@
 name: 'ga4'
-version: '3.2.0'
+version: '3.2.1'
 config-version: 2
 model-paths: ["models"]
 analysis-paths: ["analyses"]
