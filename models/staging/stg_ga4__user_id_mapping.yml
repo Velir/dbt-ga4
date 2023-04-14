@@ -5,7 +5,7 @@ models:
     description: Mapping table that contains the latest association between client_key and user_id. Unique on client_key
     columns:
       - name: client_key
-        description: Device ID obtained from GA4
+        description: Hashed combination of user_pseudo_id and stream_id
         tests:
           - not_null
           - unique
