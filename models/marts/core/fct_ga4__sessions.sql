@@ -1,9 +1,8 @@
 -- Stay mindful of performance/cost when leavin this model enabled. Making this model incremental on date is not possible because there's no way to create a single record per session AND partition on date. 
 
 select
-    user_pseudo_id,
+    client_key,
     session_key,
-    stream_id,
     min(session_partition_min_timestamp) as session_start_timestamp,
     min(session_partition_date) as session_start_date,
     sum(session_partition_count_page_views) as count_pageviews,
@@ -17,5 +16,5 @@ select
         {% endfor %}
     {% endif %}
 from {{ref('fct_ga4__sessions_daily')}}
-group by 1,2,3
+group by 1,2
 

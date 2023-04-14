@@ -1,9 +1,0 @@
-version: 2
-
-models:  
-  - name: stg_ga4__user_pseudo_id_first_last_pageviews
-    description: Captures data related to the first and last page view that each user device has completed (by user_pseudo_id).
-    columns:
-      - name: user_pseudo_id
-        tests:
-          - unique

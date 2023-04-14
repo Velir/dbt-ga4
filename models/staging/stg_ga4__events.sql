@@ -7,11 +7,11 @@ with base_events as (
     select * from {{ref('base_ga4__events_intraday')}}
     {% endif %}
 ),
--- Add unique key for sessions. session_key will be null if user_pseudo_id is null due to consent being denied. ga_session_id may be null during audience trigger events. 
+-- Add unique key for sessions. session_key will be null if client_key is null due to consent being denied. ga_session_id may be null during audience trigger events. 
 include_session_key as (
     select 
         *,
-        to_base64(md5(CONCAT(stream_id, user_pseudo_id, CAST(session_id as STRING)))) as session_key -- Surrogate key to determine unique session across streams and users. Sessions do NOT reset after midnight in GA4
+        to_base64(md5(CONCAT(client_key, CAST(session_id as STRING)))) as session_key -- Surrogate key to determine unique session across streams and users. Sessions do NOT reset after midnight in GA4
     from base_events
 ),
 -- Add a key that combines session key and date. Useful when working with session table within date-partitioned tables
