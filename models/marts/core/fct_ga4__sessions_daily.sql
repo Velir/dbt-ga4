@@ -35,7 +35,7 @@ with session_metrics as (
     select 
         session_key,
         session_partition_key,
-        user_pseudo_id,
+        client_key,
         stream_id,
         min(event_date_dt) as session_partition_date, -- Date of the session partition, does not represent the true session start date which, in GA4, can span multiple days
         min(event_timestamp) as session_partition_min_timestamp,
@@ -72,7 +72,7 @@ with session_metrics as (
     ),
     join_metrics_and_conversions as (
         select 
-            session_metrics.user_pseudo_id,
+            session_metrics.client_key,
             session_metrics.stream_id,
             session_metrics.session_partition_min_timestamp,
             session_metrics.session_partition_count_page_views,

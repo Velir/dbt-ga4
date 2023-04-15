@@ -21,8 +21,8 @@ with page_view as (
         page_title,  -- would like to move this to dim_ga4__pages but need to think how to handle page_title changing over time
         page_engagement_key,
         count(event_name) as page_views,
-        count(distinct user_pseudo_id ) as distinct_user_pseudo_ids,
-        sum( if(session_number = 1,1,0)) as new_user_pseudo_ids,
+        count(distinct client_key ) as distinct_client_keys,
+        sum( if(session_number = 1,1,0)) as new_client_keys,
         sum(entrances) as entrances,
 from {{ref('stg_ga4__event_page_view')}}
     group by 1,2,3,4,5,6,7
