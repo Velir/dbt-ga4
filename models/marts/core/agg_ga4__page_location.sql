@@ -27,7 +27,7 @@
     }}
 {% endif %}
 with normalize as (
-    select
+    select distinct
         page_title,
         page_location,
         author,
@@ -60,6 +60,7 @@ pv as (
     group by 1,2,3
 )
 select distinct
-    *
+    pv.*,
+    normalize.* except (page_location)
 from pv
 left join normalize using (page_location)
