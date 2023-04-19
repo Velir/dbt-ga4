@@ -10,7 +10,7 @@
     {%- if not should_full_refresh() -%}
         {% set earliest_shard_to_retrieve = (modules.datetime.date.today() - modules.datetime.timedelta(days=var('static_incremental_days')))|string|replace("-", "")|int %}
     {%- else -%}
-    -- Ohterwise use 'start_date' variable
+    -- Otherwise use 'start_date' variable
         {% set earliest_shard_to_retrieve = var('start_date')|int %}
     {%- endif -%}
 
