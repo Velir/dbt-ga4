@@ -311,7 +311,7 @@ vars:
 
 With these variables set, the `combine_property_data` macro will run as a pre-hook to `base_ga4_events` and clone shards to the target dataset.  The number of days' worth of data to clone during incremental runs will be based on the `static_incremental_days` variable. 
 
-Multiple-property installations treat the `"daily+streaming"` frequency setting as if it were set to `"daily"`.
+When the frequency variable is set to `daily` or `daily+streaming`, the `events_*` tables will be copied and intraday tables will be ignored. When the frequency is set to `streaming`, only the `events_intraday_*` tables will be copied.
 
 Jobs that run a large number of clone operations are prone to timing out. As a result, it is recommended that you increase the query timeout if you need to backfill or full-refresh the table, when first setting up or when the base model gets modified. Otherwise, it is best to prevent the base model from rebuilding on full refreshes unless needed to minimize timeouts.
 
