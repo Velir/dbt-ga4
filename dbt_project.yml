@@ -24,8 +24,4 @@ vars:
     dataset: "analytics_286597709"
     start_date: "20230319" # Earliest date to load
     frequency: "daily" # daily|streaming|daily+streaming. See 'Export Frequency' below. 
-    query_parameter_exclusions: ["gclid","fbclid","_ga"] 
-    default_custom_parameters:
-      - name: "new_sro_ui"
-        value_type: "string_value"
-        conversion_events:['purchase','download']
+    query_parameter_exclusions: ["gclid","fbclid","_ga"]     
