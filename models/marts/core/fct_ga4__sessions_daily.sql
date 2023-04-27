@@ -45,7 +45,7 @@ with session_metrics as (
         sum(event_value_in_usd) as session_partition_sum_event_value_in_usd,
         ifnull(max(session_engaged), 0) as session_partition_max_session_engaged,
         sum(engagement_time_msec) as session_partition_sum_engagement_time_msec,
-        min(ga_session_number) as ga_session_number
+        min(session_number) as session_number
     from {{ref('stg_ga4__events')}}
     where session_key is not null
     {% if is_incremental() %}
@@ -76,12 +76,14 @@ with session_metrics as (
         select 
             session_metrics.client_key,
             session_metrics.stream_id,
+            session_metrics.user_id,
             session_metrics.session_partition_min_timestamp,
             session_metrics.session_partition_count_page_views,
             session_metrics.session_partition_count_purchases,
             session_metrics.session_partition_sum_event_value_in_usd,
             session_metrics.session_partition_max_session_engaged,
             session_metrics.session_partition_sum_engagement_time_msec,
+            session_metrics.session_number,
             session_conversions.*
         from session_metrics left join session_conversions using (session_partition_key)
     )
