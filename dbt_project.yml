@@ -29,4 +29,3 @@ vars:
       - name: "new_sro_ui"
         value_type: "string_value"
         conversion_events:['purchase','download']
-conversion_events:['add_to_cart','generate_lead','purchase','purchase_gift_voucher']
