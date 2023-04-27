@@ -1,0 +1,18 @@
+version: 2
+
+models:  
+  - name: fct_ga4__sessions
+    description: >
+      Fact table containing metrics related to sessions. This model uses the daily partition metrics generated in fct_ga4__sessions_daily to calculate metrics for the session as a whole. Unique on session_key.
+    columns:
+      - name: session_key
+        description: >
+          Unique key assigned to sessions. Sessions can span multiple dates/partitions. 
+        tests:
+          - unique
+      - name: user_id
+        description: >
+          User ID associated with the client. Will be set to null unless explicitly assigned in the GA4 implementation. This value can change mid-session so we take the 'max' value.
+      - name: session_start_date
+        description: >
+          Date associated with the first session partition.
