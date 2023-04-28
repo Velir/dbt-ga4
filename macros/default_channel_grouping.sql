@@ -25,6 +25,7 @@ case
     or REGEXP_CONTAINS({{source}}, r"email|e-mail|e_mail|e mail") = true
     then 'Email'
   when REGEXP_CONTAINS({{medium}}, r"affiliate|affiliates") = true
+  or REGEXP_CONTAINS({{source}}, r"awin|a-win") = true
     then 'Affiliates'
   when {{source_category}} = 'SOURCE_CATEGORY_SHOPPING' and REGEXP_CONTAINS({{medium}},r"^(.*cp.*|ppc|paid.*)$")
     then 'Paid Shopping'
