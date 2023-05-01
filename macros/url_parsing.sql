@@ -7,7 +7,7 @@
 {% endmacro %}
 
 {% macro remove_query_parameters(url, parameters)%}
-{% if parameters == "*all*" %}
+{% if "*all*" in parameters %}
     regexp_replace({{url}}, r'(\?|&|#).*', '')
 {% else %}
 REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE({{url}}, '(\\?|&)({{ parameters|join("|") }})=[^&]*', '\\1'), '\\?&+', '?'), '&+', '&'), '\\?$|&$', '')

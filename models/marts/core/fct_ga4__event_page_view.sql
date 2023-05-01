@@ -28,6 +28,14 @@
         )
     }}
 {% endif %}
+with page_engagement as (
+    select
+        page_engagement_key,
+        sum(page_engagement_time_msec) as total_engagement_time_msec,
+        sum(page_engagement_denominator) as avg_engagement_time_denominator
+    from {{ ref('stg_ga4__page_engaged_time') }}
+    group by 1
+)
 select
     event_key,
     user_key,
@@ -59,8 +67,13 @@ select
     entrances,
     exits,
     load_time,
-    article_pubdate
+    article_pubdate,
+    ga_session_number,
+    page_engagement_key,
+    page_engagement.total_engagement_time_msec,
+    page_engagement.avg_engagement_time_denominator
 from {{ ref('stg_ga4__event_page_view') }}
+left join page_engagement using (page_engagement_key)
 {% if is_incremental() %}
     {% if var('static_incremental_days', 1 ) %}
         where event_date_dt in ({{ partitions_to_replace | join(',') }})
