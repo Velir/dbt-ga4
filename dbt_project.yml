@@ -25,4 +25,4 @@ vars:
     start_date: "20230319" # Earliest date to load
     frequency: "daily" # daily|streaming|daily+streaming. See 'Export Frequency' below. 
     query_parameter_exclusions: ["gclid","fbclid","_ga"] 
-    conversion_events:['purchase']
+    conversion_events: ['purchase','add_to_cart','generate_lead','purchase_gift_voucher']
