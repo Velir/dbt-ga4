@@ -22,7 +22,7 @@ vars:
   ga4:
     project: "ga4-export-381215"
     dataset: "analytics_286597709"
-    start_date: "20230420" # Earliest date to load
+    start_date: "20230319" # Earliest date to load
     frequency: "daily" # daily|streaming|daily+streaming. See 'Export Frequency' below. 
     
   
