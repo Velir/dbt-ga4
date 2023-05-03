@@ -34,11 +34,11 @@ with authors as (
         event_date_dt,
         concat(cast(extract(year from event_date_dt) as string),'-',  cast(extract(month from event_date_dt) as string)) as year_month,
         count(distinct case when date_trunc(event_date_dt, month) = date_trunc(article_pubdate, month) then page_location else null end) as articles_published_in_year_month,
-        count (geo_country) as page_views,
-        countif (geo_country = 'United States' and mv_author_session_status = 'author_payable') as us_organic_page_views,
-        countif (geo_country = 'United States' and mv_author_session_status = 'author_non_payable') as us_paid_page_views,
-        countif (geo_country != 'United States' and mv_author_session_status = 'author_payable') as global_organic_page_views,
-        countif (geo_country != 'United States' and mv_author_session_status = 'author_non_payable') as global_paid_page_views,
+        count (*) as page_views,
+        sum( case when mv_region = 'US' and mv_author_session_status = 'Organic' then 1 else 0 end ) as us_organic_page_views,
+        sum( case when mv_region = 'US' and mv_author_session_status = 'Paid' then 1 else 0 end ) as us_paid_page_views,
+        sum( case when mv_region = 'Global' and mv_author_session_status = 'Organic' then 1 else 0 end ) as global_organic_page_views,
+        sum( case when mv_region = 'Global' and mv_author_session_status = 'Paid' then 1 else 0 end ) as global_paid_page_views,
     from {{ref('fct_ga4__event_page_view')}}
     {% if is_incremental() and var('static_incremental_days', 1) %}
         where event_date_dt in ({{ partitions_to_replace | join(',') }})
