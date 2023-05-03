@@ -22,11 +22,12 @@ with base_events as (
 add_user_key as (
     select 
         *,
-        case
-            when user_id is not null then to_base64(md5(user_id))
-            when user_pseudo_id is not null then to_base64(md5(user_pseudo_id))
-            else null -- this case is reached when privacy settings are enabled
-        end as user_key
+        --case
+        --    when user_id is not null then to_base64(md5(user_id))
+        --    when user_pseudo_id is not null then to_base64(md5(user_pseudo_id))
+        --    else null -- this case is reached when privacy settings are enabled
+        --end as user_key
+        to_base64(md5(user_pseudo_id)) as user_key
     from base_events
 ), 
 -- Add unique keys for sessions and events
