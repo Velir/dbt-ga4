@@ -27,9 +27,9 @@ with page_view as (
 from {{ref('stg_ga4__event_page_view')}}
 {% if is_incremental() %}
     {% if var('static_incremental_days', false)  %}
-        and event_date_dt in ({{ partitions_to_replace | join(',') }})
+        where event_date_dt in ({{ partitions_to_replace | join(',') }})
     {% else %}
-        and event_date_dt >= _dbt_max_partition
+        where event_date_dt >= _dbt_max_partition
     {% endif %}
 {% endif %}
     group by 1,2,3,4,5,6,7
@@ -50,9 +50,9 @@ from {{ref('stg_ga4__event_page_view')}}
     from {{ref('stg_ga4__event_scroll')}}
     {% if is_incremental() %}
         {% if var('static_incremental_days', false)  %}
-            and event_date_dt in ({{ partitions_to_replace | join(',') }})
+            where event_date_dt in ({{ partitions_to_replace | join(',') }})
         {% else %}
-            and event_date_dt >= _dbt_max_partition
+            where event_date_dt >= _dbt_max_partition
         {% endif %}
     {% endif %}
     group by 1,2,3
