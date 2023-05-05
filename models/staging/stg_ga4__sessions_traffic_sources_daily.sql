@@ -33,6 +33,7 @@
 
 with session_events as (
     select 
+        client_key,
         session_partition_key,
         event_date_dt as session_partition_date,
         event_timestamp,
@@ -64,6 +65,7 @@ set_default_channel_grouping as (
 ),
 session_source as (
     select    
+        client_key,
         session_partition_key,
         session_partition_date,
         COALESCE(FIRST_VALUE((CASE WHEN event_source <> '(direct)' THEN event_source END) IGNORE NULLS) OVER (session_window), '(direct)') AS session_source,
