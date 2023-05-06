@@ -1,13 +1,20 @@
+{% set partitions_to_replace = ['current_date'] %}
+{% if var('static_incremental_days', false)%}
+    {% for i in range(var('static_incremental_days')) %}
+        {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
+    {% endfor %}
+{% endif %}
 {{
     config(
         materialized = 'incremental',
         incremental_strategy = 'insert_overwrite',
         tags = ["incremental"],
         partition_by={
-        "field": "event_date_dt",
-        "data_type": "date",
-        "granularity": "day"
-        }
+            "field": "event_date_dt",
+            "data_type": "date",
+            "granularity": "day"
+        },
+        partitions = partitions_to_replace
     )
 }}
 
