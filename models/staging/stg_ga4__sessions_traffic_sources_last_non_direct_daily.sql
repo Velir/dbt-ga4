@@ -37,7 +37,7 @@ with last_non_direct_session_partition_key as (
           last_value(non_direct_session_partition_key ignore nulls) over(
           partition by client_key
           order by
-              UNIX_MICROS(TIMESTAMP(session_partition_date)) range between 2592000000000 preceding --TODO need to work with session start timestamp, not date
+              session_partition_timestamp range between 2592000000000 preceding
               and current row -- 30 day lookback
           )
       ELSE non_direct_session_partition_key

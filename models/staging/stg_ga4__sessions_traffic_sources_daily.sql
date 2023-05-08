@@ -63,11 +63,12 @@ set_default_channel_grouping as (
         ,{{ga4.default_channel_grouping('event_source','event_medium','source_category')}} as default_channel_grouping
     from session_events
 ),
-session_source as (
+first_session_source as (
     select    
         client_key
         ,session_partition_key
         ,session_partition_date
+        ,event_timestamp
         ,COALESCE(FIRST_VALUE((CASE WHEN event_source <> '(direct)' THEN event_source END) IGNORE NULLS) OVER (session_window), '(direct)') AS session_source
         ,COALESCE(FIRST_VALUE((CASE WHEN event_source <> '(direct)' THEN COALESCE(event_medium, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS session_medium
         ,COALESCE(FIRST_VALUE((CASE WHEN event_source <> '(direct)' THEN COALESCE(source_category, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS session_source_category
@@ -75,9 +76,29 @@ session_source as (
         ,COALESCE(FIRST_VALUE((CASE WHEN event_source <> '(direct)' THEN COALESCE(event_content, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS session_content
         ,COALESCE(FIRST_VALUE((CASE WHEN event_source <> '(direct)' THEN COALESCE(event_term, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS session_term
         ,COALESCE(FIRST_VALUE((CASE WHEN event_source <> '(direct)' THEN COALESCE(default_channel_grouping, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS session_default_channel_grouping
-        ,if(event_source <> '(direct)', session_partition_key, null) as non_direct_session_partition_key --provide the session_partition_key only if source is not direct. Useful for last non-direct attribution modeling
     from set_default_channel_grouping
     WINDOW session_window AS (PARTITION BY session_partition_key ORDER BY event_timestamp ASC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+),
+find_non_direct_session_partition_key as (
+
+    select 
+        *
+        ,if(session_source <> '(direct)', session_partition_key, null) as non_direct_session_partition_key --provide the session_partition_key only if source is not direct. Useful for last non-direct attribution modeling
+    from first_session_source
 )
 
-select distinct * from session_source
+select 
+        client_key
+        ,session_partition_key
+        ,session_partition_date
+        ,session_source
+        ,session_medium
+        ,session_source_category
+        ,session_campaign
+        ,session_content
+        ,session_term
+        ,session_default_channel_grouping
+        ,non_direct_session_partition_key
+        ,min(event_timestamp) as session_partition_timestamp
+from find_non_direct_session_partition_key
+group by 1,2,3,4,5,6,7,8,9,10,11
