@@ -1,3 +1,23 @@
+{% if var('static_incremental_days', false ) %}
+    {% set partitions_to_replace = ['current_date'] %}
+    {% for i in range(var('static_incremental_days')) %}
+        {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
+    {% endfor %}
+    {{
+        config(
+            materialized = 'incremental',
+            incremental_strategy = 'insert_overwrite',
+            tags = ["incremental"],
+            partition_by={
+                "field": "session_partition_date",
+                "data_type": "date",
+                "granularity": "day"
+            },
+            partitions = partitions_to_replace
+        )
+    }}
+{% endif %}
+
 with last_non_direct_session_partition_key as (
   select
     client_key
@@ -23,7 +43,11 @@ with last_non_direct_session_partition_key as (
       ELSE non_direct_session_partition_key
     END as session_partition_key_last_non_direct,
   from
-    {{ref('stg_ga4__sessions_traffic_sources_daily')}}
+  {{ref('stg_ga4__sessions_traffic_sources_daily')}}
+  {% if is_incremental() %}
+      -- Add 30 to static_incremental_days to include the session attribution lookback window
+      where session_partition_date >= date_sub(current_date, interval ({{var('static_incremental_days')}}+30) day)
+  {% endif %}
 )
 ,join_last_non_direct_session_source as (
   select
@@ -48,7 +72,10 @@ with last_non_direct_session_partition_key as (
   from last_non_direct_session_partition_key
   left join {{ref('stg_ga4__sessions_traffic_sources_daily')}} last_non_direct_source on
     last_non_direct_session_partition_key.session_partition_key_last_non_direct = last_non_direct_source.session_partition_key
-
+  {% if is_incremental() %}
+      -- Only keep the records in the partitions we wish to replace (as opposed to the whole 30 day lookback window)
+      where last_non_direct_session_partition_key.session_partition_date in ({{ partitions_to_replace | join(',') }})
+  {% endif %}
 )
 
 select * from join_last_non_direct_session_source
