@@ -10,9 +10,9 @@ A,D,20230508,1683580559,(direct),,,,,,,
 """.lstrip()
 
 expected_csv = """client_key,session_partition_key,session_partition_date,session_source,session_medium,session_source_category,session_campaign,session_content,session_term,session_default_channel_grouping,session_partition_key_last_non_direct,session_source_last_non_direct,session_medium_last_non_direct,session_source_category_last_non_direct,session_campaign_last_non_direct,session_content_last_non_direct,session_term_last_non_direct,session_default_channel_grouping_last_non_direct
-A,A,20230507,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,default_channel_grouping_a,A,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,default_channel_grouping_a
-A,B,20230508,(direct),,,,,,,A,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,default_channel_grouping_a
-A,C,20230507,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,default_channel_grouping_a,A,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,default_channel_grouping_a
+A,A,20230505,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,default_channel_grouping_a,A,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,default_channel_grouping_a
+A,B,20230506,(direct),,,,,,,A,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,default_channel_grouping_a
+A,C,20230507,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,default_channel_grouping_a,C,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,default_channel_grouping_a
 A,D,20230508,(direct),,,,,,,C,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,default_channel_grouping_a
 """.lstrip()
 
@@ -36,5 +36,4 @@ class TestSessionsTrafficSourcesLastNonDirectDaily():
     
     def test_mock_run_and_check(self, project):
         run_dbt(["build"])
-        breakpoint()
         check_relations_equal(project.adapter, ["actual", "expected"])
