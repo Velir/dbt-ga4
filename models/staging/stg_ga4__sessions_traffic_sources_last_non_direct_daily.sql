@@ -62,13 +62,13 @@ with last_non_direct_session_partition_key as (
     ,last_non_direct_session_partition_key.session_term
     ,last_non_direct_session_partition_key.session_default_channel_grouping
     ,last_non_direct_session_partition_key.session_partition_key_last_non_direct
-    ,last_non_direct_source.session_source as session_source_last_non_direct
-    ,last_non_direct_source.session_medium as session_medium_last_non_direct
-    ,last_non_direct_source.session_source_category as session_source_category_last_non_direct
-    ,last_non_direct_source.session_campaign as session_campaign_last_non_direct
-    ,last_non_direct_source.session_content as session_content_last_non_direct
-    ,last_non_direct_source.session_term as session_term_last_non_direct
-    ,last_non_direct_source.session_default_channel_grouping as session_default_channel_grouping_last_non_direct
+    ,coalesce(last_non_direct_source.session_source, '(direct)') as session_source_last_non_direct -- Value will be null if only direct sessions are within the lookback window
+    ,coalesce(last_non_direct_source.session_medium, '(none)') as session_medium_last_non_direct
+    ,coalesce(last_non_direct_source.session_source_category, '(none)') as session_source_category_last_non_direct
+    ,coalesce(last_non_direct_source.session_campaign, '(none)') as session_campaign_last_non_direct
+    ,coalesce(last_non_direct_source.session_content, '(none)') as session_content_last_non_direct
+    ,coalesce(last_non_direct_source.session_term, '(none)') as session_term_last_non_direct
+    ,coalesce(last_non_direct_source.session_default_channel_grouping, '(none)') as session_default_channel_grouping_last_non_direct
   from last_non_direct_session_partition_key
   left join {{ref('stg_ga4__sessions_traffic_sources_daily')}} last_non_direct_source on
     last_non_direct_session_partition_key.session_partition_key_last_non_direct = last_non_direct_source.session_partition_key
