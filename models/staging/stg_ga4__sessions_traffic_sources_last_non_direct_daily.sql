@@ -1,4 +1,4 @@
-{% if var('static_incremental_days', 3) %}
+{% if var('static_incremental_days',false) %}
     {% set partitions_to_replace = ['current_date'] %}
     {% for i in range(var('static_incremental_days',3)) %}
         {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
@@ -62,13 +62,13 @@ with last_non_direct_session_partition_key as (
     ,last_non_direct_session_partition_key.session_term
     ,last_non_direct_session_partition_key.session_default_channel_grouping
     ,last_non_direct_session_partition_key.session_partition_key_last_non_direct
-    ,coalesce(last_non_direct_source.session_source, '(direct)') as session_source_last_non_direct -- Value will be null if only direct sessions are within the lookback window
-    ,coalesce(last_non_direct_source.session_medium, '(none)') as session_medium_last_non_direct
-    ,coalesce(last_non_direct_source.session_source_category, '(none)') as session_source_category_last_non_direct
-    ,coalesce(last_non_direct_source.session_campaign, '(none)') as session_campaign_last_non_direct
-    ,coalesce(last_non_direct_source.session_content, '(none)') as session_content_last_non_direct
-    ,coalesce(last_non_direct_source.session_term, '(none)') as session_term_last_non_direct
-    ,coalesce(last_non_direct_source.session_default_channel_grouping, '(none)') as session_default_channel_grouping_last_non_direct
+    ,coalesce(last_non_direct_source.session_source, '(direct)') as last_non_direct_source -- Value will be null if only direct sessions are within the lookback window
+    ,coalesce(last_non_direct_source.session_medium, '(none)') as last_non_direct_medium
+    ,coalesce(last_non_direct_source.session_source_category, '(none)') as last_non_direct_source_category
+    ,coalesce(last_non_direct_source.session_campaign, '(none)') as last_non_direct_campaign
+    ,coalesce(last_non_direct_source.session_content, '(none)') as last_non_direct_content
+    ,coalesce(last_non_direct_source.session_term, '(none)') as last_non_direct_term
+    ,coalesce(last_non_direct_source.session_default_channel_grouping, '(none)') as last_non_direct_default_channel_grouping
   from last_non_direct_session_partition_key
   left join {{ref('stg_ga4__sessions_traffic_sources_daily')}} last_non_direct_source on
     last_non_direct_session_partition_key.session_partition_key_last_non_direct = last_non_direct_source.session_partition_key

@@ -92,13 +92,13 @@ with event_dimensions as
         session_default_channel_grouping,
         session_source_category,
         -- last non-direct traffic sources
-        session_source_last_non_direct,
-        session_medium_last_non_direct,
-        session_campaign_last_non_direct,
-        session_content_last_non_direct,
-        session_term_last_non_direct,
-        session_default_channel_grouping_last_non_direct,
-        session_source_category_last_non_direct
+        last_non_direct_source,
+        last_non_direct_medium,
+        last_non_direct_campaign,
+        last_non_direct_content,
+        last_non_direct_term,
+        last_non_direct_default_channel_grouping,
+        last_non_direct_source_category
     from {{ref('stg_ga4__sessions_traffic_sources_last_non_direct_daily')}}
     where 1=1
     {% if is_incremental() %}
@@ -177,13 +177,13 @@ with event_dimensions as
         session_default_channel_grouping,
         session_source_category,
         -- last non-direct traffic sources
-        session_source_last_non_direct,
-        session_medium_last_non_direct,
-        session_campaign_last_non_direct,
-        session_content_last_non_direct,
-        session_term_last_non_direct,
-        session_default_channel_grouping_last_non_direct,
-        session_source_category_last_non_direct
+        last_non_direct_source,
+        last_non_direct_medium,
+        last_non_direct_campaign,
+        last_non_direct_content,
+        last_non_direct_term,
+        last_non_direct_default_channel_grouping,
+        last_non_direct_source_category
     from session_dimensions
     left join traffic_sources sessions_traffic_sources using (session_partition_key)
 )
