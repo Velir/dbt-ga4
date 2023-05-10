@@ -14,11 +14,11 @@ models:
         description: First non-null source value of the session
         tests:
           - not_null
-      - name: session_source_last_non_direct
+      - name: last_non_direct_source
         description: The the most recent non-direct traffic source within a 30-day lookback window.
         tests:
           - not_null
-      - name: session_default_channel_grouping_last_non_direct
+      - name: last_non_direct_default_channel_grouping
         description: The the most recent non-direct channel grouping within a 30-day lookback window.
         tests:
           - not_null
