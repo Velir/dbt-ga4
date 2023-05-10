@@ -326,3 +326,6 @@ models:
         base_ga4__events:
           +full_refresh: false
 ```
+# dbt Stlye Guide
+
+This package attempts to adhere to the Brooklyn Data style guide found [here](https://github.com/brooklyn-data/co/blob/main/sql_style_guide.md). This work is in-progress. 
