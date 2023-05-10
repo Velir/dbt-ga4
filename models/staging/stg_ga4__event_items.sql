@@ -3,6 +3,7 @@ with items_with_params as (
         event_key,
         event_name,
         event_date_dt,
+        stream_id,
         i.item_id,
         i.item_name,
         i.item_brand,
