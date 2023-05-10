@@ -1,6 +1,6 @@
-{% if var('static_incremental_days', false ) %}
+{% if var('static_incremental_days', 3) %}
     {% set partitions_to_replace = ['current_date'] %}
-    {% for i in range(var('static_incremental_days')) %}
+    {% for i in range(var('static_incremental_days',3)) %}
         {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
     {% endfor %}
     {{
@@ -37,8 +37,8 @@ with last_non_direct_session_partition_key as (
           last_value(non_direct_session_partition_key ignore nulls) over(
           partition by client_key
           order by
-              session_partition_timestamp range between 2592000000000 preceding
-              and current row -- 30 day lookback
+              session_partition_timestamp range between {{var('session_attribution_lookback_window_days', 30 ) * 24 * 60 * 60 * 1000000 }} preceding
+              and current row -- lookback window 
           )
       ELSE non_direct_session_partition_key
     END as session_partition_key_last_non_direct,
@@ -46,7 +46,7 @@ with last_non_direct_session_partition_key as (
   {{ref('stg_ga4__sessions_traffic_sources_daily')}}
   {% if is_incremental() %}
       -- Add 30 to static_incremental_days to include the session attribution lookback window
-      where session_partition_date >= date_sub(current_date, interval ({{var('static_incremental_days')}}+30) day)
+      where session_partition_date >= date_sub(current_date, interval ({{var('static_incremental_days',3) + var('session_attribution_lookback_window_days', 30 )}} ) day)
   {% endif %}
 )
 ,join_last_non_direct_session_source as (

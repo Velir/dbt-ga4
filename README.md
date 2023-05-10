@@ -225,6 +225,16 @@ vars:
     conversion_events:['purchase','download']
 ```
 
+### Session Attribution Lookback Window
+
+The `stg_ga4__sessions_traffic_sources_last_non_direct_daily` model provides last non-direct session attribution within a configurable lookback window. The default is 30 days, but this can be overridden with the `session_attribution_lookback_window_days` variable.
+
+```
+vars:
+  ga4:
+    session_attribution_lookback_window_days: 90
+```
+
 # Custom Events
 
 Custom events can be generated in your project using the `create_custom_event` macro. Simply create a new model in your project and enter the following:
