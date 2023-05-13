@@ -7,6 +7,7 @@ Features include:
 - Conversion of sharded event tables into a single partitioned table
 - Incremental loading of GA4 data into your staging tables 
 - Page, session and user dimensional models with conversion counts
+- Last non-direct session attribution
 - Simple methods for accessing query parameters (like UTM params) or filtering query parameters (like click IDs)
 - Support for custom event parameters & user properties
 - Mapping from source/medium to default channel grouping
@@ -24,6 +25,8 @@ Features include:
 | stg_ga4__derived_session_properties | Finds the most recent occurance of specific event_params or user_properties value and assigns them to a session's session_key. Derived session properties are specified as variables (see documentation below) |
 | stg_ga4__session_conversions_daily | Produces daily counts of conversions per session. The list of conversion events to include is configurable (see documentation below) |
 | stg_ga4__sessions_traffic_sources | Finds the first source, medium, campaign, content, paid search term (from UTM tracking), and default channel grouping for each session. |
+| stg_ga4__sessions_traffic_sources_daily | Same data as stg_ga4__sessions_traffic_sources, but partitioned by day to allow for efficient loading and querying of data. |
+| stg_ga4__sessions_traffic_sources_last_non_direct_daily | Finds the last non-direct source attributed to each session within a 30-day lookback window. Assumes each session is contained within a day. |
 | dim_ga4__client_keys | Dimension table for user devices as indicated by client_keys. Contains attributes such as first and last page viewed.| 
 | dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and acquisition data. Can be expensive to run on large installs (see `dim_ga4__sessions_daily`) |
 | dim_ga4__sessions_daily | Query-optimized session dimension table that is incremental and partitioned on date. Assumes that each partition is contained within a single day |
@@ -46,7 +49,7 @@ To pull the latest stable release along with minor updates, add the following to
 ```
 packages:
   - package: Velir/ga4
-    version: [">=3.0.0", "<3.2.0"]
+    version: [">=3.2.0", "<3.3.0"]
 ```
 
 ## Install From main branch on GitHub
@@ -222,6 +225,16 @@ vars:
     conversion_events:['purchase','download']
 ```
 
+### Session Attribution Lookback Window
+
+The `stg_ga4__sessions_traffic_sources_last_non_direct_daily` model provides last non-direct session attribution within a configurable lookback window. The default is 30 days, but this can be overridden with the `session_attribution_lookback_window_days` variable.
+
+```
+vars:
+  ga4:
+    session_attribution_lookback_window_days: 90
+```
+
 # Custom Events
 
 Custom events can be generated in your project using the `create_custom_event` macro. Simply create a new model in your project and enter the following:
@@ -323,3 +336,6 @@ models:
         base_ga4__events:
           +full_refresh: false
 ```
+# dbt Stlye Guide
+
+This package attempts to adhere to the Brooklyn Data style guide found [here](https://github.com/brooklyn-data/co/blob/main/sql_style_guide.md). This work is in-progress. 
