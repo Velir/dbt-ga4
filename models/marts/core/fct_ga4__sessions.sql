@@ -1,4 +1,4 @@
--- Stay mindful of performance/cost when using this model. Making this model partitioned on date is not possible because there's no way to create a single record per session AND partition on date. 
+-- Stay mindful of performance/cost when using this model. Making this model partitioned on date is not possible because there's no way to create a single record per session AND partition on date.
 
 select
     client_key,
@@ -15,7 +15,7 @@ select
     min(session_number) as session_number
     {% if var('conversion_events', false) %}
         {% for ce in var('conversion_events',[]) %}
-            , sum({{ce}}_count) as count_{{ce}}
+            , sum({{ga4.conversion_event_column_name(ce, '', '_count')}}) as {{ga4.conversion_event_column_name(ce, 'count_', '')}}
         {% endfor %}
     {% endif %}
 from {{ref('fct_ga4__sessions_daily')}}
