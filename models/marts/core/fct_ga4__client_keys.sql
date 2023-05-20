@@ -11,7 +11,7 @@ select
     count(distinct session_key)  as count_sessions
     {% if var('conversion_events', false) %}
         {% for ce in var('conversion_events',[]) %}
-            , sum(count_{{ce}}) as count_{{ce}}
+            , sum({{ga4.conversion_event_column_name(ce, 'count_', '')}}) as {{ga4.conversion_event_column_name(ce, 'count_', '')}}
         {% endfor %}
     {% endif %}
 from {{ref('fct_ga4__sessions')}}
