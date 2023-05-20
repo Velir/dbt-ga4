@@ -20,15 +20,7 @@ A,A2022-01-02,2022-01-02,1
 
 actual = read_file('../models/staging/stg_ga4__session_conversions_daily.sql')
 
-mock_macro = """
-{% macro conversion_event_column_name(event_name, prefix, suffix) %}
-    {% if var('conversion_event_renamers', false) and var('conversion_event_renamers')[event_name] %}
-        {{prefix}}{{var('conversion_event_renamers')[event_name]}}{{suffix}}
-    {% else %}
-        {{prefix}}{{event_name}}{{suffix}}
-    {% endif %}
-{% endmacro %}
-"""
+macro = read_file('../macros/conversion_event_column_name.sql')
 
 class TestUsersFirstLastEvents():
     # everything that goes in the "seeds" directory (= CSV format)
@@ -49,7 +41,7 @@ class TestUsersFirstLastEvents():
     @pytest.fixture(scope="class")
     def macros(self):
         return {
-            "conversion_event_column_name.sql": mock_macro
+            "conversion_event_column_name.sql": macro
         }
 
     def test_mock_run_and_check(self, project):
