@@ -225,6 +225,17 @@ vars:
     conversion_events:['purchase','download']
 ```
 
+By specifying `conversion_event_column_renamers`, you can optionally rename the output column. This can be used when the conversion event name is a special character that does not correspond to a column.
+
+```
+vars:
+  ga4:
+    conversion_events:['purchase(item)']
+    conversion_event_column_renamers:
+      purchase(item): "purchase_item"
+```
+
+
 ### Session Attribution Lookback Window
 
 The `stg_ga4__sessions_traffic_sources_last_non_direct_daily` model provides last non-direct session attribution within a configurable lookback window. The default is 30 days, but this can be overridden with the `session_attribution_lookback_window_days` variable.
