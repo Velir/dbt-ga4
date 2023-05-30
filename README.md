@@ -182,7 +182,7 @@ vars:
 
 Derived session properties are similar to derived user properties, but on a per-session basis, for properties that change slowly over time. This provides additional flexibility in allowing users to turn any event parameter into a session property. 
 
-Derived Session Properties are included in the `dim_ga4__sessions` and `db_ga4__sessions_daily` models and contain the latest event parameter or user property value per session.
+Derived Session Properties are included in the `dim_ga4__sessions` and `dim_ga4__sessions_daily` models and contain the latest event parameter or user property value per session.
 
 ```
 derived_session_properties:
