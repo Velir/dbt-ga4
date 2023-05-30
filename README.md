@@ -49,7 +49,7 @@ To pull the latest stable release along with minor updates, add the following to
 ```
 packages:
   - package: Velir/ga4
-    version: [">=3.2.0", "<3.3.0"]
+    version: [">=4.0.0", "<4.1.0"]
 ```
 
 ## Install From main branch on GitHub
