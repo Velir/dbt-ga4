@@ -6,11 +6,16 @@
 
     create schema if not exists `{{var('project')}}.{{var('dataset')}}`;
 
+    -- Something in how dbt processes macros in pre-hooks causes code without line breaks to appear on a single line in production but not development
+    -- This results in code that we want to be commented out when there isn't a blank line after, but only in production
+    -- ALWAYS ADD AN EMPTY LINE AFTER A COMMENT
     -- If incremental, then use static_incremental_days variable to find earliest shard to copy
+
     {%- if not should_full_refresh() -%}
         {% set earliest_shard_to_retrieve = (modules.datetime.date.today() - modules.datetime.timedelta(days=var('static_incremental_days')))|string|replace("-", "")|int %}
     {%- else -%}
     -- Otherwise use 'start_date' variable
+
         {% set earliest_shard_to_retrieve = var('start_date')|int %}
     {%- endif -%}
 
