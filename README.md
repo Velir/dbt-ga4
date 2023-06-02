@@ -49,7 +49,7 @@ To pull the latest stable release along with minor updates, add the following to
 ```
 packages:
   - package: Velir/ga4
-    version: [">=3.2.0", "<3.3.0"]
+    version: [">=4.0.0", "<4.1.0"]
 ```
 
 ## Install From main branch on GitHub
@@ -182,7 +182,7 @@ vars:
 
 Derived session properties are similar to derived user properties, but on a per-session basis, for properties that change slowly over time. This provides additional flexibility in allowing users to turn any event parameter into a session property. 
 
-Derived Session Properties are included in the `fct_ga4__sessions` model and contain the latest event parameter or user property value per session.
+Derived Session Properties are included in the `dim_ga4__sessions` and `dim_ga4__sessions_daily` models and contain the latest event parameter or user property value per session.
 
 ```
 derived_session_properties:
