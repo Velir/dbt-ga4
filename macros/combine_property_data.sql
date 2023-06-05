@@ -7,12 +7,13 @@
     create schema if not exists `{{var('project')}}.{{var('dataset')}}`;
 
     -- If incremental, then use static_incremental_days variable to find earliest shard to copy
-    {%- if not should_full_refresh() -%}
+    {% if not should_full_refresh() %}
         {% set earliest_shard_to_retrieve = (modules.datetime.date.today() - modules.datetime.timedelta(days=var('static_incremental_days')))|string|replace("-", "")|int %}
-    {%- else -%}
+    {% else %}
     -- Otherwise use 'start_date' variable
+
         {% set earliest_shard_to_retrieve = var('start_date')|int %}
-    {%- endif -%}
+    {% endif %}
 
     {% for property_id in var('property_ids') %}
         {%- set schema_name = "analytics_" + property_id|string -%}
