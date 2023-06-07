@@ -75,7 +75,7 @@ detect_gclid as (
 remove_query_params as (
 
     select 
-        * EXCEPT (page_location, page_referrer),
+        * EXCEPT (page_location, page_referrer, engagement_time_msec),
         page_location as original_page_location,
         page_referrer as original_page_referrer,
         -- If there are query parameters to exclude, exclude them using regex
