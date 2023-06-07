@@ -82,11 +82,15 @@ remove_query_params as (
         -- If there are query parameters to exclude, exclude them using regex
         {% if var('query_parameter_exclusions',none) is not none %}
         {{ga4.remove_query_parameters('page_location',var('query_parameter_exclusions'))}} as page_location,
-        {{ga4.remove_query_parameters('page_referrer',var('query_parameter_exclusions'))}} as page_referrer
+        {{ga4.remove_query_parameters('page_referrer',var('query_parameter_exclusions'))}} as page_referrer,
         {% else %}
         page_location,
-        page_referrer
+        page_referrer,
         {% endif %}
+        case
+            when engagement_time_msec >  1800000 then 0
+            else engagement_time_msec
+        end as engagement_time_msec
     from detect_gclid
 ),
 enrich_params as (
