@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: ga
+    database: "{{var('project')}}" 
+    schema: "{{var('dataset')}}" 
+    tables:
+      - name: events
+        identifier: "events_*" #Scan across all sharded event tables. Use the 'start_date' variable to limit this scan
+        description: Main events table exported by GA4. Sharded by date.
