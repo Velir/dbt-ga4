@@ -336,6 +336,29 @@ models:
         base_ga4__events:
           +full_refresh: false
 ```
+
+# Multiple GCP Projects Support
+
+If your GA4 properties are stored in distinct projects, and/or if you want to store your GA4 sources in a different Project than the resulting dbt models you could use the following configuration.
+
+
+In this scenario, the `property_ids` variable contains a list of dictionnaries where the `project` and `property_id` variables are defined. The Multi-property mechanism will apply - see previous section. More specifically, you need to defined the `static_incremental_days` and `dataset` (where the combined dataset will be created).
+
+```
+vars:
+  ga4:
+    property_ids: 
+      - project: 'gcp_project_1'
+        property_id: 11111111
+      - project: 'gcp_project_2'
+        property_id: 22222222
+
+    static_incremental_days: 3
+    dataset: "my_combined_dataset"
+```
+
+
+
 # dbt Stlye Guide
 
 This package attempts to adhere to the Brooklyn Data style guide found [here](https://github.com/brooklyn-data/co/blob/main/sql_style_guide.md). This work is in-progress. 
