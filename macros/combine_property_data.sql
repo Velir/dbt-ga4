@@ -34,21 +34,21 @@
     {% for property_item in property_dict_lst %}
         {%- set schema_name = "analytics_" + property_item['property_id']|string -%}
         
-        -- Copy daily tables
+        {#  Copy daily tables #}
         {%- set relations = dbt_utils.get_relations_by_pattern(schema_pattern=schema_name, table_pattern='events_intraday_%', database=property_item['project']) -%}
         {% for relation in relations %}
             {%- set relation_suffix = relation.identifier|replace('events_intraday_', '') -%}
             {%- if relation_suffix|int >= earliest_shard_to_retrieve|int -%}
-                CREATE OR REPLACE TABLE `{{property_item['project']}}.{{var('dataset')}}.events_intraday_{{relation_suffix}}{{property_item['property_id']}}` CLONE `{{property_item['project']}}.analytics_{{property_item['property_id']}}.events_intraday_{{relation_suffix}}`;
+                CREATE OR REPLACE TABLE `{{var('project')}}.{{var('dataset')}}.events_intraday_{{relation_suffix}}{{property_item['property_id']}}` CLONE `{{property_item['project']}}.analytics_{{property_item['property_id']}}.events_intraday_{{relation_suffix}}`;
             {%- endif -%}
         {% endfor %}
 
-        -- Copy intraday tables
+        {# Copy intraday tables #}
         {%- set relations = dbt_utils.get_relations_by_pattern(schema_pattern=schema_name, table_pattern='events_%', exclude='events_intraday_%', database=property_item['project']) -%}
         {% for relation in relations %}
             {%- set relation_suffix = relation.identifier|replace('events_', '') -%}
             {%- if relation_suffix|int >= earliest_shard_to_retrieve|int -%}
-                CREATE OR REPLACE TABLE `{{property_item['project']}}.{{var('dataset')}}.events_{{relation_suffix}}{{property_item['property_id']}}` CLONE `{{property_item['project']}}.analytics_{{property_item['property_id']}}.events_{{relation_suffix}}`;
+                CREATE OR REPLACE TABLE `{{var('project')}}.{{var('dataset')}}.events_{{relation_suffix}}{{property_item['property_id']}}` CLONE `{{property_item['project']}}.analytics_{{property_item['property_id']}}.events_{{relation_suffix}}`;
             {%- endif -%}
         {% endfor %}
     {% endfor %}
