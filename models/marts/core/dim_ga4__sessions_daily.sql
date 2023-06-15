@@ -124,6 +124,19 @@ with event_dimensions as
     {% endif %}     
 )
 {% endif %}
+,partners_id_from_sessions as (
+    select 
+        * except (session_partition_date)
+    from {{ref('stg_ga4__partner_from_url_daily')}}
+    where 1=1
+    {% if is_incremental() %}
+        {% if var('static_incremental_days', false ) %}
+            and session_partition_date in ({{ partitions_to_replace | join(',') }})
+        {% else %}
+            and session_partition_date >= _dbt_max_partition
+        {% endif %}
+    {% endif %}     
+)
 ,session_dimensions as 
 (
     select    
@@ -191,6 +204,7 @@ with event_dimensions as
     select 
         * 
     from join_traffic_source
+		left join partners_id_from_sessions using (session_partition_key)
     {% if var('derived_session_properties', false) %}
     -- If derived session properties have been assigned as variables, join them on the session_partition_key
     left join session_properties using (session_partition_key)

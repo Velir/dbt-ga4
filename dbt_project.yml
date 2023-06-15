@@ -27,4 +27,4 @@ models:
     # +enabled: false
     marts:
       +materialized: table
-      +enabled: false
+      # +enabled: false

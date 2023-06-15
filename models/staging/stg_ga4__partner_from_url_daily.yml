@@ -1,0 +1,11 @@
+version: 2
+
+models:  
+  - name: stg_ga4__partner_from_url_daily
+    description: >
+      Incremental model that will pull out the most recent instance of a partner_id from url for each session_partition_key. 
+      Later used in the fct_ga4__sessions_daily fact table.
+    columns:
+      - name: session_partition_key
+        tests:
+          - unique

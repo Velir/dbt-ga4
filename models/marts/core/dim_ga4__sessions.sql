@@ -64,6 +64,7 @@ include_session_properties as (
     select 
         * 
     from join_traffic_source
+		left join {{ref('stg_ga4__partner_from_url')}} using (session_key)
     {% if var('derived_session_properties', false) %}
     -- If derived session properties have been assigned as variables, join them on the session_key
     left join {{ref('stg_ga4__derived_session_properties')}} using (session_key)
