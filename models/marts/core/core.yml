@@ -14,12 +14,6 @@ models:
         description: Hashed combination of user_pseudo_id and stream_id
         tests:
           - unique
-  - name: fct_ga4__sessions
-    description: Fact table containing session metrics. 1 row per session. Sessions can span multiple days, so it isn't possible to partition this table by day. 
-    columns:
-      - name: session_key
-        tests:
-          - unique
   - name: fct_ga4__pages
     description: Incremental model with page metrics such as visits, users, new_users, entrances and exits as well as configurable conversion counts. Each row is grouped by page_location, event_date_dt, and hour.
     columns:
@@ -32,11 +26,5 @@ models:
     columns:
       - name: client_key
         description: Hashed combination of user_pseudo_id and stream_id
-        tests: 
-          - unique
-  - name: fct_ga4__user_ids
-    description: Fact table with aggregate metrics at the level of the user_id when one is present, otherwise at the device level (as indicated by the client_key). Metrics are aggregated from fct_ga4__client_keys.
-    columns:
-      - name: user_id_or_client_key
         tests: 
           - unique

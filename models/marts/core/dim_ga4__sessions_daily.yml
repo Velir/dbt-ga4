@@ -20,3 +20,7 @@ models:
       - name: session_partition_date
         description: >
           Date associated with the session_partition_key. Used to partition the table. Filter on this column to optimize query cost and performance. 
+      - name: session_source
+        description: The source of the session based on the events contained within this particular session. For last non-direct source, see last_non_direct_source
+      - name: last_non_direct_source
+        description: The last non-direct source attributed to this session based on a 30-day lookback window. 

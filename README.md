@@ -7,6 +7,7 @@ Features include:
 - Conversion of sharded event tables into a single partitioned table
 - Incremental loading of GA4 data into your staging tables 
 - Page, session and user dimensional models with conversion counts
+- Last non-direct session attribution
 - Simple methods for accessing query parameters (like UTM params) or filtering query parameters (like click IDs)
 - Support for custom event parameters & user properties
 - Mapping from source/medium to default channel grouping
@@ -24,6 +25,8 @@ Features include:
 | stg_ga4__derived_session_properties | Finds the most recent occurance of specific event_params or user_properties value and assigns them to a session's session_key. Derived session properties are specified as variables (see documentation below) |
 | stg_ga4__session_conversions_daily | Produces daily counts of conversions per session. The list of conversion events to include is configurable (see documentation below) |
 | stg_ga4__sessions_traffic_sources | Finds the first source, medium, campaign, content, paid search term (from UTM tracking), and default channel grouping for each session. |
+| stg_ga4__sessions_traffic_sources_daily | Same data as stg_ga4__sessions_traffic_sources, but partitioned by day to allow for efficient loading and querying of data. |
+| stg_ga4__sessions_traffic_sources_last_non_direct_daily | Finds the last non-direct source attributed to each session within a 30-day lookback window. Assumes each session is contained within a day. |
 | dim_ga4__client_keys | Dimension table for user devices as indicated by client_keys. Contains attributes such as first and last page viewed.| 
 | dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and acquisition data. Can be expensive to run on large installs (see `dim_ga4__sessions_daily`) |
 | dim_ga4__sessions_daily | Query-optimized session dimension table that is incremental and partitioned on date. Assumes that each partition is contained within a single day |
@@ -46,7 +49,7 @@ To pull the latest stable release along with minor updates, add the following to
 ```
 packages:
   - package: Velir/ga4
-    version: [">=3.0.0", "<3.2.0"]
+    version: [">=4.0.0", "<4.1.0"]
 ```
 
 ## Install From main branch on GitHub
@@ -179,7 +182,7 @@ vars:
 
 Derived session properties are similar to derived user properties, but on a per-session basis, for properties that change slowly over time. This provides additional flexibility in allowing users to turn any event parameter into a session property. 
 
-Derived Session Properties are included in the `fct_ga4__sessions` model and contain the latest event parameter or user property value per session.
+Derived Session Properties are included in the `dim_ga4__sessions` and `dim_ga4__sessions_daily` models and contain the latest event parameter or user property value per session.
 
 ```
 derived_session_properties:
@@ -220,6 +223,16 @@ Specific event names can be specified as conversions by setting the `conversion_
 vars:
   ga4:
     conversion_events:['purchase','download']
+```
+
+### Session Attribution Lookback Window
+
+The `stg_ga4__sessions_traffic_sources_last_non_direct_daily` model provides last non-direct session attribution within a configurable lookback window. The default is 30 days, but this can be overridden with the `session_attribution_lookback_window_days` variable.
+
+```
+vars:
+  ga4:
+    session_attribution_lookback_window_days: 90
 ```
 
 # Custom Events
@@ -299,3 +312,29 @@ models:
         base_ga4__events:
           +full_refresh: false
 ```
+
+# Multiple GCP Projects Support
+
+If your GA4 properties are stored in distinct projects, and/or if you want to store your GA4 sources in a different Project than the resulting dbt models you could use the following configuration.
+
+
+In this scenario, the `property_ids` variable contains a list of dictionnaries where the `project` and `property_id` variables are defined. The Multi-property mechanism will apply - see previous section. More specifically, you need to defined the `static_incremental_days` and `dataset` (where the combined dataset will be created).
+
+```
+vars:
+  ga4:
+    property_ids: 
+      - project: 'gcp_project_1'
+        property_id: 11111111
+      - project: 'gcp_project_2'
+        property_id: 22222222
+
+    static_incremental_days: 3
+    dataset: "my_combined_dataset"
+```
+
+
+
+# dbt Stlye Guide
+
+This package attempts to adhere to the Brooklyn Data style guide found [here](https://github.com/brooklyn-data/co/blob/main/sql_style_guide.md). This work is in-progress. 
