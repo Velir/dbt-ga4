@@ -72,7 +72,7 @@ packages:
 ```
 ## Required Variables
 
-This package assumes that you have an existing DBT project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded. Source data is defined using the following variables which must be set in `dbt_project.yml`.
+This package assumes that you have an existing DBT project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded. Source data is defined using the `project` and `dataset` variables below. The `static_incremental_days` variable defines how many days' worth of data to reprocess during incremental runs. 
 
 ```
 vars:
@@ -82,6 +82,7 @@ vars:
     start_date: "YYYYMMDD" # Earliest date to load
     static_incremental_days: 3 # Number of days to scan and reprocess on each run
 ```
+See [Multi-Property Support](#multi-property-support) section for details on configuring multiple GA4 properties as a source.
 
 ## Optional Variables
 
@@ -254,14 +255,6 @@ vars:
       - name: "some_other_parameter"
         value_type: "string_value"
 ```
-
-# Incremental Loading of Event Data (and how to handle late-arriving hits)
-
-By default, GA4 exports data into sharded event tables that use the event date as the table suffix in the format of `events_YYYYMMDD` or `events_intraday_YYYYMMDD`. This package incrementally loads data from these tables into `base_ga4__events` which is partitioned on date. There are two incremental loading strategies available:
-
-- Dynamic incremental partitions (Default) - This strategy queries the destination table to find the latest date available. Data beyond that date range is loaded in incrementally on each run.
-- Static incremental partitions - This strategy is enabled when the `static_incremental_days` variable is set to an integer. It incrementally loads in the last X days worth of data regardless of what data is availabe. Google will update the daily event tables within the last 72 hours to handle late-arriving hits so you should use this strategy if late-arriving hits is a concern. The 'dynamic incremental' strategy will not re-process past date tables. Ex: A `static_incremental_days` setting of `3` would load data from `current_date - 1` `current_date - 2` and `current_date - 3`. Note that `current_date` uses UTC as the timezone.
-
 # Connecting to BigQuery
 
 This package assumes that BigQuery is the source of your GA4 data. Full instructions for connecting DBT to BigQuery are here: https://docs.getdbt.com/reference/warehouse-profiles/bigquery-profile
