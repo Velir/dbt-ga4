@@ -5,6 +5,8 @@
 }}
  with add_to_cart_with_params as (
    select *except (items),
+   {{ ga4.unnest_key('event_params', 'currency') }},
+   {{ ga4.unnest_key('event_params', 'value', 'double_value') }},
    (select items FROM UNNEST(items) items LIMIT 1) as items
     {% if var("default_custom_parameters", "none") != "none" %}
       {{ ga4.stage_custom_parameters( var("default_custom_parameters") )}}

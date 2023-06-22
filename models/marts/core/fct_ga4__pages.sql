@@ -1,13 +1,20 @@
+{% set partitions_to_replace = ['current_date'] %}
+{% if var('static_incremental_days', false)%}
+    {% for i in range(var('static_incremental_days')) %}
+        {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
+    {% endfor %}
+{% endif %}
 {{
     config(
         materialized = 'incremental',
         incremental_strategy = 'insert_overwrite',
         tags = ["incremental"],
         partition_by={
-        "field": "event_date_dt",
-        "data_type": "date",
-        "granularity": "day"
-        }
+            "field": "event_date_dt",
+            "data_type": "date",
+            "granularity": "day"
+        },
+        partitions = partitions_to_replace
     )
 }}
 
@@ -25,6 +32,13 @@ with page_view as (
         sum( if(session_number = 1,1,0)) as new_client_keys,
         sum(entrances) as entrances,
 from {{ref('stg_ga4__event_page_view')}}
+{% if is_incremental() %}
+    {% if var('static_incremental_days', false)  %}
+        where event_date_dt in ({{ partitions_to_replace | join(',') }})
+    {% else %}
+        where event_date_dt >= _dbt_max_partition
+    {% endif %}
+{% endif %}
     group by 1,2,3,4,5,6,7
 ), page_engagement as (
     select
@@ -41,6 +55,13 @@ from {{ref('stg_ga4__event_page_view')}}
         page_title,
         count(event_name) as scroll_events
     from {{ref('stg_ga4__event_scroll')}}
+    {% if is_incremental() %}
+        {% if var('static_incremental_days', false)  %}
+            where event_date_dt in ({{ partitions_to_replace | join(',') }})
+        {% else %}
+            where event_date_dt >= _dbt_max_partition
+        {% endif %}
+    {% endif %}
     group by 1,2,3
 )
 {% if var('conversion_events',false) %}

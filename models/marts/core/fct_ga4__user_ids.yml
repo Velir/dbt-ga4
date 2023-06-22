@@ -1,0 +1,11 @@
+version: 2
+
+models:  
+  - name: fct_ga4__user_ids
+    description: Fact table with aggregate metrics at the level of the user_id when one is present, otherwise at the device level (as indicated by the client_key). Metrics are aggregated from fct_ga4__client_keys.
+    columns:
+      - name: user_id_or_client_key
+    tests: 
+    - unique:
+        column_name: "md5(user_id_or_client_key || stream_id)"
+        
