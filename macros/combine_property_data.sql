@@ -6,18 +6,18 @@
 
     create schema if not exists `{{var('project')}}.{{var('dataset')}}`;
 
-    -- If incremental, then use static_incremental_days variable to find earliest shard to copy
+    {# If incremental, then use static_incremental_days variable to find earliest shard to copy #}
     {% if not should_full_refresh() %}
         {% set earliest_shard_to_retrieve = (modules.datetime.date.today() - modules.datetime.timedelta(days=var('static_incremental_days')))|string|replace("-", "")|int %}
     {% else %}
-    -- Otherwise use 'start_date' variable
+    {# Otherwise use 'start_date' variable #}
 
         {% set earliest_shard_to_retrieve = var('start_date')|int %}
     {% endif %}
 
     {% for property_id in var('property_ids') %}
         {%- set schema_name = "analytics_" + property_id|string -%}
-            -- Copy daily tables
+            {# Copy daily tables #}
             {%- set relations = dbt_utils.get_relations_by_pattern(schema_pattern=schema_name, table_pattern='events_intraday_%', database=var('project')) -%}
             {% for relation in relations %}
                 {%- set relation_suffix = relation.identifier|replace('events_intraday_', '') -%}
@@ -25,7 +25,7 @@
                     CREATE OR REPLACE TABLE `{{var('project')}}.{{var('dataset')}}.events_intraday_{{relation_suffix}}{{property_id}}` CLONE `{{var('project')}}.analytics_{{property_id}}.events_intraday_{{relation_suffix}}`;
                 {%- endif -%}
             {% endfor %}
-            -- Copy intraday tables
+            {# Copy intraday tables #}
             {%- set relations = dbt_utils.get_relations_by_pattern(schema_pattern=schema_name, table_pattern='events_%', exclude='events_intraday_%', database=var('project')) -%}
             {% for relation in relations %}
                 {%- set relation_suffix = relation.identifier|replace('events_', '') -%}
