@@ -1,22 +1,20 @@
-{% if var('static_incremental_days',false) %}
-    {% set partitions_to_replace = ['current_date'] %}
-    {% for i in range(var('static_incremental_days',3)) %}
-        {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
-    {% endfor %}
-    {{
-        config(
-            materialized = 'incremental',
-            incremental_strategy = 'insert_overwrite',
-            tags = ["incremental"],
-            partition_by={
-                "field": "session_partition_date",
-                "data_type": "date",
-                "granularity": "day"
-            },
-            partitions = partitions_to_replace
-        )
-    }}
-{% endif %}
+{% set partitions_to_replace = ['current_date'] %}
+{% for i in range(var('static_incremental_days',3)) %}
+    {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
+{% endfor %}
+{{
+    config(
+        materialized = 'incremental',
+        incremental_strategy = 'insert_overwrite',
+        tags = ["incremental"],
+        partition_by={
+            "field": "session_partition_date",
+            "data_type": "date",
+            "granularity": "day"
+        },
+        partitions = partitions_to_replace
+    )
+}}
 
 with last_non_direct_session_partition_key as (
   select
