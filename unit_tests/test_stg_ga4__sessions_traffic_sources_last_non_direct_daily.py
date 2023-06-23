@@ -36,5 +36,5 @@ class TestSessionsTrafficSourcesLastNonDirectDaily():
         }
     
     def test_mock_run_and_check(self, project):
-        run_dbt(["build", "--vars", "static_incremental_days: 3"])
+        run_dbt(["build"])
         check_relations_equal(project.adapter, ["actual", "expected"])
