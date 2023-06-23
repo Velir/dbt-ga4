@@ -26,4 +26,7 @@ def dbt_profile_target():
 
 @pytest.fixture(scope="class")
 def project_config_update():
-    return {'name': 'ga4'}
+    return {
+            'name': 'ga4'
+            , 'vars':{'static_incremental_days':3}
+            }

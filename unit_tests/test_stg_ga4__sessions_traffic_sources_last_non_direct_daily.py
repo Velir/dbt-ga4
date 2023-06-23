@@ -31,7 +31,8 @@ class TestSessionsTrafficSourcesLastNonDirectDaily():
     @pytest.fixture(scope="class")
     def models(self):
         return {
-            "actual.sql": actual,
+            # Hack-y solution to ensure the model is not partitioned. Loading mock data (date columns) from a seed file + partitioning don't work well together. 
+            "actual.sql": actual.replace("materialized = 'incremental',","materialized = 'view',"),
         }
     
     def test_mock_run_and_check(self, project):

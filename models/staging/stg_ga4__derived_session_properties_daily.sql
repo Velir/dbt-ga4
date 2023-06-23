@@ -1,37 +1,22 @@
-{% if var('static_incremental_days', false ) %}
-    {% set partitions_to_replace = ['current_date'] %}
-    {% for i in range(var('static_incremental_days')) %}
-        {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
-    {% endfor %}
-    {{
-        config(
-            enabled = true if var('derived_session_properties', false) else false,
-            materialized = 'incremental',
-            incremental_strategy = 'insert_overwrite',
-            tags = ["incremental"],
-            partition_by={
-                "field": "session_partition_date",
-                "data_type": "date",
-                "granularity": "day"
-            },
-            partitions = partitions_to_replace
-        )
-    }}
-{% else %}
-    {{
-        config(
-            enabled = true if var('derived_session_properties', false) else false,
-            materialized = 'incremental',
-            incremental_strategy = 'insert_overwrite',
-            tags = ["incremental"],
-            partition_by={
-                "field": "session_partition_date",
-                "data_type": "date",
-                "granularity": "day"
-            }
-        )
-    }}
-{% endif %}
+{% set partitions_to_replace = ['current_date'] %}
+{% for i in range(var('static_incremental_days')) %}
+    {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
+{% endfor %}
+{{
+    config(
+        enabled = true if var('derived_session_properties', false) else false,
+        materialized = 'incremental',
+        incremental_strategy = 'insert_overwrite',
+        tags = ["incremental"],
+        partition_by={
+            "field": "session_partition_date",
+            "data_type": "date",
+            "granularity": "day"
+        },
+        partitions = partitions_to_replace
+    )
+}}
+
 
 with unnest_event_params as
 (
@@ -49,11 +34,7 @@ with unnest_event_params as
     from {{ref('stg_ga4__events')}}
     where event_key is not null
     {% if is_incremental() %}
-        {% if var('static_incremental_days', false ) %}
             and event_date_dt in ({{ partitions_to_replace | join(',') }})
-        {% else %}
-            and event_date_dt >= _dbt_max_partition
-        {% endif %}
     {% endif %}
 
 )
