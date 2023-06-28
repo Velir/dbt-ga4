@@ -1,35 +1,21 @@
-{% if var('static_incremental_days', false)%}
-    {% set partitions_to_replace = ['current_date'] %}
-    {% for i in range(var('static_incremental_days')) %}
-        {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
-    {% endfor %}
-    {{
-        config(
-            materialized = 'incremental',
-            incremental_strategy = 'insert_overwrite',
-            tags = ["incremental"],
-            partition_by={
-                "field": "session_partition_date",
-                "data_type": "date",
-                "granularity": "day"
-            },
-            partitions = partitions_to_replace
-        )
-    }}
-{% else %}
-    {{
-        config(
-            materialized = 'incremental',
-            incremental_strategy = 'insert_overwrite',
-            tags = ["incremental"],
-            partition_by={
-                "field": "session_partition_date",
-                "data_type": "date",
-                "granularity": "day"
-            }
-        )
-    }}
-{% endif %}
+{% set partitions_to_replace = ['current_date'] %}
+{% for i in range(var('static_incremental_days')) %}
+    {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
+{% endfor %}
+{{
+    config(
+        materialized = 'incremental',
+        incremental_strategy = 'insert_overwrite',
+        tags = ["incremental"],
+        partition_by={
+            "field": "session_partition_date",
+            "data_type": "date",
+            "granularity": "day"
+        },
+        partitions = partitions_to_replace
+    )
+}}
+
 
 with session_metrics as (
     select 
@@ -48,11 +34,7 @@ with session_metrics as (
     from {{ref('stg_ga4__events')}}
     where session_key is not null
     {% if is_incremental() %}
-        {% if var('static_incremental_days', false)  %}
             and event_date_dt in ({{ partitions_to_replace | join(',') }})
-        {% else %}
-            and event_date_dt >= _dbt_max_partition
-        {% endif %}
     {% endif %}
     group by 1,2,3,4
 )
@@ -64,11 +46,7 @@ with session_metrics as (
     select * from {{ref('stg_ga4__session_conversions_daily')}}
     where 1=1
     {% if is_incremental() %}
-        {% if var('static_incremental_days', false) %}
             and session_partition_date in ({{ partitions_to_replace | join(',') }})
-        {% else %}
-            and session_partition_date >= _dbt_max_partition
-        {% endif %}
     {% endif %}
     ),
     join_metrics_and_conversions as (

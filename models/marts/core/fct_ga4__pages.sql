@@ -1,9 +1,7 @@
 {% set partitions_to_replace = ['current_date'] %}
-{% if var('static_incremental_days', false)%}
-    {% for i in range(var('static_incremental_days')) %}
-        {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
-    {% endfor %}
-{% endif %}
+{% for i in range(var('static_incremental_days')) %}
+    {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
+{% endfor %}
 {{
     config(
         materialized = 'incremental',
@@ -33,11 +31,7 @@ with page_view as (
         sum(entrances) as entrances,
 from {{ref('stg_ga4__event_page_view')}}
 {% if is_incremental() %}
-    {% if var('static_incremental_days', false)  %}
         where event_date_dt in ({{ partitions_to_replace | join(',') }})
-    {% else %}
-        where event_date_dt >= _dbt_max_partition
-    {% endif %}
 {% endif %}
     group by 1,2,3,4,5,6,7
 ), page_engagement as (
@@ -56,11 +50,7 @@ from {{ref('stg_ga4__event_page_view')}}
         count(event_name) as scroll_events
     from {{ref('stg_ga4__event_scroll')}}
     {% if is_incremental() %}
-        {% if var('static_incremental_days', false)  %}
             where event_date_dt in ({{ partitions_to_replace | join(',') }})
-        {% else %}
-            where event_date_dt >= _dbt_max_partition
-        {% endif %}
     {% endif %}
     group by 1,2,3
 )
