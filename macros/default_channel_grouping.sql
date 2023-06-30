@@ -74,6 +74,7 @@ case
     then 'Audio'
   when 
     {{medium}} = 'sms'
+      or {{source}} = 'sms'
     then 'SMS'
   when 
     REGEXP_CONTAINS({{medium}}, r"(mobile|notification|push$)") or {{source}} = 'firebase'
