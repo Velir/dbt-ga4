@@ -60,13 +60,14 @@ case
     {{medium}} = 'organic' or {{source_category}} = 'SOURCE_CATEGORY_SEARCH'
     then 'Organic Search'
   when 
-    REGEXP_CONTAINS({{medium}}, r"^(.*video.*)$") or {{source_category}} = 'SOURCE_CATEGORY_VIDEO'
+    {{source_category}} = 'SOURCE_CATEGORY_VIDEO'
+      or REGEXP_CONTAINS({{medium}}, r"^(.*video.*)$")
     then 'Organic Video'
   when 
     {{source_category}} = 'SOURCE_CATEGORY_SHOPPING'
     then 'Organic Shopping'
   when 
-    {{medium}} = 'referral'
+    {{medium}} in ("referral", "app", "link")
     then 'Referral'
   when 
     {{medium}} = 'audio'
