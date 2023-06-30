@@ -8,12 +8,16 @@
 
 {% macro default__default_channel_grouping(source, medium, source_category) %}
 case 
-  when {{source}} is null and {{medium}} is null 
+  when 
+    (
+      {{source}} is null 
+        and {{medium}} is null
+    )
+    or (
+      {{source}} = '(direct)'
+      and ({{medium}} = '(none)' or {{medium}} = '(not set)')
+    ) 
     then 'Direct'
-  when {{source}} = '(direct)'
-    and ({{medium}} = '(none)' or {{medium}} = '(not set)')
-    then 'Direct'
-
   when 
     (
       REGEXP_CONTAINS({{source}}, r"^(facebook|instagram|pinterest|reddit|twitter|linkedin)") = true
