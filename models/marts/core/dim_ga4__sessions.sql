@@ -39,6 +39,8 @@ with session_first_event as
         event_timestamp as session_start_timestamp,
         page_location as landing_page,
         page_hostname as landing_page_hostname,
+        page_referrer as session_referrer,
+        original_page_referrer as original_session_referrer,
         mv_region,
         geo_continent,
         geo_country,
