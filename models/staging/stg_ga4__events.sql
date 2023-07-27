@@ -46,21 +46,20 @@ detect_gclid as (
         end as event_campaign
     from include_event_key
 ),
+{% if var('query_parameter_extraction', none) != none %}
+extract_query_params as (
+    select
+        *,
+        {%- for param in var('query_parameter_extraction') -%}
+            {{ extract_query_parameter_value( 'page_location' , param ) }} as {{"query_param_"+param}}
+            {% if not loop.last %},{% endif %}
+        {%- endfor -%}
+    from detect_gclid
+),
+{% endif %}
 remove_query_params as (
     select 
         * EXCEPT (page_location, page_referrer),
-        {% if var('xclid', none) != "none" %}
-            array_agg(
-                {%- for clid in var('xclid') -%}
-                    if( substr_contains( 'page_location' , {{clid + "="}} )
-                        struct(   
-                            '{{clid}}' as name,
-                            {{ extract_query_parameter_value( 'page_location' , clid ) }} as value
-                        )){% if not loop.last %},{% endif %}
-                    {% endif %}
-                {%- endfor -%}
-            ) as xclid,
-        {% endif %}
         page_location as original_page_location,
         page_referrer as original_page_referrer,
         {{ extract_page_path('page_location') }} as page_path,
@@ -72,7 +71,12 @@ remove_query_params as (
         page_location,
         page_referrer
         {% endif %}
+
+        {% if var('query_parameter_extraction', none) != none %}
+        from extract_query_params
+        {% else %}
         from detect_gclid
+        {% endif %}
 ),
 enrich_params as (
     select 
