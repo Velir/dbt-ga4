@@ -31,7 +31,7 @@
                 {%- set relation_suffix = relation.identifier|replace('events_', '') -%}
                 {%- if relation_suffix|int >= earliest_shard_to_retrieve|int -%}
                     CREATE OR REPLACE TABLE `{{var('project')}}.{{var('dataset')}}.events_{{relation_suffix}}{{property_id}}` CLONE `{{var('project')}}.analytics_{{property_id}}.events_{{relation_suffix}}`;
-                    DROP TABLE IF EXISTS `{{var('project')}}.{{var('dataset')}}.events_intraday_{{relation_suffix}}{{property_id}}`
+                    DROP TABLE IF EXISTS `{{var('project')}}.{{var('dataset')}}.events_intraday_{{relation_suffix}}{{property_id}}`;
                 {%- endif -%}
             {% endfor %}
     {% endfor %}
