@@ -8,6 +8,3 @@ sources:
       - name: events
         identifier: events_* # Scan across all sharded event tables. Use the 'start_date' variable to limit this scan
         description: Main events table exported by GA4. Sharded by date. 
-      - name: events_intraday
-        identifier: events_intraday_*
-        description: Intraday events table which is optionally exported by GA4.
