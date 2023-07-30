@@ -23,7 +23,7 @@ with source as (
         from {{ source('ga4', 'events') }}
         where cast( replace(_table_suffix, 'intraday_', '') as int64) >= {{var('start_date')}}
     {% if is_incremental() %}
-        and parse_date('%Y%m%d', left(_TABLE_SUFFIX, 8)) in ({{ partitions_to_replace | join(',') }})
+        and parse_date('%Y%m%d', left( replace(_table_suffix, 'intraday_', ''), 8)) in ({{ partitions_to_replace | join(',') }})
     {% endif %}
 ),
 renamed as (
