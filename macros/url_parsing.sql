@@ -13,3 +13,7 @@ REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE({{url}}, '(\\?|&)({{
 {% macro extract_page_path(url) %}
 REGEXP_EXTRACT({{url}}, '(?:\\w+:)?\\/\\/[^\\/]+([^?#]+)')
 {% endmacro %}
+
+{% macro extract_query_parameter_value(url, param) %}
+    REGEXP_EXTRACT( {{url}}, r'{{param}}=([^&|\?|#]*)'  )
+{% endmacro %}
