@@ -95,6 +95,18 @@ vars:
   ga4: 
     query_parameter_exclusions: ["gclid","fbclid","_ga"] 
 ```
+
+### Query Parameter Extraction
+
+Setting `query_parameter_extraction` will extract query string parameters from the `page_location` field into new columns. This can be used to extract advertising click IDs into columns that can be joined with advertising data sets. Ex:
+
+```
+vars:
+  ga4: 
+    query_parameter_extraction: ["gclid","fbclid","keyword"] 
+```
+
+
 ### Custom Parameters
 
 Within GA4, you can add custom parameters to any event. These custom parameters will be picked up by this package if they are defined as variables within your `dbt_project.yml` file using the following syntax:

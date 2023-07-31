@@ -46,9 +46,18 @@ detect_gclid as (
         end as event_campaign
     from include_event_key
 ),
--- Remove specific query strings from page_location field
+{% if var('query_parameter_extraction', none) != none %}
+extract_query_params as (
+    select
+        *,
+        {%- for param in var('query_parameter_extraction') -%}
+            {{ extract_query_parameter_value( 'page_location' , param ) }} as {{"query_param_"+param}}
+            {% if not loop.last %},{% endif %}
+        {%- endfor -%}
+    from detect_gclid
+),
+{% endif %}
 remove_query_params as (
-
     select 
         * EXCEPT (page_location, page_referrer),
         page_location as original_page_location,
@@ -62,7 +71,12 @@ remove_query_params as (
         page_location,
         page_referrer
         {% endif %}
-    from detect_gclid
+
+        {% if var('query_parameter_extraction', none) != none %}
+        from extract_query_params
+        {% else %}
+        from detect_gclid
+        {% endif %}
 ),
 enrich_params as (
     select 
