@@ -24,7 +24,7 @@ with source_daily as (
         {{ ga4.base_select_source() }}
         from {{ source('ga4', 'events') }}
         where _table_suffix not like '%intraday%'
-        and cast( _table_suffix as int64) >= {{var('start_date')}}
+        and cast( left(_TABLE_SUFFIX, 8) as int64) >= {{var('start_date')}}
     {% if is_incremental() %}
         and parse_date('%Y%m%d', left(_TABLE_SUFFIX, 8)) in ({{ partitions_to_replace | join(',') }})
     {% endif %}
@@ -34,7 +34,7 @@ with source_daily as (
         select 
             {{ ga4.base_select_source() }}
             from {{ source('ga4', 'events_intraday') }}
-            where cast( _table_suffix as int64) >= {{var('start_date')}}
+            where cast( left(_TABLE_SUFFIX, 8) as int64) >= {{var('start_date')}}
         {% if is_incremental() %}
             and parse_date('%Y%m%d', left(_TABLE_SUFFIX, 8)) in ({{ partitions_to_replace | join(',') }})
         {% endif %}
