@@ -77,9 +77,7 @@
     app_info.install_store as app_info_install_store,
     app_info.firebase_app_id as app_info_firebase_app_id,
     app_info.install_source as app_info_install_source,
-    traffic_source.name as user_campaign,
-    traffic_source.medium as user_medium,
-    traffic_source.source as user_source,
+    traffic_source,
     stream_id,
     platform,
     ecommerce,
@@ -99,6 +97,7 @@
     {{ ga4.unnest_key('event_params', 'campaign', 'lower_string_value', 'event_campaign') }},
     {{ ga4.unnest_key('event_params', 'content', 'lower_string_value', 'event_content') }},
     {{ ga4.unnest_key('event_params', 'term', 'lower_string_value', 'event_term') }},
+    {{ ga4.unnest_key('event_params', 'gclid', 'string_value','event_gclid') }},
     CASE 
         WHEN event_name = 'page_view' THEN 1
         ELSE 0
