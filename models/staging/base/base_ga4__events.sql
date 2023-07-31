@@ -29,8 +29,7 @@ with source_daily as (
         and parse_date('%Y%m%d', left(_TABLE_SUFFIX, 8)) in ({{ partitions_to_replace | join(',') }})
     {% endif %}
 ),
--- Include intraday data if using a single-property configuration and the events_intraday_* table exists 
-{% if var('property_ids', false) == false and relations_intraday|length > 0 %}
+
     source_intraday as (
         select 
             {{ ga4.base_select_source() }}
@@ -50,13 +49,6 @@ with source_daily as (
             {{ ga4.base_select_renamed() }}
         from unioned
     )
-{% else %}
-    renamed as (
-        select 
-            {{ ga4.base_select_renamed() }}
-        from source_daily
-    )
-{% endif%}
 
 select * from renamed
 qualify row_number() over(partition by event_date_dt, stream_id, user_pseudo_id, session_id, event_name, event_timestamp, to_json_string(ARRAY(SELECT params FROM UNNEST(event_params) AS params ORDER BY key))) = 1
