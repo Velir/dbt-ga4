@@ -24,18 +24,17 @@ with source_daily as (
         {{ ga4.base_select_source() }}
         from {{ source('ga4', 'events') }}
         where _table_suffix not like '%intraday%'
-        and cast( _table_suffix as int64) >= {{var('start_date')}}
+        and cast( left(_TABLE_SUFFIX, 8) as int64) >= {{var('start_date')}}
     {% if is_incremental() %}
         and parse_date('%Y%m%d', left(_TABLE_SUFFIX, 8)) in ({{ partitions_to_replace | join(',') }})
     {% endif %}
 ),
--- Include intraday data if using a single-property configuration and the events_intraday_* table exists 
-{% if var('property_ids', false) == false and relations_intraday|length > 0 %}
+
     source_intraday as (
         select 
             {{ ga4.base_select_source() }}
             from {{ source('ga4', 'events_intraday') }}
-            where cast( _table_suffix as int64) >= {{var('start_date')}}
+            where cast( left(_TABLE_SUFFIX, 8) as int64) >= {{var('start_date')}}
         {% if is_incremental() %}
             and parse_date('%Y%m%d', left(_TABLE_SUFFIX, 8)) in ({{ partitions_to_replace | join(',') }})
         {% endif %}
@@ -50,13 +49,6 @@ with source_daily as (
             {{ ga4.base_select_renamed() }}
         from unioned
     )
-{% else %}
-    renamed as (
-        select 
-            {{ ga4.base_select_renamed() }}
-        from source_daily
-    )
-{% endif%}
 
 select * from renamed
 qualify row_number() over(partition by event_date_dt, stream_id, user_pseudo_id, session_id, event_name, event_timestamp, to_json_string(ARRAY(SELECT params FROM UNNEST(event_params) AS params ORDER BY key))) = 1
