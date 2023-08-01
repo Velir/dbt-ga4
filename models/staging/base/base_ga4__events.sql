@@ -48,7 +48,12 @@ with source_daily as (
         select 
             {{ ga4.base_select_renamed() }}
         from unioned
+    ),
+    final as (
+        select * from renamed
+        qualify row_number() over(partition by event_date_dt, stream_id, user_pseudo_id, session_id, event_name, event_timestamp, to_json_string(ARRAY(SELECT params FROM UNNEST(event_params) AS params ORDER BY key))) = 1
     )
 
-select * from renamed
-qualify row_number() over(partition by event_date_dt, stream_id, user_pseudo_id, session_id, event_name, event_timestamp, to_json_string(ARRAY(SELECT params FROM UNNEST(event_params) AS params ORDER BY key))) = 1
+select *,
+{{ map_stream_id("stream_id", var("stream_properties", "none")) }} AS stream_name
+from final
