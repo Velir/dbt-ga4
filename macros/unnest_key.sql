@@ -8,6 +8,10 @@
     (select 
         {% if value_type == "lower_string_value" %}
             lower(value.string_value)   
+        {% elif value_type == "multiple_values_to_string" %}
+            COALESCE(CAST(value.int_value AS STRING), CAST(value.float_value AS STRING), CAST(value.double_value AS STRING), value.string_value) 
+        {% elif value_type == "multiple_number_values" %}
+            COALESCE(value.int_value , value.float_value, value.double_value) 
         {% else %}
             value.{{value_type}}    
         {% endif %}
