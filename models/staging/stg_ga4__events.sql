@@ -1,3 +1,14 @@
+{{ config(
+    partition_by={
+		"field": "event_date_dt",
+		"data_type": "date",
+		"granularity": "day"
+		},
+	cluster_by=["event_name"]
+    )
+}}
+
+
 -- This staging model contains key creation and window functions. Keeping window functions outside of the base incremental model ensures that the incremental updates don't artificially limit the window partition sizes (ex: if a session spans 2 days, but only 1 day is in the incremental update)
 with base_events as (
     select * from {{ ref('base_ga4__events')}}
