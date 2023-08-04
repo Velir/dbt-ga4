@@ -26,7 +26,7 @@ include_session_partition_key as (
 include_event_key as (
     select 
         *,
-        to_base64(md5(CONCAT(session_key, event_name, CAST(event_timestamp as STRING), to_json_string(event_params)))) as event_key -- Surrogate key for unique events.  
+        to_base64(md5(CONCAT(session_key, event_name, CAST(event_timestamp as STRING), to_json_string(ARRAY(SELECT x FROM UNNEST(event_params) AS x  ORDER BY key))))) as event_key -- Surrogate key for unique events.  
     from include_session_partition_key
 ),
 detect_gclid as (
