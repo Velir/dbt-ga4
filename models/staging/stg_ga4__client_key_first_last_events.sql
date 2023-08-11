@@ -7,7 +7,8 @@ with first_last_event as (
         client_key,
         FIRST_VALUE(event_key) OVER (PARTITION BY client_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS first_event,
         LAST_VALUE(event_key) OVER (PARTITION BY client_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS last_event,
-        stream_id
+        stream_id,
+        stream_name
     from {{ref('stg_ga4__events')}}
     where client_key is not null --remove users with privacy settings enabled
 ),
@@ -16,7 +17,8 @@ events_by_client_key as (
         client_key,
         first_event,
         last_event,
-        stream_id
+        stream_id,
+        stream_name
     from first_last_event
 ),
 events_joined as (
@@ -73,7 +75,7 @@ events_joined as (
         events_last.device_web_info_hostname as last_device_web_info_hostname,
         events_last.traffic_source.name as last_user_campaign,
         events_last.traffic_source.medium as last_user_medium,
-        events_last.traffic_source.source as last_user_source,
+        events_last.traffic_source.source as last_user_source
     from events_by_client_key
     left join {{ref('stg_ga4__events')}} events_first
         on events_by_client_key.first_event = events_first.event_key
