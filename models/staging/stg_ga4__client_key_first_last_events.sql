@@ -45,9 +45,9 @@ events_joined as (
         events_first.device_web_info_browser as first_device_web_info_browser,
         events_first.device_web_info_browser_version as first_device_web_info_browser_version,
         events_first.device_web_info_hostname as first_device_web_info_hostname,
-        events_first.user_campaign as first_user_campaign,
-        events_first.user_medium as first_user_medium,
-        events_first.user_source as first_user_source,
+        events_first.traffic_source.name as first_user_campaign,
+        events_first.traffic_source.medium as first_user_medium,
+        events_first.traffic_source.source as first_user_source,
         events_last.geo_continent as last_geo_continent,
         events_last.geo_country as last_geo_country,
         events_last.geo_region as last_geo_region,
@@ -71,9 +71,9 @@ events_joined as (
         events_last.device_web_info_browser as last_device_web_info_browser,
         events_last.device_web_info_browser_version as last_device_web_info_browser_version,
         events_last.device_web_info_hostname as last_device_web_info_hostname,
-        events_last.user_campaign as last_user_campaign,
-        events_last.user_medium as last_user_medium,
-        events_last.user_source as last_user_source,
+        events_last.traffic_source.name as last_user_campaign,
+        events_last.traffic_source.medium as last_user_medium,
+        events_last.traffic_source.source as last_user_source,
     from events_by_client_key
     left join {{ref('stg_ga4__events')}} events_first
         on events_by_client_key.first_event = events_first.event_key
