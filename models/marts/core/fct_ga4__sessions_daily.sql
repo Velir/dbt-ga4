@@ -23,6 +23,7 @@ with session_metrics as (
         session_partition_key,
         client_key,
         stream_id,
+        stream_name,
         max(user_id) as user_id, -- user_id can be null at the start and end of a session and still be set in the middle
         min(event_date_dt) as session_partition_date, -- Date of the session partition, does not represent the true session start date which, in GA4, can span multiple days
         min(event_timestamp) as session_partition_min_timestamp,
