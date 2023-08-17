@@ -20,6 +20,7 @@ with page_view as (
     select
         event_date_dt,
         stream_id,
+        stream_name,
         page_location,  -- includes query string parameters not listed in query_parameter_exclusions variable
         page_key,
         page_path,
