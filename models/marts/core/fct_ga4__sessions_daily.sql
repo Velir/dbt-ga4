@@ -37,7 +37,7 @@ with session_metrics as (
     {% if is_incremental() %}
             and event_date_dt in ({{ partitions_to_replace | join(',') }})
     {% endif %}
-    group by 1,2,3,4
+    group by 1,2,3,4,5
 )
 {% if var('conversion_events', false) == false %}
     select * from session_metrics
@@ -54,6 +54,7 @@ with session_metrics as (
         select 
             session_metrics.client_key,
             session_metrics.stream_id,
+            session_metrics.stream_name,
             session_metrics.user_id,
             session_metrics.session_partition_min_timestamp,
             session_metrics.session_partition_count_page_views,
