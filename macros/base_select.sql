@@ -5,6 +5,7 @@
 {% macro default__base_select_source() %}
     parse_date('%Y%m%d',event_date) as event_date_dt,
     event_timestamp,
+    DATETIME(TIMESTAMP_MICROS(event_timestamp), "Europe/Berlin") as event_timestamp_dt,
     event_name,
     event_params,
     event_previous_timestamp,
@@ -34,6 +35,7 @@
 {% macro default__base_select_renamed() %}
     event_date_dt,
     event_timestamp,
+    DATETIME(TIMESTAMP_MICROS(event_timestamp), "Europe/Berlin") as event_timestamp_dt,
     lower(replace(trim(event_name), " ", "_")) as event_name, -- Clean up all event names to be snake cased
     event_params,
     event_previous_timestamp,
