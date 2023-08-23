@@ -15,5 +15,5 @@ select
         {% endfor %}
     {% endif %}
 from {{ref('fct_ga4__sessions_daily')}}
-group by 1, 2
+group by 1, 2, 3
 
