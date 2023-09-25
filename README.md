@@ -293,11 +293,6 @@ Package users can override this macro and implement their own channel groupings 
 
 Overriding the package's default channel mapping makes use of dbt's dispatch override capability documented here: https://docs.getdbt.com/reference/dbt-jinja-functions/dispatch#overriding-package-macros
 
-# Overriding Page Path Parsing
-By default, this package assumes valid URLs and parses the page path from the URL using a specific regex pattern.
-
-Similar to above, package users can override this macro by creating a macro in your project names `default__extract_page_path` that accepts a url argument.
-
 # Multi-Property Support
 
 Multiple GA4 properties are supported by listing out the project IDs in the `property_ids` variable. In this scenario, the `static_incremental_days` variable is required and the `dataset` variable will define the target dataset where source data will be copied.
