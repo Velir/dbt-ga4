@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install dbt-core
-          pip install dbt-bigquery
+          pip install dbt-bigquery==1.5.6
           pip install pytest
       
       - name: Run tests
