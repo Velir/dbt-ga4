@@ -19,7 +19,7 @@ jobs:
 
       - uses: actions/setup-python@v1
         with:
-          python-version: "3.8.x"
+          python-version: "3.11.x"
 
       - name: Authenticate using service account
         run: 'echo "$KEYFILE" > ./dbt-service-account.json'
@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install dbt-core
-          pip install dbt-bigquery==1.5.6
+          pip install dbt-bigquery
           pip install pytest
       
       - name: Run tests
