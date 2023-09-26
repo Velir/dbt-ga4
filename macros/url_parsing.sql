@@ -11,7 +11,11 @@ REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE({{url}}, '(\\?|&)({{
 {% endmacro %}
 
 {% macro extract_page_path(url) %}
-REGEXP_EXTRACT({{url}}, '(?:\\w+:)?\\/\\/[^\\/]+([^?#]+)')
+  {{ return(adapter.dispatch('extract_page_path', 'ga4')(url)) }}
+{% endmacro %}
+
+{% macro default__extract_page_path(url) %}
+   REGEXP_EXTRACT({{url}}, '(?:\\w+:)?\\/\\/[^\\/]+([^?#]+)')
 {% endmacro %}
 
 {% macro extract_query_parameter_value(url, param) %}
