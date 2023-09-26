@@ -17,6 +17,10 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
+      - name: Get current date
+        id: date
+        run: echo "CURRENT_DATE=$(date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_ENV
+
       - uses: actions/setup-python@v4
         with:
           python-version: "3.x" 
