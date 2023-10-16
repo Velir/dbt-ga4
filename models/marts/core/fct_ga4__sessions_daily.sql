@@ -26,7 +26,7 @@ with session_metrics as (
     -- Give 1 extra day to ensure we beging aggregation at the start of a session
     where session_key is not null
     {% if is_incremental() %}
-        and event_date_dt >= DATE_SUB(_dbt_max_partition, INTERVAL 1 DAY)
+        and event_date_dt >= DATE_SUB("{{var('start_date')}}", INTERVAL 1 DAY)
     {% endif %}
     group by 1,2,3
 )
@@ -37,7 +37,7 @@ with session_metrics as (
     session_conversions as (
     select * from {{ref('stg_ga4__session_conversions')}}
     {% if is_incremental() %}
-        where session_partition_date >= DATE_SUB(_dbt_max_partition, INTERVAL 1 DAY)
+        where session_partition_date >= DATE_SUB("{{var('start_date')}}", INTERVAL 1 DAY)
     {% endif %}
     ),
     join_metrics_and_conversions as (
