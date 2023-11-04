@@ -272,7 +272,7 @@ select
 from input
 """
 
-class TestUsersFirstLastEvents():
+class TestDefaultChannelGrouping():
     # everything that goes in the "seeds" directory (= CSV format)
     @pytest.fixture(scope="class")
     def seeds(self):
