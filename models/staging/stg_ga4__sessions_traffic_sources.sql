@@ -1,5 +1,5 @@
 with session_events as (
-    select 
+    select
         session_key
         ,event_timestamp
         ,events.event_source
@@ -17,11 +17,11 @@ with session_events as (
 set_default_channel_grouping as (
     select
         *
-        ,{{ga4.default_channel_grouping('event_source','event_medium','source_category')}} as default_channel_grouping
+        ,{{ga4.default_channel_grouping('event_source','event_medium','source_category', 'event_campaign')}} as default_channel_grouping
     from session_events
 ),
 session_source as (
-    select    
+    select
         session_key
         ,COALESCE(FIRST_VALUE((CASE WHEN event_source <> '(direct)' THEN event_source END) IGNORE NULLS) OVER (session_window), '(direct)') AS session_source
         ,COALESCE(FIRST_VALUE((CASE WHEN event_source <> '(direct)' THEN COALESCE(event_medium, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS session_medium

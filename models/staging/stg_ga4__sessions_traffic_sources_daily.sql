@@ -18,7 +18,7 @@
 
 
 with session_events as (
-    select 
+    select
         client_key
         ,session_partition_key
         ,event_date_dt as session_partition_date
@@ -42,11 +42,11 @@ with session_events as (
 set_default_channel_grouping as (
     select
         *
-        ,{{ga4.default_channel_grouping('event_source','event_medium','source_category')}} as default_channel_grouping
+        ,{{ga4.default_channel_grouping('event_source','event_medium','source_category', 'event_campaign')}} as default_channel_grouping
     from session_events
 ),
 first_session_source as (
-    select    
+    select
         client_key
         ,session_partition_key
         ,session_partition_date
@@ -63,13 +63,13 @@ first_session_source as (
 ),
 find_non_direct_session_partition_key as (
 
-    select 
+    select
         *
         ,if(session_source <> '(direct)', session_partition_key, null) as non_direct_session_partition_key --provide the session_partition_key only if source is not direct. Useful for last non-direct attribution modeling
     from first_session_source
 )
 
-select 
+select
         client_key
         ,session_partition_key
         ,session_partition_date
