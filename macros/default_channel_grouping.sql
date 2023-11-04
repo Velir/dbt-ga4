@@ -1,6 +1,5 @@
 -- Google's documentation is here: https://support.google.com/analytics/answer/9756891?hl=en
 -- source_category Excel file can be downloaded from the above link and may change over time
-
 {% macro default_channel_grouping(source, medium, source_category, campaign) %}
   {{ return(adapter.dispatch('default_channel_grouping', 'ga4')(source, medium, source_category, campaign)) }}
 {% endmacro %}
@@ -60,7 +59,7 @@ case
     then 'Paid Video'
 
   -- Display:
-  --   Medium is one of (“display”, “banner”, “expandable”, “interstitial”, “cpm”)
+  --   Medium is one of ("display", "banner", "expandable", "interstitial", "cpm")
   when {{medium}} in ('display', 'banner', 'expandable', 'interstitial', 'cpm')
     then 'Display'
 
@@ -80,7 +79,7 @@ case
   -- Organic Social:
   --   Source matches a regex list of social sites
   --   OR
-  --   Medium is one of (“social”, “social-network”, “social-media”, “sm”, “social network”, “social media”)
+  --   Medium is one of ("social", "social-network", "social-media", "sm", "social network", "social media")
   when {{source_category}} = 'SOURCE_CATEGORY_SOCIAL'
     or {{medium}} in ("social","social-network","social-media","sm","social network","social media")
     then 'Organic Social'
