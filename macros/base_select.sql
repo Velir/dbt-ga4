@@ -23,7 +23,16 @@
     traffic_source,
     stream_id,
     platform,
-    ecommerce,
+    ecommerce.total_item_quantity,
+    ecommerce.purchase_revenue_in_usd,
+    ecommerce.purchase_revenue,
+    ecommerce.refund_value_in_usd,
+    ecommerce.refund_value,
+    ecommerce.shipping_value_in_usd,
+    ecommerce.shipping_value,
+    ecommerce.tax_value_in_usd,
+    ecommerce.unique_items,
+    ecommerce.transaction_id,
     items,
 {% endmacro %}
 
@@ -82,8 +91,47 @@
     traffic_source.source as user_source,
     stream_id,
     platform,
-    ecommerce,
-    items,
+    struct(
+        total_item_quantity
+        , purchase_revenue_in_usd
+        , purchase_revenue
+        , refund_value_in_usd
+        , refund_value
+        , shipping_value_in_usd
+        , shipping_value
+        , tax_value_in_usd
+        , unique_items
+        , transaction_id        
+    ) as ecommerce,
+    (select 
+        array_agg(struct(
+            unnested_items.item_id
+            , unnested_items.item_name
+            , unnested_items.item_brand
+            , unnested_items.item_variant
+            , unnested_items.item_category
+            , unnested_items.item_category2
+            , unnested_items.item_category3
+            , unnested_items.item_category4
+            , unnested_items.item_category5
+            , unnested_items.price_in_usd
+            , unnested_items.price
+            , unnested_items.quantity
+            , unnested_items.item_revenue_in_usd
+            , unnested_items.item_refund
+            , unnested_items.coupon
+            , unnested_items.affiliation
+            , unnested_items.location_id
+            , unnested_items.item_list_id
+            , unnested_items.item_list_name
+            , unnested_items.item_list_index
+            , unnested_items.promotion_id
+            , unnested_items.promotion_name
+            , unnested_items.creative_name
+            , unnested_items.creative_slot
+            , unnested_items.item_params
+        )) from unnest(items) as unnested_items 
+    ) items,
     {{ ga4.unnest_key('event_params', 'ga_session_id', 'int_value', 'session_id') }},
     {{ ga4.unnest_key('event_params', 'page_location') }},
     {{ ga4.unnest_key('event_params', 'ga_session_number',  'int_value', 'session_number') }},
