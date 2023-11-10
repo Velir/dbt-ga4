@@ -31,6 +31,7 @@
     ecommerce.shipping_value_in_usd,
     ecommerce.shipping_value,
     ecommerce.tax_value_in_usd,
+    ecommerce.tax_value,
     ecommerce.unique_items,
     ecommerce.transaction_id,
     items,
@@ -100,6 +101,7 @@
         , shipping_value_in_usd
         , shipping_value
         , tax_value_in_usd
+        , tax_value
         , unique_items
         , transaction_id        
     ) as ecommerce,
@@ -118,6 +120,8 @@
             , unnested_items.price
             , unnested_items.quantity
             , unnested_items.item_revenue_in_usd
+            , unnested_items.item_revenue
+            , unnested_items.item_refund_in_usd
             , unnested_items.item_refund
             , unnested_items.coupon
             , unnested_items.affiliation
