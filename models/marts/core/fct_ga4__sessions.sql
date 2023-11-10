@@ -1,5 +1,8 @@
--- Stay mindful of performance/cost when using this model. Making this model partitioned on date is not possible because there's no way to create a single record per session AND partition on date. 
-
+{{ 
+    config(
+        materialized = 'view'
+    )
+ }}
 select
     client_key,
     session_key,
