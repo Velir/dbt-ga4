@@ -70,13 +70,6 @@ packages:
 packages:
   - local: ../dbt-ga4
 ```
-## Version Upgrade
-Since the release of version `5.0.0`, Google changed format of the `items` record which caused the `base_ga4__events` model to fail. This was fixed with a simple full refresh, but that cost extra processing.
-
-Version `5.1.0` explicitly unnests and re-nests the `items` and `ecommerce` records in the `base_ga4__events` model so that future changes will not break the model.
-
-Every effort has been made to re-nest the contents of those records into the same slots which should ensure that you can upgrade without rebuilding your `base_ga4__events` table. However, if you run in to an error with the `base_ga4__events` model on upgrading, you will either need to run a full refresh to fix the error or over-ride the `base_select` macro with your own version where the order of the `items` and `ecommerce` fields matches that seen in your existing `base_ga4__events` table.
-
 ## Required Variables
 
 This package assumes that you have an existing DBT project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded. Source data is defined using the `project` and `dataset` variables below. The `static_incremental_days` variable defines how many days' worth of data to reprocess during incremental runs. 
