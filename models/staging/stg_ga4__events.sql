@@ -4,7 +4,7 @@
 		"data_type": "date",
 		"granularity": "day"
 		},
-        materialized='incremental'
+        materialized='incremental',
 	cluster_by=["event_name"]
     )
 }}
