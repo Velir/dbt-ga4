@@ -14,7 +14,7 @@
 with base_events as (
     select * from {{ ref('base_ga4__events')}}
     {% if is_incremental() %}
-       where event_date = CURRENT_DATE()
+       where event_date_dt = CURRENT_DATE()
     {% endif %}
 ),
 -- Add key that captures a combination of stream_id and user_pseudo_id to uniquely identify a 'client' (aka. a device) within a single stream
