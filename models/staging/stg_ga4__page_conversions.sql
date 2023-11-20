@@ -1,5 +1,6 @@
 {{ config(
-  enabled= var('conversion_events', false) != false
+  enabled= var('conversion_events', false) != false,
+  materialized='incremental'
 ) }}
 
 select 
@@ -8,4 +9,7 @@ select
     , countif(event_name = '{{ce}}') as {{ce}}_count
     {% endfor %}
 from {{ref('stg_ga4__events')}}
+{% if is_incremental() %}
+  where event_date_dt = CURRENT_DATE()
+{% endif %}
 group by 1
