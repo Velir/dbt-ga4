@@ -1,3 +1,9 @@
+{{
+  config(
+    materialized='incremental'
+  )
+}}
+
  with session_start_with_params as (
    select *,
       {{ ga4.unnest_key('event_params', 'entrances',  'int_value') }},
@@ -10,6 +16,9 @@
       {% endif %}
  from {{ref('stg_ga4__events')}}    
  where event_name = 'session_start'
+ {% if is_incremental() %}
+  and event_date_dt = CURRENT_DATE()
+ {% endif %}
 )
 
 select * from session_start_with_params
