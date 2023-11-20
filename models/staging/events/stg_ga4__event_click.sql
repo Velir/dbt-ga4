@@ -1,5 +1,11 @@
 -- reference here: https://support.google.com/analytics/answer/9216061?hl=en 
- 
+
+{{
+  config(
+    materialized='incremental'
+  )
+}}
+
  with click_with_params as (
    select *,
       {{ ga4.unnest_key('event_params', 'entrances',  'int_value') }},
@@ -21,6 +27,9 @@
       {% endif %}
  from {{ref('stg_ga4__events')}}
  where event_name = 'click'
+ {% if is_incremental() %}
+  and event_date_dt = CURRENT_DATE()
+ {% endif %}
 )
 
 select * from click_with_params
