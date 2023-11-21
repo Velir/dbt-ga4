@@ -13,7 +13,7 @@ with page_views_first_last as (
     from {{ref('stg_ga4__events')}}
     where event_name = 'page_view'
     {% if is_incremental() %}
-        and event_date_dt = CURRENT_DATE()
+        and event_date_dt >= CURRENT_DATE() - 7
     {% endif %}
 ),
 page_views_by_session_key as (

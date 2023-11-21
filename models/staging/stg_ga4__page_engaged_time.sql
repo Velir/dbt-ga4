@@ -10,7 +10,7 @@ select
     sum(engagement_time_msec) as page_engagement_time,
 from {{ ref('stg_ga4__events') }}
 {% if is_incremental() %}
-    where event_date_dt = CURRENT_DATE()
+    where event_date_dt >= CURRENT_DATE() - 7
 {% endif %}
 group by 1
 ),

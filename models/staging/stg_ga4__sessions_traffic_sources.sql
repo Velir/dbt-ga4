@@ -20,7 +20,7 @@ with session_events as (
     and event_name != 'session_start'
     and event_name != 'first_visit'
     {% if is_incremental() %}
-        and event_date_dt = CURRENT_DATE()
+        and event_date_dt >= CURRENT_DATE() - 7
     {% endif %}
    ),
 set_default_channel_grouping as (

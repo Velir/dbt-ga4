@@ -11,7 +11,7 @@ with event_and_query_string as
         split(page_query_string, '&') as qs_split
     from {{ref('stg_ga4__events')}}
     {% if is_incremental() %}
-        event_date_dt = CURRENT_DATE()
+        where event_date_dt >= CURRENT_DATE() - 7
     {% endif %}
 ),
 flattened_qs as

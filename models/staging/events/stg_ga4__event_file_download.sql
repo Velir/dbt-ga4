@@ -26,7 +26,7 @@
  from {{ref('stg_ga4__events')}}    
  where event_name = 'file_download'
  {% if is_incremental() %}
-  and event_date_dt = CURRENT_DATE()
+  and event_date_dt >= CURRENT_DATE() - 7
  {% endif %}
 )
 

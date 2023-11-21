@@ -40,7 +40,7 @@ with items_with_params as (
         unnest(items) as i
     where event_name in ('add_payment_info', 'add_shipping_info', 'add_to_cart','add_to_wishlist','begin_checkout' ,'purchase','refund', 'remove_from_cart','select_item', 'select_promotion','view_item_list','view_promotion', 'view_item')
     {% if is_incremental() %}
-        and event_date_dt = CURRENT_DATE()
+        and event_date_dt >= CURRENT_DATE() - 7
     {% endif %}
 )
 

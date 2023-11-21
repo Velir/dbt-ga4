@@ -19,7 +19,7 @@ with first_visit_with_params as (
  from {{ref('stg_ga4__events')}}    
  where event_name = 'first_visit'
  {% if is_incremental() %}
-  and event_date_dt = CURRENT_DATE()
+  and event_date_dt >= CURRENT_DATE() - 7
  {% endif %}
 )
 
