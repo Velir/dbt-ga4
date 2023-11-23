@@ -1,12 +1,15 @@
 {{ config(
   enabled = true if var('user_properties', false) else false,
-  materialized = "table"
+  materialized = "incremental"
 ) }}
 
 -- Remove null client_key (users with privacy enabled)
 with events_from_valid_users as (
     select * from {{ref('stg_ga4__events')}}
     where client_key is not null
+    {% if is_incremental() %}
+       and event_date_dt >= CURRENT_DATE() - 7
+    {% endif %}
 ),
 unnest_user_properties as
 (
