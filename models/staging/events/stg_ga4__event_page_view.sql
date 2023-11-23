@@ -1,3 +1,7 @@
+{{
+    config(materialized='incremental')
+}}
+
  with page_view_with_params as (
    select * except(page_engagement_key),
       {{ ga4.unnest_key('event_params', 'entrances',  'int_value') }},
@@ -15,6 +19,9 @@
       {% endif %}
  from {{ref('stg_ga4__events')}}    
  where event_name = 'page_view'
+ {% if is_incremental() %}
+       and event_date_dt >= CURRENT_DATE() - 7
+ {% endif %}
 )
 select *
 from page_view_with_params
