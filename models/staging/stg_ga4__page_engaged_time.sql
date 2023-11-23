@@ -1,8 +1,17 @@
+{{
+    config(
+        materialized='incremental'
+    )
+}}
+
 with pek_time as (
 select
     page_engagement_key,
     sum(engagement_time_msec) as page_engagement_time,
 from {{ ref('stg_ga4__events') }}
+{% if is_incremental() %}
+    where event_date_dt >= CURRENT_DATE() - 7
+{% endif %}
 group by 1
 ),
 matched_pv as ( -- need to replace the pek with one that uses page_location to match back to correct page_view

@@ -1,3 +1,9 @@
+{{
+    config(
+        materialized='incremental'
+    )
+}}
+
 with session_events as (
     select 
         session_key
@@ -13,6 +19,9 @@ with session_events as (
     where session_key is not null
     and event_name != 'session_start'
     and event_name != 'first_visit'
+    {% if is_incremental() %}
+        and event_date_dt >= CURRENT_DATE() - 7
+    {% endif %}
    ),
 set_default_channel_grouping as (
     select

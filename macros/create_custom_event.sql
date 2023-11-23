@@ -12,4 +12,7 @@
         {% endif %}
     from {{ref('stg_ga4__events')}}
     where event_name = '{{event_name}}'
+    {% if is_incremental() %}
+        and event_date_dt >= CURRENT_DATE() - 7
+    {% endif %}
 {%- endmacro -%}
