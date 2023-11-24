@@ -1,4 +1,4 @@
-# GA4 DBT Package 
+# GA4 DBT Package
 
 This [dbt](https://www.getdbt.com/) package connects to an exported GA4 dataset and provides useful transformations as well as report-ready dimensional models that can be used to build reports.
 
