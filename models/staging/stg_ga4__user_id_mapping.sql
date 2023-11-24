@@ -1,5 +1,5 @@
 {{
-    config(materialized='incremental')
+    config(materialized='table')
 }}
 
 with events_with_user_id as (

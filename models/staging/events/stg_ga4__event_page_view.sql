@@ -1,5 +1,7 @@
 {{
     config(materialized='incremental')
+    unique_key='event_key'
+
 }}
 
  with page_view_with_params as (
