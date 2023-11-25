@@ -1,6 +1,13 @@
 {{
   config(
-    materialized='incremental'
+    materialized='incremental',
+        
+        incremental_strategy='insert_overwrite',
+        partition_by={
+                        "field": "event_date_dt",
+                        "data_type": "date",
+                        "granularity": "day"
+                    },
   )
 }}
 

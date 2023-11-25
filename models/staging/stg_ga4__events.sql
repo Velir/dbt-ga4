@@ -5,6 +5,7 @@
 		"granularity": "day"
 		},
         materialized='incremental',
+        incremental_strategy='insert_overwrite',
 	cluster_by=["event_name"]
     )
 }}

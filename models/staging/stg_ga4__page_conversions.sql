@@ -1,6 +1,6 @@
 {{ config(
   enabled= var('conversion_events', false) != false,
-  materialized='incremental'
+  materialized='table'
 ) }}
 
 select 
