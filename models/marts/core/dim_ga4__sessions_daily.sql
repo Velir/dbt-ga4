@@ -53,9 +53,9 @@ with event_dimensions as
         device_web_info_browser,
         device_web_info_browser_version,
         device_web_info_hostname,
-        user_campaign,
-        user_medium,
-        user_source,
+        event_campaign,
+        event_medium,
+        event_source,
     from {{ref('stg_ga4__events')}}
     where event_name != 'first_visit' 
     and event_name != 'session_start'
@@ -134,9 +134,9 @@ with event_dimensions as
         ,FIRST_VALUE(device_web_info_browser IGNORE NULLS) OVER (session_partition_window) AS device_web_info_browser
         ,FIRST_VALUE(device_web_info_browser_version IGNORE NULLS) OVER (session_partition_window) AS device_web_info_browser_version
         ,FIRST_VALUE(device_web_info_hostname IGNORE NULLS) OVER (session_partition_window) AS device_web_info_hostname
-        ,FIRST_VALUE(user_campaign IGNORE NULLS) OVER (session_partition_window) AS user_campaign
-        ,FIRST_VALUE(user_medium IGNORE NULLS) OVER (session_partition_window) AS user_medium
-        ,FIRST_VALUE(user_source IGNORE NULLS) OVER (session_partition_window) AS user_source
+        ,FIRST_VALUE(event_campaign IGNORE NULLS) OVER (session_partition_window) AS user_campaign
+        ,FIRST_VALUE(event_medium IGNORE NULLS) OVER (session_partition_window) AS user_medium
+        ,FIRST_VALUE(event_source IGNORE NULLS) OVER (session_partition_window) AS user_source
         from event_dimensions
     WINDOW session_partition_window AS (PARTITION BY session_partition_key ORDER BY event_timestamp ASC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
 )

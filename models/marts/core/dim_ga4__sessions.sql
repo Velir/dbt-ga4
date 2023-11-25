@@ -42,9 +42,9 @@ with session_first_event as
         device_web_info_hostname,
         session_number,
         session_number = 1 as is_first_session,
-        user_campaign,
-        user_medium,
-        user_source,
+        event_campaign,
+        event_medium,
+        event_source,
     from session_first_event
 ),
 join_traffic_source as (
