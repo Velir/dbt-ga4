@@ -160,3 +160,38 @@
         ELSE 0
     END AS is_purchase
 {% endmacro %}
+
+
+{% macro base_select_user_source() %}
+    {{ return(adapter.dispatch('base_select_user_source', 'ga4')()) }}
+{% endmacro %}
+
+{% macro base_select_user_source() %}
+    , parse_date('%Y%m%d',occurrence_date) as occurrence_date_dt
+    , user_info.last_active_timestamp_micros
+    , user_info.user_first_touch_timestamp_micros
+    , user_info.first_purchase_date
+    , device.operating_system as device_operating_system
+    , device.category as device_category
+    , device.mobile_brand_name as device_mobile_brand_name
+    , device.unified_screen_name as device_unified_screen_name
+    , geo.city as geo_city
+    , geo.country as geo_country
+    , geo.countinent as geo_continent
+    , geo.region as geo_region
+    , audiences -- leaving audiences as a record to be unnested into its own table
+    , user_properties -- unnesting in the staging model
+    , user_ltv.revenue_in_usd as user_ltv_revenue_in_usd
+    , user_ltv.sessions as user_ltv_sessions
+    , user_ltv.engagement_time_millis as user_ltv_engagement_time_millis -- we use msec, but there are millis and micros in the source data
+    , user_ltv.purchases as user_ltv_purchases
+    , user_ltv.engaged_sessions as user_ltv_engaged_sessions
+    , user_ltv.session_duration_micros as user_ltv_session_duration_micros
+    , predictions.in_app_purchase_score_7d as predictions_in_app_purchase_score_7d
+    , predictions.purachase_score_7d as predictions_in_purchase_score_7d
+    , predictions.churn_score_7d as predictions_churn_score_7d
+    , predictions.revenue_28d_in_usd as predictions_revenue_28d_in_usd
+    , privacy_info.is_limited_ad_tracking as privacy_info_is_limited_ad_tracking
+    , privacy_info.is_ads_personalization_allowed as privacy_info_is_ads_personalization_allowed
+    , last_updated_date
+{% endmacro %}
