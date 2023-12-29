@@ -235,7 +235,7 @@ Specific event names can be specified as conversions by setting the `conversion_
 ```
 vars:
   ga4:
-    conversion_events:['purchase','download']
+    conversion_events: ['purchase','download']
 ```
 
 ### Session Attribution Lookback Window
