@@ -4,7 +4,7 @@
 
 {% macro default__combine_property_data() %}
 
-    create schema if not exists `{{var('project')}}.{{var('dataset')}}`;
+    create schema if not exists `{{target.project}}.{{var('combined_dataset')}}`;
 
     {# If incremental, then use static_incremental_days variable to find earliest shard to copy #}
     {% if not should_full_refresh() %}
@@ -22,7 +22,7 @@
             {% for relation in relations %}
                 {%- set relation_suffix = relation.identifier|replace('events_intraday_', '') -%}
                 {%- if relation_suffix|int >= earliest_shard_to_retrieve|int -%}
-                    CREATE OR REPLACE TABLE `{{var('project')}}.{{var('dataset')}}.events_intraday_{{relation_suffix}}{{property_id}}` CLONE `{{var('project')}}.analytics_{{property_id}}.events_intraday_{{relation_suffix}}`;
+                    CREATE OR REPLACE TABLE `{{target.project}}.{{var('combined_dataset')}}.events_intraday_{{relation_suffix}}{{property_id}}` CLONE `{{var('project')}}.analytics_{{property_id}}.events_intraday_{{relation_suffix}}`;
                 {%- endif -%}
             {% endfor %}
             {# Copy daily tables and drop old intraday table #}
@@ -30,8 +30,8 @@
             {% for relation in relations %}
                 {%- set relation_suffix = relation.identifier|replace('events_', '') -%}
                 {%- if relation_suffix|int >= earliest_shard_to_retrieve|int -%}
-                    CREATE OR REPLACE TABLE `{{var('project')}}.{{var('dataset')}}.events_{{relation_suffix}}{{property_id}}` CLONE `{{var('project')}}.analytics_{{property_id}}.events_{{relation_suffix}}`;
-                    DROP TABLE IF EXISTS `{{var('project')}}.{{var('dataset')}}.events_intraday_{{relation_suffix}}{{property_id}}`;
+                    CREATE OR REPLACE TABLE `{{target.project}}.{{var('combined_dataset')}}.events_{{relation_suffix}}{{property_id}}` CLONE `{{var('project')}}.analytics_{{property_id}}.events_{{relation_suffix}}`;
+                    DROP TABLE IF EXISTS `{{target.project}}.{{var('combined_dataset')}}.events_intraday_{{relation_suffix}}{{property_id}}`;
                 {%- endif -%}
             {% endfor %}
     {% endfor %}
