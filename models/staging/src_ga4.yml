@@ -2,7 +2,7 @@ version: 2
 
 sources:
   - name: ga4
-    database: "{{var('project')}}" 
+    database: "{{var('source_project')}}" 
     schema: "{{var('dataset')}}" 
     tables:
       - name: events
