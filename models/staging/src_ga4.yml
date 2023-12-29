@@ -3,7 +3,10 @@ version: 2
 sources:
   - name: ga4
     database: "{{var('source_project')}}" 
-    schema: "{{var('dataset')}}" 
+    schema: | # Source from combined property dataset if set, otherwise source from source property
+      {%- if  var('combined_dataset', false) != false -%} {{var('combined_dataset')}}
+      {%- else -%} "analytics_{{var('property_ids')[0]}}"
+      {%- endif -%}
     tables:
       - name: events
         identifier: events_* # Scan across all sharded event tables. Use the 'start_date' variable to limit this scan

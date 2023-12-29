@@ -77,12 +77,25 @@ This package assumes that you have an existing DBT project with a BigQuery profi
 ```
 vars:
   ga4:
-    project: "your_gcp_project"
-    dataset: "your_ga4_dataset"
+    source_project: "my_source_gcp_project" # Project that contains raw GA4 data
+    property_ids: [11111111] # Array of properties to process
     start_date: "YYYYMMDD" # Earliest date to load
     static_incremental_days: 3 # Number of days to scan and reprocess on each run
 ```
-See [Multi-Property Support](#multi-property-support) section for details on configuring multiple GA4 properties as a source.
+
+## Required Variables (Multi-Project Instance)
+
+When processing multiple properties at a time, the required variables change slightly. See [Multi-Property Support](#multi-property-support) section for details on configuring multiple GA4 properties as a source.
+
+```
+vars:
+  ga4:
+    source_project: "my_source_gcp_project" # Project that contains raw GA4 data
+    combined_dataset: "my_combined_data" # Dataset where multi-property data is cloned
+    property_ids: [11111111,2222222] # Array of properties to process
+    start_date: "YYYYMMDD" # Earliest date to load
+    static_incremental_days: 3 # Number of days to scan and reprocess on each run
+```
 
 ## Optional Variables
 
