@@ -308,14 +308,14 @@ Overriding the package's default channel mapping makes use of dbt's dispatch ove
 
 # Multi-Property Support
 
-Multiple GA4 properties are supported by listing out the project IDs in the `property_ids` variable. In this scenario, the `static_incremental_days` variable is required and the `dataset` variable will define the target dataset where source data will be copied.
+Multiple GA4 properties are supported by listing out the project IDs in the `property_ids` variable. In this scenario, the `static_incremental_days` variable is required and the `combined_dataset` variable will define the dataset (in your profile's target project) where source data will be copied.
 
 ```
 vars:
   ga4:
     property_ids: [11111111, 22222222, 33333333]
     static_incremental_days: 3
-    dataset: "my_combined_dataset"
+    combined_dataset: "my_combined_dataset"
 ```
 
 With these variables set, the `combine_property_data` macro will run as a pre-hook to `base_ga4_events` and clone shards to the target dataset.  The number of days' worth of data to clone during incremental runs will be based on the `static_incremental_days` variable. 
