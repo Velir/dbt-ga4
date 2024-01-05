@@ -36,12 +36,21 @@ from {{ref('stg_ga4__event_page_view')}}
     group by 1,2,3,4,5,6,7
 ), page_engagement as (
     select
-        page_view.* except(page_engagement_key),
+        page_view.event_date_dt,
+        page_view.stream_id,
+        page_view.page_location,
+        page_view.page_title,
+        page_view.page_key,
+        page_view.page_path,
+        sum(page_view.page_views) as page_views,  -- page_engagement_key references the page_referrer; need to re-aggregate metrics
+        sum(page_view.distinct_client_keys) as distinct_client_keys,
+        sum(page_view.new_client_keys) as new_client_keys,
+        sum(page_view.entrances) as entrances,
         sum(page_engagement_time_msec) as total_engagement_time_msec,
         sum( page_engagement_denominator) as avg_engagement_time_denominator
     from {{ ref('stg_ga4__page_engaged_time') }}
     right join page_view using (page_engagement_key)
-    group by 1,2,3,4,5,6,7,8,9,10
+    group by 1,2,3,4,5,6
 ), scroll as (
     select
         event_date_dt,
