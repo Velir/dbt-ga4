@@ -66,7 +66,7 @@ with last_non_direct_session_partition_key as (
     ,coalesce(last_non_direct_source.session_campaign, '(none)') as last_non_direct_campaign
     ,coalesce(last_non_direct_source.session_content, '(none)') as last_non_direct_content
     ,coalesce(last_non_direct_source.session_term, '(none)') as last_non_direct_term
-    ,coalesce(last_non_direct_source.session_default_channel_grouping, '(none)') as last_non_direct_default_channel_grouping
+    ,coalesce(last_non_direct_source.session_default_channel_grouping, 'Direct') as last_non_direct_default_channel_grouping
   from last_non_direct_session_partition_key
   left join {{ref('stg_ga4__sessions_traffic_sources_daily')}} last_non_direct_source on
     last_non_direct_session_partition_key.session_partition_key_last_non_direct = last_non_direct_source.session_partition_key
