@@ -3,19 +3,9 @@
     {% set partitions_to_replace = partitions_to_replace.append('current_date - ' + (i+1)|string) %}
 {% endfor %}
 
-{{
-    config(
-        pre_hook="{{ ga4.combine_property_data() }}" if var('combined_dataset', false) else "",
-        materialized = 'incremental',
-        incremental_strategy = {{ var('ga4_incremental_strategy') }},
-        partition_by={
-            "field": "event_date_dt",
-            "data_type": "date",
-        },
-        partitions = partitions_to_replace,
-        cluster_by=['event_name']
-    )
-}}
+
+{{ incremental_config('event_date_dt', 'date') }}
+
 
 with source as (
     select
