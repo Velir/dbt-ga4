@@ -8,7 +8,7 @@ select
     count(event_source) as sources
     , count(event_medium) as mediums
 from {{ref('stg_ga4__events')}}
-where page_location like '%gclid%'
+where original_page_location like '%gclid%'
     and event_source != 'google'
     and event_medium != 'cpc'
 having sources > 0
