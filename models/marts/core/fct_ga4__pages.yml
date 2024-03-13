@@ -2,10 +2,10 @@ version: 2
 
 models:
   - name: fct_ga4__pages
-    description: Incremental model with page metrics such as visits, users, new_users, entrances and exits as well as configurable conversion counts grouped by page_location. 
+    description: Incremental model with page metrics such as visits, users, new_users, entrances and exits as well as configurable conversion counts grouped by stream_id and page_location.
     tests:
       - unique:
-          column_name: "(page_location || event_date_dt)"
+          column_name: "(event_date_dt || stream_id || page_location)"
     columns:
       - name: total_engagement_time_msec
         description: The total engagement time for that page_location.

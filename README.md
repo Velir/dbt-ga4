@@ -30,7 +30,7 @@ Features include:
 | dim_ga4__client_keys | Dimension table for user devices as indicated by client_keys. Contains attributes such as first and last page viewed.| 
 | dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and acquisition data. Can be expensive to run on large installs (see `dim_ga4__sessions_daily`) |
 | dim_ga4__sessions_daily | Query-optimized session dimension table that is incremental and partitioned on date. Assumes that each partition is contained within a single day |
-| fct_ga4__pages | Fact table for pages which aggregates common page metrics by page_location and date. |
+| fct_ga4__pages | Fact table for pages which aggregates common page metrics by date, stream_id and page_location. |
 | fct_ga4__sessions_daily | Fact table for session metrics, partitioned by date. A single session may span multiple rows given that sessions can span multiple days.  |
 | fct_ga4__sessions | Fact table that aggregates session metrics across days. This table is not partitioned, so be mindful of performance/cost when querying. |
 
