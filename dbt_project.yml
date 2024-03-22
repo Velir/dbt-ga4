@@ -8,8 +8,8 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-#profile: 'velir_bq_ga4' # bq
-profile: 'velir_sf_ga4' # sf
+#profile: 'bq_ga4' # bq
+profile: 'sf_ga4' # sf
 
 target-path: "target"  # directory which will store compiled SQL files
 clean-targets:         # directories to be removed by `dbt clean`
@@ -18,12 +18,10 @@ clean-targets:         # directories to be removed by `dbt clean`
 
 vars:
   start_date: "20230306" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model.
-  #source_project: "velir-website-analytics" # bq
-  source_project: "google_analytics_raw_data_dest_db" # sf
-  # this becomes a question of if we should make these variables source agnositic or source specific. should it be source_database (even though that specific) or should it be bq_source_project and sf_source_database
-  # also this gets loaded into one giant view, im not sure if the sharding/partitioning comes through, it might be best to just create a table no matter what with snowflake even if its only one property
-  source_schema: "google_analytics_raw_data_dest_schema"
-  property_ids: [320375000]
+  #source_project: "analytics" # bq
+  source_project: "analytics" # sf
+  source_schema: "schema"
+  property_ids: [id]
   frequency: "daily"
   conversion_events: ['sign_up','video_complete', 'video_start', 'goalkeepers_download_report']
   static_incremental_days: 3
