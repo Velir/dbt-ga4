@@ -4,7 +4,33 @@
 {% endfor %}
 
 
-{{ incremental_config('event_date_dt', 'date') }}
+{%- if target.type == 'bigquery' -%}
+
+    {{
+        config(
+            pre_hook = "{{ ga4.combine_property_data() }}" if var('combined_dataset', false) else "",
+            materialized = "incremental",
+            incremental_strategy = "insert_overwrite",
+            partition_by = {
+                "field": "event_date_dt",
+                "data_type": "date",
+            },
+            partitions = partitions_to_replace,
+            cluster_by = ["event_name"]
+        )
+    }}
+
+{%- elif target.type == 'snowflake' -%}
+
+    {{
+        config(
+            pre_hook = "{{ ga4.combine_property_data() }}" if var('combined_dataset', false) else "",
+            materialized = "incremental",
+            incremental_strategy = "delete+insert",
+        )
+    }}
+
+{%- endif -%}
 
 
 with source as (
@@ -15,6 +41,7 @@ with source as (
     {% if is_incremental() %}
         and parse_date('%Y%m%d', left(replace(_table_suffix, 'intraday_', ''), 8)) in ({{ partitions_to_replace | join(',') }})
     {% endif %}
+    and cast(left(replace(_table_suffix, 'intraday_', ''), 8) as int64) = 20240305
 ),
 renamed as (
     select
