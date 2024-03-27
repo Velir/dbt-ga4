@@ -38,12 +38,10 @@ detect_gclid as (
         end as event_source,
         case
             when (page_location like '%gclid%' and event_medium is null) then "cpc"
-            when (page_location like '%gclid%' and event_medium = 'organic') then "cpc"
             else event_medium
         end as event_medium,
         case
             when (page_location like '%gclid%' and event_campaign is null) then "(cpc)"
-            when (page_location like '%gclid%' and event_campaign = 'organic') then "(cpc)"
             else event_campaign
         end as event_campaign
     from include_event_key
