@@ -1,0 +1,5 @@
+version: 2
+
+models:
+  - name: stg_ga4__event_purchase
+    description: GA4 events filtered to only show 'purchase' events. Pivots common event parameters into separate columns. 

@@ -1,0 +1,47 @@
+version: 2
+
+models:  
+  - name: base_ga4__events
+    description: >
+      Base events model that pulls all fields from raw data. Resulting table is partitioned on event_date_dt which 
+      is useful in that BQ queries can be cached against this table, but not against wildcard searches from the original sharded tables. 
+      This model handles some light transformation and renaming beyond the base events model. 
+      Events are deduped by looking for duplicate event and event parameter payloads. 
+      More documentation here: https://support.google.com/analytics/answer/7029846
+    columns:
+      - name: event_date_dt
+        description: Date of the event converted to Date type. Time zone is the time zone configured in the GA4 property. 
+      - name: event_timestamp
+        description: >
+          Timestamp (in microseconds) indicating when the event's batch was received (as opposed to when the event actually occurred).  
+          Time zone is technically UTC, but in a practical sense it is set to the time zone configured in the GA4 property. 
+      - name: user_campaign
+        description: >
+          Contains the initial campaign name that brought the user to the property. This has been renamed from traffic_source.name.
+          From Google's documentation: Name of the marketing campaign that first acquired the user. This field is not populated in intraday tables.
+          Note: traffic_source attribution is based on cross-channel last click. The traffic_source values do not change if the user interacts with subsequent campaigns after installation.
+          https://support.google.com/analytics/answer/7029846?hl=en#zippy=%2Ctraffic-source
+      - name: user_medium
+        description: Contains the initial medium that brought the user to the property. This has been renamed from traffic_source.medium.
+      - name: user_source
+        description: Contains the initial source that brought the user to the property. This has been renamed from traffic_source.source.
+      - name: session_id
+        description: Unique identifier for the user's session. This is not guaranteed unique across users. Renamed from ga_session_id
+      - name: event_campaign
+        description: Contain's the campaign associated with the event (typically derived from utm_campaign)
+      - name: event_source
+        description: Contain's the source associated with the event (typically derived from utm_source)
+      - name: event_medium
+        description: Contain's the campaign associated with the event (typically derived from utm_medium)
+      - name: event_content
+        description: Contain's the campaign associated with the event (typically derived from utm_content)
+      - name: event_term
+        description: Contain's the campaign associated with the event (typically derived from utm_term)
+      - name: stream_id
+        description: The numeric ID of the data stream from which the event originated.
+      - name: platform
+        description: The data stream platform (Web, IOS or Android) from which the event originated.
+      - name: privacy_info_analytics_storage
+        description: Whether Analytics storage is enabled for the user. Possible values are Yes, No, Unset
+      - name: privacy_info_ads_storage
+        description: Whether ad targeting is enabled for a user. Possible values are Yes, No, Unset

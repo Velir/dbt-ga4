@@ -1,0 +1,20 @@
+version: 2
+
+models:  
+  - name: stg_ga4__events
+    description: Staging model that generates keys for users, sessions, and events. Also parses URLs to remove query string params as defined in project config. 
+    columns:
+      - name: client_key
+        description: Surrogate key created from stream_id and user_pseudo_id. Provides a way to uniquely identify a user's device within a stream. Important when using the package to combine data across properties and streams.
+      - name: event_key
+        tests:
+          - unique
+      - name: page_path
+        description: This field contains the page_location with the query string portion removed. Uses macro remove_query_string
+      - name: page_engagement_key
+        description: > 
+          This field is used to assign engagement_time_msec to the correct page. 
+          While the GA4 documentation claims that a user_engagement event that sets engagement_time_msec should fire when navigating to a new page, 
+          the data shows that this is not always the case. When a user_engagement event does not fire, the engagement_time_msec parameter is assigned to the next page_view. 
+          This engagement time should be credited to the previous page, 
+          so for page_view events this field uses the session_key and page_referrer as the key while all other events use the session_key and page_location.

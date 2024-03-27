@@ -1,0 +1,11 @@
+version: 2
+
+models:  
+  - name: stg_ga4__derived_session_properties_daily
+    description: >
+      Optional model that will pull out the most recent instance of a particular event parameter for each session_partition_key. 
+      Later used in the fct_ga4__sessions_daily fact table.
+    columns:
+      - name: session_partition_key
+        tests:
+          - unique

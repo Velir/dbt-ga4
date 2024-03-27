@@ -1,0 +1,11 @@
+version: 2
+
+models:  
+  - name: stg_ga4__derived_session_properties
+    description: >
+      Optional model that will pull out the most recent instance of a particular event parameter for each session_key. 
+      Later used in the fct_ga4__sessions fact table.
+    columns:
+      - name: session_key
+        tests:
+          - unique  

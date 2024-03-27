@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: dim_ga4__sessions
+    description: Dimension table for sessions containing context useful for filtering such as acquisition source, medium, and campaign. Each row represents a session. Unique on session_key
+    columns:
+      - name: session_key
+        tests:
+          - unique
+  - name: dim_ga4__client_keys
+    description: Dimension table for user devices (client_key) which includes data from the first and last event produced. Unique on client_key
+    columns:
+      - name: client_key
+        description: Hashed combination of user_pseudo_id and stream_id
+        tests:
+          - unique
+  - name: fct_ga4__client_keys
+    description: Fact table with aggregate metrics at the level of the user's device (as indicated by the client_key). Metrics are aggregated from fct_ga4__sessions.
+    columns:
+      - name: client_key
+        description: Hashed combination of user_pseudo_id and stream_id
+        tests: 
+          - unique

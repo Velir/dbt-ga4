@@ -1,0 +1,37 @@
+name: Run Unit Tests on Pull Request
+
+on: [pull_request_target,workflow_dispatch]
+env:
+  BIGQUERY_PROJECT: ${{ secrets.BIGQUERY_PROJECT }}
+
+jobs:
+  pytest_run_all:
+    name: Pytest Run All
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./unit_tests
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/setup-python@v1
+        with:
+          python-version: "3.11.x"
+
+      - name: Authenticate using service account
+        run: 'echo "$KEYFILE" > ./dbt-service-account.json'
+        shell: bash
+        env:
+          KEYFILE: ${{secrets.GCP_BIGQUERY_USER_KEYFILE}}
+
+      - name: Install dependencies
+        run: |
+          pip install dbt-core
+          pip install dbt-bigquery
+          pip install pytest
+      
+      - name: Run tests
+        run: python -m pytest .

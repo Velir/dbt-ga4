@@ -1,0 +1,10 @@
+version: 2
+
+models:  
+  - name: stg_ga4__user_properties
+    description: Contains unnested user_properties. Uses the user_properties dbt variable to determine which properties to unnest. 
+    columns:
+      - name: client_key
+        description: Hashed combination of user_pseudo_id and stream_id
+        tests:
+          - unique

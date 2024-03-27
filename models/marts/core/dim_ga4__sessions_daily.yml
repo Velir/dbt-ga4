@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: dim_ga4__sessions_daily
+    description: >
+      Incremental, partitioned dimension table for session partitions. Partitioned on session_partition_date for improved query optimization when filtering on date. 
+      Contains context useful for filtering sessions such as acquisition source, medium, and campaign. 
+      Each row represents a daily session partition (as opposed to a session). 
+      Unique on session_partion_key
+    columns:
+      - name: session_partition_key
+        description: >
+          Unique key assigned to session partitions which are daily partitions of a session. In GA4, sessions can span multiple days. 
+          To improve query performance, it's easier to work with 'session partitions' which can be filtered/partitioned by date.
+        tests:
+          - unique
+      - name: session_key
+        description: >
+          Unique key assigned to sessions. Sessions can span multiple dates/partitions. 
+      - name: session_partition_date
+        description: >
+          Date associated with the session_partition_key. Used to partition the table. Filter on this column to optimize query cost and performance. 
+      - name: session_source
+        description: The source of the session based on the events contained within this particular session. For last non-direct source, see last_non_direct_source
+      - name: last_non_direct_source
+        description: The last non-direct source attributed to this session based on a 30-day lookback window. 

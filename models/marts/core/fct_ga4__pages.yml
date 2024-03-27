@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: fct_ga4__pages
+    description: Incremental model with page metrics such as visits, users, new_users, entrances and exits as well as configurable conversion counts grouped by stream_id and page_location.
+    tests:
+      - unique:
+          column_name: "(event_date_dt || stream_id || page_location)"
+    columns:
+      - name: total_engagement_time_msec
+        description: The total engagement time for that page_location.
+      - name: avg_engagement_time_denominator
+        description: Use avg_engagement_time_denominator to calculate the average engagement time, which is derived by dividing the sum of total engagement time by the product of the sum of the denominator and 1000 to get the average engagement time in seconds (average_engagement_time = sum(total_engagement_time_msec)/(sum(avg_engagement_time_denominator) *1000 )). The denominator excludes page_view events where no engagement time is recorded for the page_location within a session. However, it includes subsequent page_view events to a page_location that has previously recorded a page_view event in the same session, even if the subsequent event has no recorded engagement time.

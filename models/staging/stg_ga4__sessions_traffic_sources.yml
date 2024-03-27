@@ -1,0 +1,17 @@
+version: 2
+
+models:  
+  - name: stg_ga4__sessions_traffic_sources
+    description: >
+      Finds the first session source, medium and campaign and adds the default channel grouping information. 
+      Uses the first non-null source value as the basis for selecting the event that will be used to assign source, medium, campaign, content, and term values. 
+      The session_start and first_visit events are ignored for this purpose as they contain no acquisition data. 
+      Aggregated by session_key.
+    columns:
+      - name: session_key
+        tests:
+          - unique
+      - name: session_source
+        description: First non-null source value of the session
+        tests:
+          - not_null

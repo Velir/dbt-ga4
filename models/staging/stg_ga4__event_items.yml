@@ -1,0 +1,5 @@
+version: 2
+
+models:
+  - name: stg_ga4__event_items
+    description: Flattens out the 'items' field for e-commerce events such as purchase and add_to_cart

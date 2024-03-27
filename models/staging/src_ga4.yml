@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: ga4
+    database: | # Source from target.project if multi-property, otherwise source from source_project
+      {%- if  var('combined_dataset', false) != false -%} {{target.project}}
+      {%- else -%} {{var('source_project')}}
+      {%- endif -%}
+    schema: | # Source from combined property dataset if set, otherwise source from original GA4 property
+      {%- if  var('combined_dataset', false) != false -%} {{var('combined_dataset')}}
+      {%- else -%} analytics_{{var('property_ids')[0]}}
+      {%- endif -%}
+    tables:
+      - name: events
+        identifier: events_* # Scan across all sharded event tables. Use the 'start_date' variable to limit this scan
+        description: Main events table exported by GA4. Sharded by date. 

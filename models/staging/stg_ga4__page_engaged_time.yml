@@ -1,0 +1,10 @@
+version: 2
+
+models:  
+  - name: stg_ga4__page_engaged_time
+    description: View that calculates the numerator and denominator for engagement time metrics.
+    columns:
+      - name: page_engagement_time
+        description: Total engagement time in a session for all page_view events to the same page_location.
+      - name: page_engagement_denominator
+        description: The total number of page_views in a session to the same page_location except for pages with no page_engagement_time.
