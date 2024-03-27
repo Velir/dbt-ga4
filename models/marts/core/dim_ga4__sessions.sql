@@ -1,3 +1,19 @@
+{{
+    config(
+        materialized = 'incremental',
+        incremental_strategy = 'merge',
+        tags = ["incremental"],
+        on_schema_change = 'sync_all_columns',
+        unnest_keys = ['session_key'],
+        partition_by={
+            "field": "session_partition_date",
+            "data_type": "date",
+            "granularity": "day"
+        },
+    )
+}}
+
+
 -- Dimension table for sessions based on the first event that isn't session_start or first_visit.
 with session_first_event as 
 (
@@ -5,12 +21,15 @@ with session_first_event as
     from {{ref('stg_ga4__events')}}
     where event_name != 'first_visit' 
     and event_name != 'session_start'
+    {% if is_incremental() %}
+      and event_date_dt >= date_sub(current_date, interval {{var('static_incremental_days',3) | int}} day)
+    {% endif %}
     qualify row_number() over(partition by session_key order by event_timestamp) = 1
 ),
  session_start_dims as (
     select 
         session_key,
-        event_date_dt as session_start_date,
+        event_date_dt as session_partition_date,
         event_timestamp as session_start_timestamp,
         page_path as landing_page_path,
         page_location as landing_page,
@@ -59,6 +78,9 @@ join_traffic_source as (
         sessions_traffic_sources.session_source_category
     from session_start_dims
     left join {{ref('stg_ga4__sessions_traffic_sources')}} sessions_traffic_sources using (session_key)
+    {% if is_incremental() %}
+      where sessions_traffic_sources.session_partition_date >= date_sub(current_date, interval {{var('static_incremental_days',3) | int}} day)
+    {% endif %}
 ),
 include_session_properties as (
     select 

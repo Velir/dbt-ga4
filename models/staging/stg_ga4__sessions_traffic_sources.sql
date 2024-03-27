@@ -1,3 +1,17 @@
+{{
+    config(
+        materialized = 'incremental',
+        incremental_strategy = 'insert_overwrite',
+        tags = ["incremental"],
+        on_schema_change = 'sync_all_columns',
+        partition_by={
+            "field": "session_partition_date",
+            "data_type": "date",
+            "granularity": "day"
+        },
+    )
+}}
+
 with session_events as (
     select
         session_key
@@ -8,11 +22,15 @@ with session_events as (
         ,event_content
         ,event_term
         ,source_category
+        ,event_date_dt
     from {{ref('stg_ga4__events')}} events
     left join {{ref('ga4_source_categories')}} source_categories on events.event_source = source_categories.source
     where session_key is not null
     and event_name != 'session_start'
     and event_name != 'first_visit'
+    {% if is_incremental() %}
+      and event_date_dt >= date_sub(current_date, interval {{var('static_incremental_days',3) | int}} day)
+    {% endif %}
    ),
 set_default_channel_grouping as (
     select
@@ -23,6 +41,7 @@ set_default_channel_grouping as (
 session_source as (
     select
         session_key
+        ,FIRST_VALUE( event_date_dt IGNORE NULLS) OVER (session_window) AS session_partition_date
         ,COALESCE(FIRST_VALUE((CASE WHEN event_source <> '(direct)' THEN event_source END) IGNORE NULLS) OVER (session_window), '(direct)') AS session_source
         ,COALESCE(FIRST_VALUE((CASE WHEN event_source <> '(direct)' THEN COALESCE(event_medium, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS session_medium
         ,COALESCE(FIRST_VALUE((CASE WHEN event_source <> '(direct)' THEN COALESCE(source_category, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS session_source_category
