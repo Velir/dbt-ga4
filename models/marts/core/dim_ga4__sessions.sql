@@ -10,6 +10,9 @@
             "data_type": "date",
             "granularity": "day"
         },
+        merge_exclude_columns= [
+            'session_partition_date'
+        ]
     )
 }}
 
@@ -17,14 +20,16 @@
 -- Dimension table for sessions based on the first event that isn't session_start or first_visit.
 with session_first_event as 
 (
-    select *
-    from {{ref('stg_ga4__events')}}
-    where event_name != 'first_visit' 
-    and event_name != 'session_start'
+    select e.*
+    from {{ref('stg_ga4__events')}} e
+    inner join {{ref("stg_ga4__sessions_first_last_pageviews")}} pv 
+    on e.session_key = pv.session_key and e.event_date_dt = date(pv.first_page_view_event_time)
+    where e.event_name != 'first_visit' 
+    and e.event_name != 'session_start'
     {% if is_incremental() %}
-      and event_date_dt >= date_sub(current_date, interval {{var('static_incremental_days',3) | int}} day)
+      and e.event_date_dt >= date_sub(current_date, interval {{var('static_incremental_days',3) | int}} day)
     {% endif %}
-    qualify row_number() over(partition by session_key order by event_timestamp) = 1
+    qualify row_number() over(partition by e.session_key order by event_timestamp) = 1
 ),
  session_start_dims as (
     select 
