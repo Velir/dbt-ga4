@@ -32,6 +32,7 @@ jobs:
           pip install dbt-core
           pip install dbt-bigquery
           pip install pytest
+          pip install pyarrow
       
       - name: Run tests
         run: python -m pytest .
