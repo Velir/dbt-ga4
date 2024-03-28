@@ -1,3 +1,9 @@
+{{
+      config(
+        enabled = var('is_user_id_implemented', true),
+        )
+    }}
+
 with events_with_user_id as (
     select 
         user_id,

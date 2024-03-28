@@ -99,6 +99,14 @@ vars:
 
 ## Optional Variables
 
+### Exclude User Id models
+Many websites does not implement log-in feature lead to undefined (or null) `user_id` in GA4 data. While this is not recommended, but you can drop `stg_ga4__user_id_mapping` and `fct_ga4__user_ids` models by specify `is_user_id_implemented`, default to true.
+```
+vars:
+  ga4: 
+    is_user_id_implemented: false
+```
+
 ### Query Parameter Exclusions
 
 Setting `query_parameter_exclusions` will remove query string parameters from the `page_location` and `page_referrer` fields for all downstream processing. Original parameters are captured in the `original_page_location` and `original_page_referrer` fields. Ex:

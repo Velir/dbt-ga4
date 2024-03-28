@@ -20,31 +20,3 @@ models:
     +materialized: view
     marts:
       +materialized: table
-vars:
-  ga4:
-    source_project: "agile-scheme-394814"
-    property_ids: [336884118]
-    start_date: "20231001"
-    static_incremental_days: 2
-    query_parameter_exclusions: ["gclid", "fbclid", "_ga"]
-    query_parameter_extraction: ["gclid", "fbclid", "keyword"]
-    conversion_events: ["purchase", "message", "call", "generate_lead", "store_visit"]
-    user_properties:
-      - user_property_name: "phone"
-        value_type: "string_value"
-      - user_property_name: "address"
-        value_type: "string_value"
-      - user_property_name: "email"
-        value_type: "string_value"
-      - user_property_name: "name"
-        value_type: "string_value"
-    derived_user_properties:
-      - event_parameter: "page_location"
-        user_property_name: "most_recent_page_location"
-        value_type: "string_value"
-      - event_parameter: "store"
-        user_property_name: "visited_branch"
-        value_type: "string_value"
-      - event_parameter: "location"
-        user_property_name: "searched_branch"
-        value_type: "string_value"

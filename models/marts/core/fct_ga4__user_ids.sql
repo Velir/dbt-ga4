@@ -1,3 +1,11 @@
+
+    {{
+      config(
+        enabled = var('is_user_id_implemented', true),
+        )
+    }}
+
+
 with user_id_mapped as (
     select 
         client_keys.*,
