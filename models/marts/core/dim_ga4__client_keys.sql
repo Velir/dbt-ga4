@@ -70,14 +70,23 @@ include_first_last_page_views as (
 ),
 include_user_properties as (
 
-select * from include_first_last_page_views
+select p.*, 
+
+{% if var('derived_user_properties', false) %}
+    dup.* except(last_updated,client_key),
+{% endif %}
+{% if var('user_properties', false) %}
+    up.* except(last_updated,client_key),
+{% endif %}
+
+from include_first_last_page_views p
 {% if var('derived_user_properties', false) %}
 -- If derived user properties have been assigned as variables, join them on the client_key
-left join {{ref('stg_ga4__derived_user_properties')}} using (client_key)
+inner join {{ref('stg_ga4__derived_user_properties')}} as dup using (client_key)
 {% endif %}
 {% if var('user_properties', false) %}
 -- If user properties have been assigned as variables, join them on the client_key
-left join {{ref('stg_ga4__user_properties')}} using (client_key)
+inner join {{ref('stg_ga4__user_properties')}} as up using (client_key)
 {% endif %}
 
 )
