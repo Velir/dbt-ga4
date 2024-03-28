@@ -1,18 +1,15 @@
-{% set partitions_to_replace = ['current_date'] %}
-{% for i in range(var('static_incremental_days')) %}
-    {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
-{% endfor %}
 {{
     config(
         materialized = 'incremental',
-        incremental_strategy = 'insert_overwrite',
+        incremental_strategy = 'merge',
+        unique_key = ['event_date_dt', 'stream_id' , 'page_location'],
         tags = ["incremental"],
         partition_by={
             "field": "event_date_dt",
             "data_type": "date",
             "granularity": "day"
         },
-        partitions = partitions_to_replace
+        on_schema_change = 'sync_all_columns',
     )
 }}
 
@@ -29,7 +26,7 @@ with page_view as (
         sum(entrances) as entrances,
 from {{ref('stg_ga4__event_page_view')}}
 {% if is_incremental() %}
-        where event_date_dt in ({{ partitions_to_replace | join(',') }})
+        where event_date_dt >= date_sub(current_date, interval {{var('static_incremental_days',3)}} day)
 {% endif %}
     group by 1,2,3,4,5
 ), page_engagement as (
@@ -54,7 +51,7 @@ from {{ref('stg_ga4__event_page_view')}}
         count(event_name) as scroll_events
     from {{ref('stg_ga4__event_scroll')}}
     {% if is_incremental() %}
-            where event_date_dt in ({{ partitions_to_replace | join(',') }})
+            where event_date_dt >= date_sub(current_date, interval {{var('static_incremental_days',3)}} day)
     {% endif %}
     group by 1,2
 )

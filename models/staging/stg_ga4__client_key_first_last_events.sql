@@ -1,5 +1,45 @@
 {{
-    config(materialized = "table")
+    config(
+        materialized = 'incremental',
+        incremental_strategy = 'merge',
+        unique_key = ['client_key'],
+        tags = ["incremental"],
+        partition_by={
+            "field": "last_seen_at",
+            "data_type": "timestamp",
+            "granularity": "day"
+        },
+        merge_update_columns = [
+            'last_geo_continent',
+            'last_geo_country',
+            'last_geo_region',
+            'last_geo_city',
+            'last_geo_sub_continent',
+            'last_geo_metro',
+            'last_device_category',
+            'last_device_mobile_brand_name',
+            'last_device_mobile_model_name',
+            'last_device_mobile_marketing_name',
+            'last_device_mobile_os_hardware_model',
+            'last_device_operating_system',
+            'last_device_operating_system_version',
+            'last_device_vendor_id',
+            'last_device_advertising_id',
+            'last_device_language',
+            'last_device_is_limited_ad_tracking',
+            'last_device_time_zone_offset_seconds',
+            'last_device_browser',
+            'last_device_browser_version',
+            'last_device_web_info_browser',
+            'last_device_web_info_browser_version',
+            'last_device_web_info_hostname',
+            'last_user_campaign',
+            'last_user_medium',
+            'last_user_source',
+            'last_seen_at',
+        ],
+        on_schema_change = 'sync_all_columns',
+    )
 }}
 
 with first_last_event as (
@@ -10,6 +50,9 @@ with first_last_event as (
         stream_id
     from {{ref('stg_ga4__events')}}
     where client_key is not null --remove users with privacy settings enabled
+    {% if is_incremental() %}
+        and event_date_dt >= date_sub(current_date, interval {{var('static_incremental_days',3) | int}} day)
+    {% endif %}
 ),
 events_by_client_key as (
     select distinct
@@ -22,6 +65,7 @@ events_by_client_key as (
 events_joined as (
     select
         events_by_client_key.*,
+        timestamp_micros(events_first.event_timestamp) as first_visit,
         events_first.geo_continent as first_geo_continent,
         events_first.geo_country as first_geo_country,
         events_first.geo_region as first_geo_region,
@@ -74,11 +118,16 @@ events_joined as (
         events_last.user_campaign as last_user_campaign,
         events_last.user_medium as last_user_medium,
         events_last.user_source as last_user_source,
+        timestamp_micros(events_last.event_timestamp) as last_seen_at,
     from events_by_client_key
     left join {{ref('stg_ga4__events')}} events_first
         on events_by_client_key.first_event = events_first.event_key
     left join {{ref('stg_ga4__events')}} events_last
         on events_by_client_key.last_event = events_last.event_key
+    where 1=1
+    {% if is_incremental() %}
+        and events_last.event_date_dt >= date_sub(current_date, interval {{var('static_incremental_days',3) | int}} day)
+        and events_first.event_date_dt >= date_sub(current_date, interval {{var('static_incremental_days',3) | int}} day)
+    {% endif %}
 )
-
 select * from events_joined

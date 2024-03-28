@@ -172,3 +172,5 @@ cython_debug/
 
 #mac pc specific - system configuratio files
 .DS_Store
+
+.local*

@@ -1,0 +1,18 @@
+models:
+  - name: stg_ga4__sessions_first_last_pageviews
+    description: ""
+    columns:
+      - name: session_key
+        description: ""
+        data_type: STRING
+        tests:
+          - unique
+      - name: first_page_view_event_key
+        description: ""
+        data_type: STRING
+      - name: last_page_view_event_key
+        description: ""
+        data_type: STRING
+      - name: first_page_view_event_time
+        description: ""
+        data_type: TIMESTAMP
