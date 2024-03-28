@@ -1,10 +1,10 @@
 {{
     config(
         materialized = 'incremental',
-        incremental_strategy = 'merge',
+        incremental_strategy = 'insert_overwrite',
         tags = ["incremental"],
         on_schema_change = 'sync_all_columns',
-        unnest_keys = ['session_key'],
+        unique_key = ['session_key'],
         partition_by={
             "field": "session_partition_date",
             "data_type": "date",

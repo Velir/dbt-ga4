@@ -4,6 +4,7 @@
         incremental_strategy = 'insert_overwrite',
         tags = ["incremental"],
         on_schema_change = 'sync_all_columns',
+        unique_key = ['session_key'],
         partition_by={
             "field": "session_partition_date",
             "data_type": "date",

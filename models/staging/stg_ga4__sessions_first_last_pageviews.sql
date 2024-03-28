@@ -1,7 +1,7 @@
 {{
     config(
         materialized = 'incremental',
-        incremental_strategy = 'merge',
+        incremental_strategy = 'insert_overwrite',
         unique_key = ['session_key'],
         tags = ["incremental"],
         partition_by={
