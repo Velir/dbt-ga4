@@ -160,3 +160,48 @@
         ELSE 0
     END AS is_purchase
 {% endmacro %}
+
+{% macro base_select_usr_source() %}
+    {{ return(adapter.dispatch('base_select_usr_source', 'ga4')()) }}
+{% endmacro %}
+
+{% macro default__base_select_usr_source() %}
+    , user_info.last_active_timestamp_micros 
+    , user_info.user_first_touch_timestamp_micros 
+    , user_info.first_purchase_date 
+    , device.operating_system 
+    , device.category 
+    , device.mobile_brand_name 
+    , device.mobile_model_name 
+    , device.unified_screen_name 
+    , geo.city 
+    , geo.country 
+    , geo.continent 
+    , geo.region 
+    , user_ltv.revenue_in_usd 
+    , user_ltv.sessions 
+    , user_ltv.engagement_time_millis 
+    , user_ltv.purchases 
+    , user_ltv.engaged_sessions 
+    , user_ltv.session_duration_micros 
+    , predictions.in_app_purchase_score_7d 
+    , predictions.purchase_score_7d 
+    , predictions.churn_score_7d 
+    , predictions.revenue_28d_in_usd 
+    , privacy_info.is_limited_ad_tracking 
+    , privacy_info.is_ads_personalization_allowed 
+    , occurrence_date 
+    , last_updated_date
+    {% for up in var('user_properties', []) %} -- don't have sample data; need to verify
+        , (select value.string_value from unnest(user_properties) where key = '{{up}}') as {{up | lower | replace(" ", "_")}}_string_value 
+        , (select value.set_timestamp_micros from unnest(user_properties) where key = '{{up}}') as {{up | lower | replace(" ", "_")}}_set_timestamp_micros
+        , (select value.user_property_name from unnest(user_properties) where key = '{{up}}') as {{up | lower | replace(" ", "_")}}_user_property_name 
+    {% endfor %}
+    {% for aud in var('audiences', []) %} -- this should be good, though
+        , (select id from unnest(audiences) where name = '{{aud}}') as {{aud | lower | replace(" ", "_")}}_id
+        , (select name from unnest(audiences) where name = '{{aud}}') as {{aud | lower | replace(" ", "_")}}_name 
+        , (select membership_start_timestamp_micros from unnest(audiences) where name = '{{aud}}') as {{aud | lower | replace(" ", "_")}}_membership_start_timestamp_micros
+        , (select membership_expiry_timestamp_micros from unnest(audiences) where name = '{{aud}}') as {{aud | lower | replace(" ", "_")}}_membership_expiry_timestamp_micros
+        , (select npa from unnest(audiences) where name = '{{aud}}') as {{aud | replace(" ", "_")}}_npa
+    {% endfor %}
+{% endmacro %}
