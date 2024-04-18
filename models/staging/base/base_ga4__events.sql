@@ -13,7 +13,7 @@
             "data_type": "date",
         },
         partitions = partitions_to_replace,
-        cluster_by=['event_name']
+        cluster_by=['event_name', 'stream_id']
     )
 }}
 
