@@ -48,7 +48,7 @@ set_default_channel_grouping as (
 ),
 first_session_source as (
     select
-        client_id
+        stream_id
         ,client_key
         ,session_partition_key
         ,session_partition_date
