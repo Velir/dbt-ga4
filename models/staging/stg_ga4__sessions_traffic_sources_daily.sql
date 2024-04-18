@@ -19,7 +19,8 @@
 
 with session_events as (
     select
-        client_key
+        client_id
+        ,client_key
         ,session_partition_key
         ,event_date_dt as session_partition_date
         ,event_timestamp
@@ -47,7 +48,8 @@ set_default_channel_grouping as (
 ),
 first_session_source as (
     select
-        client_key
+        client_id
+        ,client_key
         ,session_partition_key
         ,session_partition_date
         ,event_timestamp
@@ -69,7 +71,7 @@ find_non_direct_session_partition_key as (
     from first_session_source
 )
 
-select
+select  client_id
         client_key
         ,session_partition_key
         ,session_partition_date
