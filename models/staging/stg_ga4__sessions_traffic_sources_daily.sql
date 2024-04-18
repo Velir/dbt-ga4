@@ -85,4 +85,4 @@ select  stream_id
         ,non_direct_session_partition_key
         ,min(event_timestamp) as session_partition_timestamp
 from find_non_direct_session_partition_key
-group by 1,2,3,4,5,6,7,8,9,10,11
+group by all
