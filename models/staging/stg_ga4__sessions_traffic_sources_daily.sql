@@ -19,7 +19,7 @@
 
 with session_events as (
     select
-        client_id
+        stream_id
         ,client_key
         ,session_partition_key
         ,event_date_dt as session_partition_date
@@ -71,8 +71,8 @@ find_non_direct_session_partition_key as (
     from first_session_source
 )
 
-select  client_id
-        client_key
+select  stream_id
+        ,client_key
         ,session_partition_key
         ,session_partition_date
         ,session_source
