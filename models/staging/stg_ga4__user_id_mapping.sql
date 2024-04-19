@@ -1,5 +1,6 @@
 with events_with_user_id as (
     select 
+        stream_id,
         user_id,
         client_key,
         event_timestamp 
@@ -9,6 +10,7 @@ with events_with_user_id as (
 ),
 include_last_seen_timestamp as (
     select 
+        stream_id,
         user_id,
         client_key,
         max(event_timestamp) as last_seen_user_id_timestamp
@@ -17,6 +19,7 @@ include_last_seen_timestamp as (
 ),
 pick_latest_timestamp as (
     select
+        stream_id,
         user_id as last_seen_user_id,
         client_key,
         last_seen_user_id_timestamp
