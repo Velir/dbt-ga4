@@ -2,7 +2,6 @@
 {% for i in range(var('static_incremental_days')) %}
     {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
 {% endfor %}
-{{ log("this.name: " ~ this.name, True)}}
 {{
     config(
         pre_hook="{{ ga4.combine_property_data() }}" if var('combined_dataset', false) else "",
@@ -23,7 +22,7 @@ with source as (
         {{ ga4.base_select_usr_source() }}
     from {{ source('ga4', 'pseudonymous_users') }}
     {% if is_incremental() %}
-        where parse_date('%Y%m%d', left(replace(_table_suffix, 'intraday_', ''), 8)) in ({{ partitions_to_replace | join(',') }})
+        where parse_date('%Y%m%d', right(_table_suffix, 8)) in ({{ partitions_to_replace | join(',') }})
     {% endif %}
 )
 

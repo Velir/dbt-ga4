@@ -12,6 +12,7 @@
     {% endif %}
     {% for property_id in var('property_ids') %}
         {%- set schema_name = "analytics_" + property_id|string -%}
+        {% set modifications = [] %}
         {%- set combine_specified_property_data_query -%}
             create schema if not exists `{{target.project}}.{{var('combined_dataset')}}`;
             {% if this.name == 'base_ga4__events' %}
@@ -21,6 +22,7 @@
                     {%- set relation_suffix = relation.identifier|replace('events_intraday_', '') -%}
                     {%- if relation_suffix|int >= earliest_shard_to_retrieve|int -%}
                         create or replace table `{{target.project}}.{{var('combined_dataset')}}.events_intraday_{{relation_suffix}}{{property_id}}` clone `{{var('source_project')}}.analytics_{{property_id}}.events_intraday_{{relation_suffix}}`;
+                        {% do modifications.append( {'source_partition': 'events_intraday_' + relation_suffix , 'destination_partition': 'events_intraday_' + relation_suffix + property_id } ) %}
                     {%- endif -%}
                 {% endfor %}
 
@@ -31,6 +33,7 @@
                     {%- if relation_suffix|int >= earliest_shard_to_retrieve|int -%}
                         create or replace table `{{target.project}}.{{var('combined_dataset')}}.events_{{relation_suffix}}{{property_id}}` clone `{{var('source_project')}}.analytics_{{property_id}}.events_{{relation_suffix}}`;
                         drop table if exists `{{target.project}}.{{var('combined_dataset')}}.events_intraday_{{relation_suffix}}{{property_id}}`;
+                        {% do modifications.append( {'source_partition': 'events_' + relation_suffix , 'destination_partition': 'events_' + relation_suffix + property_id } ) %}
                     {%- endif -%}
                 {% endfor %}
             {% elif this.name == 'base_ga4__pseudonymous_users' %}
@@ -40,6 +43,7 @@
                     {%- set relation_suffix = relation.identifier|replace('pseudonymous_users_', '') -%}
                     {%- if relation_suffix|int >= earliest_shard_to_retrieve|int -%}
                         create or replace table `{{target.project}}.{{var('combined_dataset')}}.pseudonymous_users_{{relation_suffix}}{{property_id}}` clone `{{var('source_project')}}.analytics_{{property_id}}.pseudonymous_users_{{relation_suffix}}`;
+                        {% do modifications.append( {'source_partition': 'pseudonymous_users_' + relation_suffix , 'destination_partition': 'pseudonymous_users_' + relation_suffix + property_id } ) %}
                     {%- endif -%}
                 {% endfor %}
             {% elif this.name == 'base_ga4__users' %}
@@ -49,14 +53,16 @@
                     {%- set relation_suffix = relation.identifier|replace('users_', '') -%}
                     {%- if relation_suffix|int >= earliest_shard_to_retrieve|int -%}
                         create or replace table `{{target.project}}.{{var('combined_dataset')}}.users_{{relation_suffix}}{{property_id}}` clone `{{var('source_project')}}.analytics_{{property_id}}.users_{{relation_suffix}}`;
+                        {% do modifications.append( {'source_partition': 'users_' + relation_suffix , 'destination_partition': 'users_' + relation_suffix + property_id } ) %}
                     {%- endif -%}
                 {% endfor %}
             {% endif %}
         {%- endset -%}
         {% do run_query(combine_specified_property_data_query) %}
-        -- Log needs to be adjusted for different source and target tables
         {% if execute %}
-            {{ log("Cloned from `" ~ var('source_project') ~ ".analytics_" ~ property_id ~ ".events_*` to `" ~ target.project ~ "." ~ var('combined_dataset') ~ ".events_YYYYMMDD" ~ property_id ~ "`.", True) }}                   
+            {% for modification in modifications%}
+                {{ log("Cloned from `" ~ var('source_project') ~ ".analytics_" ~ property_id ~ "." ~ modification.source_partition ~"` to `" ~ target.project ~ "." ~ var('combined_dataset') ~ "." ~ modification.destination_partition ~ "`.", True) }}                   
+            {% endfor %}
         {% endif %}
     {% endfor %}
 {% endmacro %}
