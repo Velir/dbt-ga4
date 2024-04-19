@@ -5,7 +5,7 @@
 
 {{
     config(
- -- todo multi-site
+        pre_hook="{{ ga4.combine_property_data() }}" if var('combined_dataset', false) else "",
         materialized = 'incremental',
         incremental_strategy = 'insert_overwrite',
         partition_by={
