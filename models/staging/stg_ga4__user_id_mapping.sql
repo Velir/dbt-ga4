@@ -15,7 +15,7 @@ include_last_seen_timestamp as (
         client_key,
         max(event_timestamp) as last_seen_user_id_timestamp
     from events_with_user_id
-    group by 1,2
+    group by 1,2,3
 ),
 pick_latest_timestamp as (
     select
