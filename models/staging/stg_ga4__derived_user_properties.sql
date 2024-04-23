@@ -11,6 +11,7 @@ with events_from_valid_users as (
 unnest_user_properties as
 (
     select 
+        stream_id,
         client_key,
         event_timestamp
         {% for up in var('derived_user_properties', []) %}
@@ -20,6 +21,7 @@ unnest_user_properties as
 )
 
 SELECT DISTINCT
+    stream_id,
     client_key
     {% for up in var('derived_user_properties', []) %}
         , LAST_VALUE({{ up.event_parameter }} IGNORE NULLS) OVER (user_window) AS {{ up.user_property_name }}
