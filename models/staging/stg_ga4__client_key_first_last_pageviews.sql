@@ -4,6 +4,7 @@
 
 with page_views_first_last as (
     select
+        stream_id,
         client_key,
         FIRST_VALUE(event_key) OVER (PARTITION BY client_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS first_page_view_event_key,
         LAST_VALUE(event_key) OVER (PARTITION BY client_key ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS last_page_view_event_key
@@ -12,6 +13,7 @@ with page_views_first_last as (
 ),
 page_views_by_client_key as (
     select distinct
+        stream_id,
         client_key,
         first_page_view_event_key,
         last_page_view_event_key
