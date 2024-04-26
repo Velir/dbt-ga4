@@ -1,6 +1,7 @@
 with session_events as (
     select
-        session_key
+        stream_id
+        ,session_key
         ,event_timestamp
         ,events.event_source
         ,event_medium
@@ -22,7 +23,8 @@ set_default_channel_grouping as (
 ),
 session_source as (
     select
-        session_key
+        stream_id
+        ,session_key
         ,COALESCE(FIRST_VALUE((CASE WHEN event_source <> '(direct)' THEN event_source END) IGNORE NULLS) OVER (session_window), '(direct)') AS session_source
         ,COALESCE(FIRST_VALUE((CASE WHEN event_source <> '(direct)' THEN COALESCE(event_medium, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS session_medium
         ,COALESCE(FIRST_VALUE((CASE WHEN event_source <> '(direct)' THEN COALESCE(source_category, '(none)') END) IGNORE NULLS) OVER (session_window), '(none)') AS session_source_category
