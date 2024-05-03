@@ -54,7 +54,7 @@
             {% endif %}
         {%- endset -%}
         {% do run_query(combine_specified_property_data_query) %}
-
+        -- Log needs to be adjusted for different source and target tables
         {% if execute %}
             {{ log("Cloned from `" ~ var('source_project') ~ ".analytics_" ~ property_id ~ ".events_*` to `" ~ target.project ~ "." ~ var('combined_dataset') ~ ".events_YYYYMMDD" ~ property_id ~ "`.", True) }}                   
         {% endif %}
