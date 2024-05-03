@@ -2,14 +2,14 @@
 {% for i in range(var('static_incremental_days')) %}
     {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
 {% endfor %}
-
+{{ log("this.name: " ~ this.name, True)}}
 {{
     config(
         pre_hook="{{ ga4.combine_property_data() }}" if var('combined_dataset', false) else "",
         materialized = 'incremental',
         incremental_strategy = 'insert_overwrite',
         partition_by={
-            "field": "occurence_date",
+            "field": "occurrence_date",
             "data_type": "date",
         },
         partitions = partitions_to_replace,
