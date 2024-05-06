@@ -22,7 +22,7 @@ with source as (
         {{ ga4.base_select_source() }}
     from {{ source('ga4', 'events') }}
     where cast(left(replace(_table_suffix, 'intraday_', ''), 8) as int64) >= {{var('start_date')}}
-    {% if end_date is not none %}
+    {% if {{ var('end_date') }} is not none %}
         and cast(left(replace(_table_suffix, 'intraday_', ''), 8) as int64) <= {{ var('end_date') }}
     {% endif %}
     {% if is_incremental() %}
