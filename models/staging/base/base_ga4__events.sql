@@ -23,7 +23,7 @@ with source as (
     from {{ source('ga4', 'events') }}
     where cast(left(replace(_table_suffix, 'intraday_', ''), 8) as int64) >= {{var('start_date')}}
     {% if end_date is not none %}
-        and cast(left(replace(_table_suffix, 'intraday_', ''), 8) as int64) <= {{ end_date }}
+        and cast(left(replace(_table_suffix, 'intraday_', ''), 8) as int64) <= {{ var('end_date') }}
     {% endif %}
     {% if is_incremental() %}
         and parse_date('%Y%m%d', left(replace(_table_suffix, 'intraday_', ''), 8)) in ({{ partitions_to_replace | join(',') }})
