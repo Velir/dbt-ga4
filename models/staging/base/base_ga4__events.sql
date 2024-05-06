@@ -3,6 +3,11 @@
     {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
 {% endfor %}
 
+{{ log("Running with start_date: " ~ var('start_date'), info=True) }}
+{% if var('end_date') is not none %}
+{{ log("Running with end_date: " ~ var('end_date'), info=True) }}
+{% endif %}
+
 {{
     config(
         pre_hook="{{ ga4.combine_property_data() }}" if var('combined_dataset', false) else "",
