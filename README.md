@@ -260,6 +260,13 @@ vars:
   ga4:
     session_attribution_lookback_window_days: 90
 ```
+# Select Date Range
+
+To select a date range in a where statement you can use `select_date_range` macro. You can use it in your where statement like this: 
+
+``` WHERE <statement> (or TRUE) and {{ ga4.select_date_range(start_date, end_date, date_column) }}```
+
+
 
 # Custom Events
 

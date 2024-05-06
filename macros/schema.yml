@@ -1,0 +1,15 @@
+version: 2
+
+macros:
+  - name: date
+    description: A macro to convert cents to dollars
+    arguments:
+      - name: date_column
+        type: string
+        description: The name of the date column you want to use for filtering
+      - name: start_date
+        type: string
+        description: the start date you want to use to filter the date_column (format 'YYYYMMDD')
+      - name: end_date
+        type: string
+        description: the end date you want to use to filter the date_column (format 'YYYYMMDD')
