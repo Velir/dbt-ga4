@@ -1,7 +1,7 @@
 version: 2
 
 macros:
-  - name: date
+  - name: select_date_range
     description: A macro to convert cents to dollars
     arguments:
       - name: date_column
