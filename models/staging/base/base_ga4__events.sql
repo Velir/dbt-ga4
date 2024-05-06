@@ -30,7 +30,7 @@ with source as (
     {% if var('end_date') is not none %}
         and cast(left(replace(_table_suffix, 'intraday_', ''), 8) as int64) <= {{ var('end_date')}}
     {% endif %}
-    {% if is_incremental() %}
+    {% if is_incremental() and var('end_date') is none %}
         and parse_date('%Y%m%d', left(replace(_table_suffix, 'intraday_', ''), 8)) in ({{ partitions_to_replace | join(',') }})
     {% endif %}
 ),
