@@ -1,12 +1,15 @@
-{% set partitions_to_replace = ['current_date'] %}
-{% for i in range(var('static_incremental_days')) %}
-    {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
+{% set date_range = (range(
+    (end_date|date).toordinal() - (start_date|date).toordinal() + 1
+)) %}
+
+{% for i in date_range %}
+    {% set partition_date = (start_date|date + timedelta(days=i)).strftime('%Y-%m-%d') %}
+    {% set partitions_to_replace = partitions_to_replace.append(partition_date) %}
+    {{ log("Adding partition: " ~ partition_date, info=True) }}
 {% endfor %}
 
-{{ log("Running with start_date: " ~ var('start_date'), info=True) }}
-{% if var('end_date') is not none %}
-{{ log("Running with end_date: " ~ var('end_date'), info=True) }}
-{% endif %}
+{{ log("Partitions to replace: " ~ partitions_to_replace | join(', '), info=True) }}
+
 
 {{
     config(
