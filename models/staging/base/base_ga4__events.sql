@@ -1,15 +1,41 @@
-{% set date_range = (range(
-    (end_date|date).toordinal() - (start_date|date).toordinal() + 1
-)) %}
-
-{% for i in date_range %}
-    {% set partition_date = (start_date|date + timedelta(days=i)).strftime('%Y-%m-%d') %}
-    {% set partitions_to_replace = partitions_to_replace.append(partition_date) %}
-    {{ log("Adding partition: " ~ partition_date, info=True) }}
+{% set partitions_to_replace = ['current_date'] %}
+{% for i in range(var('static_incremental_days')) %}
+    {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
 {% endfor %}
 
-{{ log("Partitions to replace: " ~ partitions_to_replace | join(', '), info=True) }}
 
+{% set start_date = var('start_date', none) %}
+{% set end_date = var('end_date', none) %}
+
+{{ log("Initial start_date: " ~ start_date, info=True) }}
+{{ log("Initial end_date: " ~ end_date, info=True) }}
+
+
+{% if execute %}
+{% if start_date and end_date %}
+    {{ log("Running with start_date: " ~ start_date, info=True) }}
+    {{ log("Running with end_date: " ~ end_date, info=True) }}
+
+    {% set formatted_start_date = start_date[:4] ~ '-' ~ start_date[4:6] ~ '-' ~ start_date[6:] %}
+    {% set formatted_end_date = end_date[:4] ~ '-' ~ end_date[4:6] ~ '-' ~ end_date[6:] %}
+
+    {{ log("Formatted start_date: " ~ formatted_start_date, info=True) }}
+    {{ log("Formatted end_date: " ~ formatted_end_date, info=True) }}
+
+    {% set date_array_query %}
+    {{ generate_date_array(formatted_start_date, formatted_end_date) }}
+    {% endset %}
+
+    {% set results = run_query(date_array_query) %}
+    {% set partitions_to_replace = [] %}
+    
+    {% set partitions_to_replace = results[0]['date_array'] %}
+
+{% endif %}
+{% endif %}
+
+
+{{ log("Partitions to replace: " ~ partitions_to_replace, info=True) }}
 
 {{
     config(
