@@ -13,6 +13,7 @@
             "granularity": "day"
         },
         partitions = partitions_to_replace
+        cluster_by=['stream_id']
     )
 }}
 
