@@ -13,7 +13,8 @@
             "data_type": "date",
             "granularity": "day"
         },
-        partitions = partitions_to_replace
+        partitions = partitions_to_replace,
+        cluster_by = ['stream_id']
     )
 }}
 
@@ -21,6 +22,7 @@
 
 with event_counts as (
     select 
+        stream_id,
         session_key,
         session_partition_key,
         min(event_date_dt) as session_partition_date -- The date of this session partition
@@ -32,7 +34,7 @@ with event_counts as (
     {% if is_incremental() %}
             and event_date_dt in ({{ partitions_to_replace | join(',') }})
     {% endif %}
-    group by 1,2
+    group by all
 )
 
 select * from event_counts
