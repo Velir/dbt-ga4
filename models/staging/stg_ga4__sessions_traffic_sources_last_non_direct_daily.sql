@@ -18,7 +18,8 @@
 
 with last_non_direct_session_partition_key as (
   select
-    client_key
+    stream_id 
+    , client_key
     ,session_partition_key
     ,session_partition_date
     ,session_source
@@ -49,7 +50,8 @@ with last_non_direct_session_partition_key as (
 )
 ,join_last_non_direct_session_source as (
   select
-    last_non_direct_session_partition_key.client_key
+    last_non_direct_source.stream_id
+    , last_non_direct_session_partition_key.client_key
     ,last_non_direct_session_partition_key.session_partition_key
     ,last_non_direct_session_partition_key.session_partition_date
     ,last_non_direct_session_partition_key.session_source
@@ -69,7 +71,7 @@ with last_non_direct_session_partition_key as (
     ,coalesce(last_non_direct_source.session_default_channel_grouping, 'Direct') as last_non_direct_default_channel_grouping
   from last_non_direct_session_partition_key
   left join {{ref('stg_ga4__sessions_traffic_sources_daily')}} last_non_direct_source on
-    last_non_direct_session_partition_key.session_partition_key_last_non_direct = last_non_direct_source.session_partition_key
+    last_non_direct_session_partition_key.session_partition_key_last_non_direct = last_non_direct_source.session_partition_key and last_non_direct_session_partition_key.stream_id = last_non_direct_source.stream_id
   {% if is_incremental() %}
       -- Only keep the records in the partitions we wish to replace (as opposed to the whole 30 day lookback window)
       where last_non_direct_session_partition_key.session_partition_date in ({{ partitions_to_replace | join(',') }})
