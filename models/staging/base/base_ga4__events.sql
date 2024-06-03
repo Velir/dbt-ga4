@@ -11,7 +11,6 @@
 {{ log("Initial end_date: " ~ end_date, info=True) }}
 
 
-{% if execute %}
 {% if start_date and end_date %}
     {{ log("Running with start_date: " ~ start_date, info=True) }}
     {{ log("Running with end_date: " ~ end_date, info=True) }}
@@ -23,15 +22,25 @@
     {{ log("Formatted end_date: " ~ formatted_end_date, info=True) }}
 
     {% set date_array_query %}
-    {{ generate_date_array(formatted_start_date, formatted_end_date) }}
+            SELECT
+            ARRAY_AGG(date) AS date_array
+        FROM
+            UNNEST(GENERATE_DATE_ARRAY(
+                DATE('{{ formatted_start_date }}'),
+                DATE('{{ formatted_end_date }}'),
+                INTERVAL 1 DAY
+            )) AS date
     {% endset %}
 
+
+    {% if execute %}
     {% set results = run_query(date_array_query) %}
     {% set partitions_to_replace = [] %}
     
     {% set partitions_to_replace = results[0]['date_array'] %}
+    {% endif %}
 
-{% endif %}
+
 {% endif %}
 
 
