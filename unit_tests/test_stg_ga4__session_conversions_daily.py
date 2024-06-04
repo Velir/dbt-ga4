@@ -31,6 +31,12 @@ actual = read_file("../models/staging/stg_ga4__session_conversions_daily.sql")
 
 
 class TestUsersFirstLastEvents:
+    # Update project name to ga4 so we can call macros with ga4.macro_name
+    @pytest.fixture(scope="class")
+    def project_config_update(self):
+        return {
+            "name": "ga4"
+        }
     # everything that goes in the "seeds" directory (= CSV format)
     @pytest.fixture(scope="class")
     def seeds(self):
