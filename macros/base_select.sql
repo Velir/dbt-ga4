@@ -35,7 +35,7 @@
     , ecommerce.unique_items
     , ecommerce.transaction_id
     , items
-    , {%- if  var('combined_dataset', false) != false %} cast(left(regexp_replace(_table_suffix, r'^\d{8}', ''), 100) as int64)
+    , {%- if  var('combined_dataset', false) != false %} cast(left(regexp_replace(_table_suffix, r'^(intraday_)?\d{8}', ''), 100) as int64)
         {%- else %} {{ var('property_ids')[0] }}
         {%- endif %} as property_id
 {% endmacro %}
