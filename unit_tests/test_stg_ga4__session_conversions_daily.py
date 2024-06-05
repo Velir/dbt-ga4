@@ -44,6 +44,14 @@ class TestUsersFirstLastEvents:
             "stg_ga4__events.csv": mock_stg_ga4__events_csv,
             "expected.csv": expected_csv,
         }
+    
+    # everything that goes in the "macros"
+    @pytest.fixture(scope="class")
+    def macros(self):
+        return {
+            "valid_column_name.sql": read_file('../macros/valid_column_name.sql'),
+        }
+
 
     # everything that goes in the "models" directory (= SQL)
     @pytest.fixture(scope="class")
@@ -66,6 +74,14 @@ class TestUsersNonStandardEventName:
             "stg_ga4__events.csv": mock_stg_ga4__nonstandard_events_csv,
             "expected.csv": expected_csv,
         }
+    
+    # everything that goes in the "macros"
+    @pytest.fixture(scope="class")
+    def macros(self):
+        return {
+            "valid_column_name.sql": read_file('../macros/valid_column_name.sql'),
+        }
+
 
     # everything that goes in the "models" directory (= SQL)
     @pytest.fixture(scope="class")
