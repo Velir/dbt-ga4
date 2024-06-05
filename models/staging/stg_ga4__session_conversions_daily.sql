@@ -25,7 +25,7 @@ with event_counts as (
         session_partition_key,
         min(event_date_dt) as session_partition_date -- The date of this session partition
         {% for ce in var('conversion_events',[]) %}
-        , countif(event_name = '{{ce}}') as {{ce}}_count
+        , countif(event_name = '{{ce}}') as {{ga4.valid_column_name(ce)}}_count
         {% endfor %}
     from {{ref('stg_ga4__events')}}
     where 1=1

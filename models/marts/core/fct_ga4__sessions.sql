@@ -14,7 +14,8 @@ select
     min(session_number) as session_number
     {% if var('conversion_events', false) %}
         {% for ce in var('conversion_events',[]) %}
-            , sum({{ce}}_count) as count_{{ce}}
+          {% set clean_ce = ga4.valid_column_name(ce) %}
+            , sum({{clean_ce}}_count) as count_{{clean_ce}}
         {% endfor %}
     {% endif %}
 from {{ref('fct_ga4__sessions_daily')}}
