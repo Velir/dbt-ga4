@@ -9,9 +9,9 @@ page_view,B
 """.lstrip()
 
 mock_stg_ga4__nonstandard_events_csv = """event_name,page_key
-my-page-view,A
-my-page-view,A
-my-page-view,B
+page-view,A
+page-view,A
+page-view,B
 """.lstrip()
 
 expected_csv = """page_key,page_view_count
@@ -26,15 +26,13 @@ class TestPageConversions:
     # Update project name to ga4 so we can call macros with ga4.macro_name
     @pytest.fixture(scope="class")
     def project_config_update(self):
-        return {
-            "name": "ga4"
-        }
-    
+        return {"name": "ga4"}
+
     # everything that goes in the "macros"
     @pytest.fixture(scope="class")
     def macros(self):
         return {
-            "valid_column_name.sql": read_file('../macros/valid_column_name.sql'),
+            "valid_column_name.sql": read_file("../macros/valid_column_name.sql"),
         }
 
     # everything that goes in the "seeds" directory (= CSV format)
@@ -66,12 +64,12 @@ class TestPageConversionsNonStandardEventName:
             "stg_ga4__events.csv": mock_stg_ga4__nonstandard_events_csv,
             "expected.csv": expected_csv,
         }
-    
+
     # everything that goes in the "macros"
     @pytest.fixture(scope="class")
     def macros(self):
         return {
-            "valid_column_name.sql": read_file('../macros/valid_column_name.sql'),
+            "valid_column_name.sql": read_file("../macros/valid_column_name.sql"),
         }
 
     # everything that goes in the "models" directory (= SQL)
@@ -82,6 +80,6 @@ class TestPageConversionsNonStandardEventName:
         }
 
     def test_mock_run_and_check(self, project):
-        run_dbt(["build", "--vars", "conversion_events: ['my-page-view']"])
+        run_dbt(["build", "--vars", "conversion_events: ['page-view']"])
         # breakpoint()
         check_relations_equal(project.adapter, ["actual", "expected"])
