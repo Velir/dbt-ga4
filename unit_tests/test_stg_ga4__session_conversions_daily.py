@@ -34,9 +34,8 @@ class TestUsersFirstLastEvents:
     # Update project name to ga4 so we can call macros with ga4.macro_name
     @pytest.fixture(scope="class")
     def project_config_update(self):
-        return {
-            "name": "ga4"
-        }
+        return {"name": "ga4", "vars": {"static_incremental_days": 3}}
+
     # everything that goes in the "seeds" directory (= CSV format)
     @pytest.fixture(scope="class")
     def seeds(self):
@@ -44,14 +43,13 @@ class TestUsersFirstLastEvents:
             "stg_ga4__events.csv": mock_stg_ga4__events_csv,
             "expected.csv": expected_csv,
         }
-    
+
     # everything that goes in the "macros"
     @pytest.fixture(scope="class")
     def macros(self):
         return {
-            "valid_column_name.sql": read_file('../macros/valid_column_name.sql'),
+            "valid_column_name.sql": read_file("../macros/valid_column_name.sql"),
         }
-
 
     # everything that goes in the "models" directory (= SQL)
     @pytest.fixture(scope="class")
@@ -74,14 +72,13 @@ class TestUsersNonStandardEventName:
             "stg_ga4__events.csv": mock_stg_ga4__nonstandard_events_csv,
             "expected.csv": expected_csv,
         }
-    
+
     # everything that goes in the "macros"
     @pytest.fixture(scope="class")
     def macros(self):
         return {
-            "valid_column_name.sql": read_file('../macros/valid_column_name.sql'),
+            "valid_column_name.sql": read_file("../macros/valid_column_name.sql"),
         }
-
 
     # everything that goes in the "models" directory (= SQL)
     @pytest.fixture(scope="class")
