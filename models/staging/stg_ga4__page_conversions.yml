@@ -22,8 +22,8 @@ unit_tests:
         page_key,page_view_count
         A,2
         B,1
-# dbt test --select test_page_conversion_count_non_standard_column --vars "{conversion_events: ['page-view']}"
-  - name: test_page_conversion_count_non_standard_column
+# dbt test --select test_page_conversion_count_non_event_name --vars "{conversion_events: ['page-view']}"
+  - name: test_page_conversion_count_non_event_name
     description: Test whether the page-level count of conversions is correct
     model: stg_ga4__page_conversions
     given:
