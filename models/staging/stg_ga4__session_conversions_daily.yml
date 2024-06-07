@@ -10,3 +10,56 @@ models:
       - name: session_partition_key
         tests:
           - unique
+unit_tests:
+# dbt test --select test_session_conversion_count --vars "{conversion_events: ['my_conversion']}"
+  - name: test_session_conversion_count
+    description: Test whether the session-level count of conversions is correct
+    model: stg_ga4__session_conversions_daily
+    overrides:
+      macros:
+        is_incremental: false 
+    given:
+      - input: ref('stg_ga4__events')
+        format: csv
+        rows: |
+          session_key,session_partition_key,event_name,event_date_dt
+          A,A2022-01-01,page_view,2022-01-01
+          A,A2022-01-01,my_conversion,2022-01-01
+          A,A2022-01-01,my_conversion,2022-01-01
+          B,B2022-01-01,my_conversion,2022-01-01
+          C,C2022-01-01,some_other_event,2022-01-01
+          A,A2022-01-02,my_conversion,2022-01-02
+    expect:
+      format: csv
+      rows: |
+        session_key,session_partition_key,session_partition_date,my_conversion_count
+        A,A2022-01-01,2022-01-01,2
+        B,B2022-01-01,2022-01-01,1
+        C,C2022-01-01,2022-01-01,0
+        A,A2022-01-02,2022-01-02,1
+# dbt test --select test_session_conversion_count_non_standard_event_name --vars "{conversion_events: ['my-conversion']}"
+  - name: test_session_conversion_count_non_standard_event_name
+    description: Test whether the session-level count of conversions is correct
+    model: stg_ga4__session_conversions_daily
+    overrides:
+      macros:
+        is_incremental: false 
+    given:
+      - input: ref('stg_ga4__events')
+        format: csv
+        rows: |
+          session_key,session_partition_key,event_name,event_date_dt
+          A,A2022-01-01,page_view,2022-01-01
+          A,A2022-01-01,my-conversion,2022-01-01
+          A,A2022-01-01,my-conversion,2022-01-01
+          B,B2022-01-01,my-conversion,2022-01-01
+          C,C2022-01-01,some_other_event,2022-01-01
+          A,A2022-01-02,my-conversion,2022-01-02
+    expect:
+      format: csv
+      rows: |
+        session_key,session_partition_key,session_partition_date,my_conversion_count
+        A,A2022-01-01,2022-01-01,2
+        B,B2022-01-01,2022-01-01,1
+        C,C2022-01-01,2022-01-01,0
+        A,A2022-01-02,2022-01-02,1
