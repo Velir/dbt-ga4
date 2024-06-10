@@ -21,30 +21,19 @@
     {{ log("Formatted start_date: " ~ formatted_start_date, info=True) }}
     {{ log("Formatted end_date: " ~ formatted_end_date, info=True) }}
 
-    {% set date_array_query %}
-            SELECT
-            ARRAY_AGG(date) AS date_array
-        FROM
-            UNNEST(GENERATE_DATE_ARRAY(
-                DATE('{{ formatted_start_date }}'),
-                DATE('{{ formatted_end_date }}'),
-                INTERVAL 1 DAY
-            )) AS date
-    {% endset %}
+    {% set date_array = generate_date_array(start_date, end_date) %}
 
-
-    {% if execute %}
-    {% set results = run_query(date_array_query) %}
-    {% set partitions_to_replace = [] %}
     
-    {% set partitions_to_replace = results[0]['date_array'] %}
-    {% endif %}
-
+    {% set partitions_to_replace = [] %}
+    {% for date in date_array %}
+        {% set formatted_date = "date('" ~ date ~ "')" %}
+        {% do partitions_to_replace.append(formatted_date) %}
+    {% endfor %}
 
 {% endif %}
 
-
 {{ log("Partitions to replace: " ~ partitions_to_replace, info=True) }}
+
 
 {{
     config(
