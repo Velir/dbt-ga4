@@ -11,6 +11,8 @@ models:
     columns:
       - name: event_date_dt
         description: Date of the event converted to Date type. Time zone is the time zone configured in the GA4 property. 
+        tests:
+          - ten_weeks_dates
       - name: event_timestamp
         description: >
           Timestamp (in microseconds) indicating when the event's batch was received (as opposed to when the event actually occurred).  
