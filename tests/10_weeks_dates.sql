@@ -3,7 +3,7 @@
 
 
 {% set environment = env_var('DBT_ENVIRONMENT', 'elmyra-dev') %}
-{% set backfill = env_var('backfill', 'false') %}
+{% set backfill = var('backfill', 'false') %}
 
 {% if environment == 'elmyra-prod' and backfill != 'true' %}
     {{ config(severity = 'error') }}
