@@ -2,10 +2,10 @@
 {% test ten_weeks_dates(model, column_name) %}
 
 
-{% set environment = env_var('DBT_ENVIRONMENT', 'elmyra-dev') %}
+{% set environment = env_var('DBT_DEPLOYMENT_ENV', 'dev') %}
 {% set backfill = var('backfill', 'false') %}
 
-{% if environment == 'elmyra-prod' and backfill != 'true' %}
+{% if environment == 'prod' and backfill != 'true' %}
     {{ config(severity = 'error') }}
 {% else %}
     {{ config(severity = 'warn') }}
