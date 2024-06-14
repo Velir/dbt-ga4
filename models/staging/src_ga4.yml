@@ -7,10 +7,19 @@ sources:
       {%- else -%} {{var('source_project')}}
       {%- endif -%}
     schema: | # Source from combined property dataset if set, otherwise source from original GA4 property
-      {%- if  var('combined_dataset', false) != false -%} {{var('combined_dataset')}}
-      {%- else -%} analytics_{{var('property_ids')[0]}}
+      {%- if var('combined_dataset', false) != false -%}
+        {{ var('combined_dataset') }}
+      {%- elif var('source_schema', false) != false -%}
+        {{ var('source_schema') }}
+      {%- else -%}
+        analytics_{{ var('property_ids')[0] }}
       {%- endif -%}
     tables:
       - name: events
-        identifier: events_* # Scan across all sharded event tables. Use the 'start_date' variable to limit this scan
-        description: Main events table exported by GA4. Sharded by date. 
+        description: Main events table exported by GA4. Sharded by date.
+        identifier: | # Scan across all sharded event tables. Use the 'start_date' variable to limit this scan
+          {%- if target.type == 'bigquery' -%} 
+            events_*
+          {%- else -%}
+            analytics_{{ var('property_ids')[0] }}__view
+          {%- endif -%}
