@@ -22,3 +22,27 @@ models:
         description: The the most recent non-direct channel grouping within a 30-day lookback window.
         tests:
           - not_null
+unit_tests:
+  - name: test_stg_ga4__sessions_traffic_sources_last_non_direct_daily
+    model: stg_ga4__sessions_traffic_sources_last_non_direct_daily
+    given:
+      - input : ref('stg_ga4__sessions_traffic_sources_daily')
+        format: csv
+        rows: |
+          client_key,session_partition_key,session_partition_date,session_partition_timestamp,session_source,session_medium,session_source_category,session_campaign,session_content,session_term,session_default_channel_grouping,non_direct_session_partition_key
+          A,A,20230505,1683321359,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,default_channel_grouping_a,A
+          A,B,20230506,1683407759,(direct),,,,,,,
+          A,C,20230507,1683494159,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,default_channel_grouping_a,C
+          A,D,20230508,1683580559,(direct),,,,,,,
+    expect: 
+      format: csv
+      rows:
+        client_key,session_partition_key,session_partition_date,session_source,session_medium,session_source_category,session_campaign,session_content,session_term,session_default_channel_grouping,session_partition_key_last_non_direct,last_non_direct_source,last_non_direct_medium,last_non_direct_source_category,last_non_direct_campaign,last_non_direct_content,last_non_direct_term,last_non_direct_default_channel_grouping
+        A,A,20230505,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,default_channel_grouping_a,A,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,default_channel_grouping_a
+        A,B,20230506,(direct),,,,,,,A,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,default_channel_grouping_a
+        A,C,20230507,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,default_channel_grouping_a,C,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,default_channel_grouping_a
+        A,D,20230508,(direct),,,,,,,C,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,default_channel_grouping_a
+    overrides:
+      macros:
+        is_incremental: false
+      vars: {session_attribution_lookback_window_days: 30}

@@ -37,7 +37,7 @@ unit_tests:
       macros:
         is_incremental: false 
       vars: {conversion_events: ['my_conversion']}
-  - name: test_session_conversion_count_non_standard_event_name
+  - name: test_stg_ga4__session_conversions_daily_non_standard_event_name
     description: Test whether the session-level count of conversions is correct
     model: stg_ga4__session_conversions_daily
     given:
