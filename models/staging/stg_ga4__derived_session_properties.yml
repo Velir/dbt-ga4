@@ -9,3 +9,38 @@ models:
       - name: session_key
         tests:
           - unique  
+unit_tests:
+# dbt test --select test_derived_session_properties --vars "derived_session_properties: [{'event_parameter':'my_param','session_property_name':'my_derived_property','value_type':'int_value'},{'user_property':'my_property','session_property_name':'my_derived_property2','value_type':'string_value'}]"
+# TODO variable override in the unit test is not wokring as expected
+  - name: test_derived_session_properties
+    description: Test whether a derived property is successfully retrieved from multiple event payloads
+    model: stg_ga4__derived_session_properties
+    given:
+      - input: ref('stg_ga4__events')
+        format: sql
+        rows: |
+          select 
+          'AAA' as session_key
+          , 1617691790431476 as event_timestamp
+          , 'first_visit' as event_name
+          , ARRAY[STRUCT('my_param' as key, STRUCT(1 as int_value) as value)] as event_params
+          , ARRAY[STRUCT('my_property' as key, STRUCT('value1' as string_value) as value)] as user_properties
+          union all
+          select
+          'AAA' as session_key
+          , 1617691790431477 as event_timestamp
+          , 'first_visit' as event_name
+          , ARRAY[STRUCT('my_param' as key, STRUCT(2 as int_value) as value)] as event_params
+          , ARRAY[] as user_properties
+          union all
+          select 
+          'BBB' as session_key
+          , 1617691790431477 as event_timestamp
+          , 'first_visit' as event_name
+          , ARRAY[STRUCT('my_param' as key, STRUCT(1 as int_value) as value)] as event_params
+          , ARRAY[STRUCT('my_property' as key, STRUCT('value2' as string_value) as value)] as user_properties
+    expect:
+      format: dict
+      rows:
+        - {session_key: AAA, my_derived_property: 2, my_derived_property2: value1}
+        - {session_key: BBB, my_derived_property: 1, my_derived_property2: value2}
