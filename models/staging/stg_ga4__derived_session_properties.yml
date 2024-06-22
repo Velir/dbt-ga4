@@ -10,7 +10,6 @@ models:
         tests:
           - unique  
 unit_tests:
-# dbt test --select test_derived_session_properties
   - name: test_derived_session_properties
     description: Test whether a derived property is successfully retrieved from multiple event payloads
     model: stg_ga4__derived_session_properties
