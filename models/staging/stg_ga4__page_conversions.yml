@@ -4,7 +4,6 @@ models:
   - name: stg_ga4__page_conversions
     description: Model that calculates the number of conversions per page. Conversions are defined as variables in the project configurations. 
 unit_tests:
-# dbt test --select test_page_conversion_count --vars "{conversion_events: ['page_view']}"
   - name: test_page_conversion_count
     description: Test whether the page-level count of conversions is correct
     model: stg_ga4__page_conversions
@@ -22,7 +21,8 @@ unit_tests:
         page_key,page_view_count
         A,2
         B,1
-# dbt test --select test_page_conversion_count_non_event_name --vars "{conversion_events: ['page-view']}"
+    overrides:
+      vars: {conversion_events: ['page_view']}
   - name: test_page_conversion_count_non_event_name
     description: Test whether the page-level count of conversions is correct
     model: stg_ga4__page_conversions
@@ -40,3 +40,5 @@ unit_tests:
         page_key,page_view_count
         A,2
         B,1
+    overrides:
+      vars: {conversion_events: ['page-view']}

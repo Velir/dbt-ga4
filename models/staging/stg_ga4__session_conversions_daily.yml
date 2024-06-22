@@ -11,13 +11,9 @@ models:
         tests:
           - unique
 unit_tests:
-# dbt test --select test_session_conversion_count --vars "{conversion_events: ['my_conversion']}"
   - name: test_session_conversion_count
     description: Test whether the session-level count of conversions is correct
     model: stg_ga4__session_conversions_daily
-    overrides:
-      macros:
-        is_incremental: false 
     given:
       - input: ref('stg_ga4__events')
         format: csv
@@ -37,13 +33,13 @@ unit_tests:
         B,B2022-01-01,2022-01-01,1
         C,C2022-01-01,2022-01-01,0
         A,A2022-01-02,2022-01-02,1
-# dbt test --select test_session_conversion_count_non_standard_event_name --vars "{conversion_events: ['my-conversion']}"
-  - name: test_session_conversion_count_non_standard_event_name
-    description: Test whether the session-level count of conversions is correct
-    model: stg_ga4__session_conversions_daily
     overrides:
       macros:
         is_incremental: false 
+      vars: {conversion_events: ['my_conversion']}
+  - name: test_session_conversion_count_non_standard_event_name
+    description: Test whether the session-level count of conversions is correct
+    model: stg_ga4__session_conversions_daily
     given:
       - input: ref('stg_ga4__events')
         format: csv
@@ -63,3 +59,7 @@ unit_tests:
         B,B2022-01-01,2022-01-01,1
         C,C2022-01-01,2022-01-01,0
         A,A2022-01-02,2022-01-02,1
+    overrides:
+      macros:
+        is_incremental: false 
+      vars: {conversion_events: ['my-conversion']}
