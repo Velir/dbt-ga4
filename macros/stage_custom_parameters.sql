@@ -6,6 +6,6 @@
 
 {% macro stage_custom_item_parameters(custom_item_parameters) %}
     {% for cip in custom_item_parameters %}
-        ,{{ ga4.unnest_key('i.item_params',  cp.name ,  cp.value_type, cp.rename_to or "default" ) }}
+        ,{{ ga4.unnest_key('i.item_params',  cip.name ,  cip.value_type, cip.rename_to or "default" ) }}
     {% endfor %}
 {% endmacro %}
