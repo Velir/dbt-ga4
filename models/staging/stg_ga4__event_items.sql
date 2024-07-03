@@ -1,6 +1,6 @@
 with items_with_params as (
     select
-        event_key,
+        event_key
         , event_name
         , event_date_dt
         , stream_id
