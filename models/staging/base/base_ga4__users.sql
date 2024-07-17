@@ -18,10 +18,9 @@
 
 with source as (
     select
-        pseudo_user_id
-        , stream_id 
+        user_id
         {{ ga4.base_select_usr_source() }}
-    from {{ source('ga4', 'pseudonymous_users') }}
+    from {{ source('ga4', 'users') }}
     {% if is_incremental() %}
         where parse_date('%Y%m%d', left(_table_suffix, 8)) in ({{ partitions_to_replace | join(',') }})
     {% endif %}
