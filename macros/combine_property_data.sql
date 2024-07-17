@@ -39,6 +39,7 @@
             {% elif this.name == 'base_ga4__pseudonymous_users' %}
                 {# Copy pseudonymous_users tables #}
                 {%- set relations = dbt_utils.get_relations_by_pattern(schema_pattern=schema_name, table_pattern='pseudonymous_users_%', database=var('source_project')) -%}
+                {{ log("Relations: " ~ relations ) }}
                 {% for relation in relations %}
                     {%- set relation_suffix = relation.identifier|replace('pseudonymous_users_', '') -%}
                     {%- if relation_suffix|int >= earliest_shard_to_retrieve|int -%}
@@ -61,7 +62,7 @@
         {% do run_query(combine_specified_property_data_query) %}
         {% if execute %}
             {% for modification in modifications%}
-                {{ log("Cloned from `" ~ var('source_project') ~ ".analytics_" ~ property_id ~ "." ~ modification.source_partition ~"` to `" ~ target.project ~ "." ~ var('combined_dataset') ~ "." ~ modification.destination_partition ~ "`.", True) }}                   
+                {{ log("Cloned from `" ~ var('source_project') ~ ".analytics_" ~ property_id ~ "." ~ modification.source_partition ~"` to `" ~ target.project ~ "." ~ var('combined_dataset') ~ "." ~ modification.destination_partition ~"`", True) }}                   
             {% endfor %}
         {% endif %}
     {% endfor %}

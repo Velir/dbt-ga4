@@ -22,7 +22,7 @@ with source as (
         {{ ga4.base_select_usr_source() }}
     from {{ source('ga4', 'pseudonymous_users') }}
     {% if is_incremental() %}
-        where parse_date('%Y%m%d', right(_table_suffix, 8)) in ({{ partitions_to_replace | join(',') }})
+        where parse_date('%Y%m%d', left(_table_suffix, 8)) in ({{ partitions_to_replace | join(',') }})
     {% endif %}
 )
 
