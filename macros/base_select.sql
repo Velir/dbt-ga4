@@ -35,6 +35,9 @@
     , ecommerce.unique_items
     , ecommerce.transaction_id
     , items
+    , {%- if  var('combined_dataset', false) != false %} cast(left(regexp_replace(_table_suffix, r'^(intraday_)?\d{8}', ''), 100) as int64)
+        {%- else %} {{ var('property_ids')[0] }}
+        {%- endif %} as property_id
 {% endmacro %}
 
 {% macro base_select_renamed() %}
@@ -136,6 +139,7 @@
             , unnested_items.item_params
         )) from unnest(items) as unnested_items 
     ) items
+    , property_id
     , {{ ga4.unnest_key('event_params', 'ga_session_id', 'int_value', 'session_id') }}
     , {{ ga4.unnest_key('event_params', 'page_location') }}
     , {{ ga4.unnest_key('event_params', 'ga_session_number',  'int_value', 'session_number') }}

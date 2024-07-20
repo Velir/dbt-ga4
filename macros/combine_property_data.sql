@@ -6,7 +6,11 @@
     {% if not should_full_refresh() %}
         {# If incremental, then use static_incremental_days variable to find earliest shard to copy #}
         {%- set earliest_shard_to_retrieve = (modules.datetime.date.today() - modules.datetime.timedelta(days=var('static_incremental_days')))|string|replace("-", "")|int -%}
+        {# If incremental, then use static_incremental_days variable to find earliest shard to copy #}
+        {%- set earliest_shard_to_retrieve = (modules.datetime.date.today() - modules.datetime.timedelta(days=var('static_incremental_days')))|string|replace("-", "")|int -%}
     {% else %}
+        {# Otherwise use 'start_date' variable #}
+        {%- set earliest_shard_to_retrieve = var('start_date')|int -%}
         {# Otherwise use 'start_date' variable #}
         {%- set earliest_shard_to_retrieve = var('start_date')|int -%}
     {% endif %}
