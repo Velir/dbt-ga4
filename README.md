@@ -307,7 +307,7 @@ models:
           +enabled: true
         base_ga4__users:
           +enabled: true
-      stg_ga4__pseudonymous_users:
+      stg_ga4__client_keys:
         +enabled: true
       stg_ga4__users:
         +enabled: true
