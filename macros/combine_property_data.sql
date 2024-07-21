@@ -22,7 +22,7 @@
                     {%- set relation_suffix = relation.identifier|replace('events_intraday_', '') -%}
                     {%- if relation_suffix|int >= earliest_shard_to_retrieve|int -%}
                         create or replace table `{{target.project}}.{{var('combined_dataset')}}.events_intraday_{{relation_suffix}}{{property_id}}` clone `{{var('source_project')}}.analytics_{{property_id}}.events_intraday_{{relation_suffix}}`;
-                        {% do modifications.append( {'source_partition': 'events_intraday_' + relation_suffix , 'destination_partition': 'events_intraday_' + relation_suffix + property_id } ) %}
+                        {% do modifications.append( {'source_partition': 'events_intraday_' + relation_suffix , 'destination_partition': 'events_intraday_' + relation_suffix + property_id|string } ) %}
                     {%- endif -%}
                 {% endfor %}
 
@@ -33,7 +33,7 @@
                     {%- if relation_suffix|int >= earliest_shard_to_retrieve|int -%}
                         create or replace table `{{target.project}}.{{var('combined_dataset')}}.events_{{relation_suffix}}{{property_id}}` clone `{{var('source_project')}}.analytics_{{property_id}}.events_{{relation_suffix}}`;
                         drop table if exists `{{target.project}}.{{var('combined_dataset')}}.events_intraday_{{relation_suffix}}{{property_id}}`;
-                        {% do modifications.append( {'source_partition': 'events_' + relation_suffix , 'destination_partition': 'events_' + relation_suffix + property_id } ) %}
+                        {% do modifications.append( {'source_partition': 'events_' + relation_suffix , 'destination_partition': 'events_' + relation_suffix + property_id|string } ) %}
                     {%- endif -%}
                 {% endfor %}
             {% elif this.name == 'base_ga4__pseudonymous_users' %}
@@ -44,7 +44,7 @@
                     {%- set relation_suffix = relation.identifier|replace('pseudonymous_users_', '') -%}
                     {%- if relation_suffix|int >= earliest_shard_to_retrieve|int -%}
                         create or replace table `{{target.project}}.{{var('combined_dataset')}}.pseudonymous_users_{{relation_suffix}}{{property_id}}` clone `{{var('source_project')}}.analytics_{{property_id}}.pseudonymous_users_{{relation_suffix}}`;
-                        {% do modifications.append( {'source_partition': 'pseudonymous_users_' + relation_suffix , 'destination_partition': 'pseudonymous_users_' + relation_suffix + property_id } ) %}
+                        {% do modifications.append( {'source_partition': 'pseudonymous_users_' + relation_suffix , 'destination_partition': 'pseudonymous_users_' + relation_suffix + property_id|string } ) %}
                     {%- endif -%}
                 {% endfor %}
             {% elif this.name == 'base_ga4__users' %}
@@ -54,7 +54,7 @@
                     {%- set relation_suffix = relation.identifier|replace('users_', '') -%}
                     {%- if relation_suffix|int >= earliest_shard_to_retrieve|int -%}
                         create or replace table `{{target.project}}.{{var('combined_dataset')}}.users_{{relation_suffix}}{{property_id}}` clone `{{var('source_project')}}.analytics_{{property_id}}.users_{{relation_suffix}}`;
-                        {% do modifications.append( {'source_partition': 'users_' + relation_suffix , 'destination_partition': 'users_' + relation_suffix + property_id } ) %}
+                        {% do modifications.append( {'source_partition': 'users_' + relation_suffix , 'destination_partition': 'users_' + relation_suffix + property_id|string } ) %}
                     {%- endif -%}
                 {% endfor %}
             {% endif %}
@@ -62,7 +62,7 @@
         {% do run_query(combine_specified_property_data_query) %}
         {% if execute %}
             {% for modification in modifications%}
-                {{ log("Cloned from `" ~ var('source_project') ~ ".analytics_" ~ property_id ~ "." ~ modification.source_partition ~"` to `" ~ target.project ~ "." ~ var('combined_dataset') ~ "." ~ modification.destination_partition ~"`", True) }}                   
+                {{ log("Cloned from `" ~ var('source_project') ~ ".analytics_" ~ property_id|string ~ "." ~ modification.source_partition ~"` to `" ~ target.project ~ "." ~ var('combined_dataset') ~ "." ~ modification.destination_partition ~"`", True) }}                   
             {% endfor %}
         {% endif %}
     {% endfor %}
