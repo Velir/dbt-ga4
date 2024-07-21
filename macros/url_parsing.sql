@@ -7,7 +7,11 @@
 {% endmacro %}
 
 {% macro remove_query_parameters(url, parameters)%}
+{% if "*all*" in parameters %}
+    regexp_replace({{url}}, r'(\?|&|#).*', '')
+{% else %}
 REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE({{url}}, '(\\?|&)({{ parameters|join("|") }})=[^&]*', '\\1'), '\\?&+', '?'), '&+', '&'), '\\?$|&$', '')
+{% endif %}
 {% endmacro %}
 
 {% macro extract_page_path(url) %}

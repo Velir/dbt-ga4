@@ -18,3 +18,35 @@ models:
           the data shows that this is not always the case. When a user_engagement event does not fire, the engagement_time_msec parameter is assigned to the next page_view. 
           This engagement time should be credited to the previous page, 
           so for page_view events this field uses the session_key and page_referrer as the key while all other events use the session_key and page_location.
+
+unit_tests:
+  - name: query_parameter_removal
+    description: "Check that query parameters get removed from the model."
+    model: stg_ga4__events
+    given:
+      - input: ref('base_ga4__events')
+        rows:
+          - {page_location: https://asite.com/page?parameter=this_param,    page_referrer: https://asite.com/previous_page?parameter=previous_value}
+          - {page_location: https://asite.com/anotherpage?parameter=param%20with%20encoded%20spaces,    page_referrer: https://asite.com/previous_page?utm_source=source_value}
+    overrides:
+      vars:
+        remove_query_string: ["parameter"]
+    expect:
+      rows:
+        - {page_location: https://asite.com/page,    page_referrer: https://asite.com/previous_page}
+        - {page_location: https://asite.com/anotherpage,    page_referrer: https://asite.com/previous_page?utm_source=source_value}
+  - name: query_parameter_remove_all
+    description: "Check that the '*all*' flag removes all query parameters from the model."
+    model: stg_ga4__events
+    given:
+      - input: ref('base_ga4__events')
+        rows:
+          - {page_location: https://asite.com/page?parameter=this_param,    page_referrer: https://asite.com/previous_page?parameter=previous_value}
+          - {page_location: https://asite.com/anotherpage?parameter=param%20with%20encoded%20spaces,    page_referrer: https://asite.com/previous_page?utm_source=source_value}
+    overrides:
+      vars:
+        remove_query_string: ["*all*"]
+    expect:
+      rows:
+        - {page_location: https://asite.com/page,    page_referrer: https://asite.com/previous_page}
+        - {page_location: https://asite.com/anotherpage,    page_referrer: https://asite.com/previous_page}
