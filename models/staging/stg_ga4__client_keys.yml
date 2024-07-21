@@ -7,8 +7,9 @@ models:
         This model is keyed on client_key which is the key used by the package for joining with client (browser/app).
         This model unnests user properties and audience using variables of the same name that match the user property 
         or audience name and prefixing the unnested fields with those names.
+    tests:
+      - unique:
+          column_name: "(client_key || occurrence_date)"
     columns:
       - name: client_key
         description: Hashed combination of user_pseudo_id and stream_id
-        tests:
-          - unique
