@@ -1,4 +1,4 @@
-{% macro select_date_range(start_date, end_date, date_column, parse=true) %}
+{% macro select_date_range_ga4_package_custom(start_date, end_date, date_column, parse=true) %}
     {% if start_date is not none and end_date is not none %}
     {% if parse %}
         {{ date_column }} between 
