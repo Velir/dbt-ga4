@@ -1,4 +1,6 @@
 {% test ten_weeks_dates(model, column_name) %}
+{% set start_date = var('start_date') %}
+{% set end_date = var('end_date') %}
 
 select *
 from (
@@ -8,7 +10,12 @@ from (
 
     from {{ model }}
     where {{ column_name }} is not null
-    and {{ select_date_range_ga4_package_custom(var("start_date"), var("end_date"), "event_date_dt") }}
+    {% if start_date is not none and start_date != '' and end_date is not none and end_date != '' %}
+        and event_date_dt between '{{ start_date }}' and '{{ end_date }}'
+    {% elif start_date is not none and start_date != '' %}
+        and event_date_dt >= '{{ start_date }}'
+    {% endif %}
+
     group by {{ column_name }}
     having count(*) > 1
 
