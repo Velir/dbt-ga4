@@ -1,4 +1,4 @@
-{% test test_unique_stg_ga4__events_event_key_custom(model, column_name) %}
+{% test test_unique_custom(model, column_name) %}
 {% set start_date = var('start_date') %}
 {% set end_date = var('end_date') %}
 
