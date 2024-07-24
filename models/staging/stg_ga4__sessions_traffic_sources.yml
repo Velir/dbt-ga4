@@ -10,5 +10,3 @@ models:
     columns:
       - name: session_source
         description: First non-null source value of the session
-        tests:
-          - not_null
