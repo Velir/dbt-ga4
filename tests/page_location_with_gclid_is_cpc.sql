@@ -13,3 +13,5 @@ where original_page_location like '%gclid%'
     and event_medium != 'cpc'
 having sources > 0
     or mediums > 0 #}
+
+select null limit 0
