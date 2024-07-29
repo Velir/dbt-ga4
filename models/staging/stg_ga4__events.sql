@@ -33,12 +33,30 @@ detect_gclid as (
     select
         * except (event_source, event_medium, event_campaign),
         case
-            when (page_location like '%gclid%' and event_source is null) then "google"
+            when (
+                page_location like '%gclid%' 
+                and (
+                    event_source is null
+                    or event_source like '%safeframe.googlesyndication.com%'
+                    or event_source like '%doubleclick.net%'
+                )
+            ) then "google"
             else event_source
         end as event_source,
         case
             when (page_location like '%gclid%' and event_medium is null) then "cpc"
+
             when (page_location like '%gclid%' and event_medium = 'organic') then "cpc"
+
+            when (
+                page_location like '%gclid%' 
+                and (
+                    event_source is null
+                    or event_source like '%safeframe.googlesyndication.com%'
+                    or event_source like '%doubleclick.net%'
+                )
+                and event_medium = 'referral'
+            ) then "cpc"
             else event_medium
         end as event_medium,
         case
