@@ -6,7 +6,11 @@
     REGEXP_EXTRACT({{ url }}, '\\?(.+)')
 {% endmacro %}
 
-{% macro remove_query_parameters(url, parameters)%}
+{% macro remove_query_parameters(url, parameters) %}
+  {{ return(adapter.dispatch('remove_query_parameters', 'ga4')(url, parameters)) }}
+{% endmacro %}
+
+{% macro default__remove_query_parameters(url, parameters)%}
 {% if "*all*" in parameters %}
     regexp_replace({{url}}, r'(\?|&|#).*', '')
 {% else %}
