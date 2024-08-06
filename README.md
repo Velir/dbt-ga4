@@ -109,6 +109,16 @@ vars:
     query_parameter_exclusions: ["gclid","fbclid","_ga"] 
 ```
 
+You can remove all query parameters by setting `query_parameter_exclusions` to `*all*`.
+
+```
+vars:
+  ga4:
+    query_parameter_exclusions: ["*all*"]
+```
+
+By default, parameters are removed from URL fragments (elements after the hash # symbol). If you wish to exclude query parameters but keep URL fragments with the same key, you will need to override the `remove_query_parameters` macro.
+
 ### Query Parameter Extraction
 
 Setting `query_parameter_extraction` will extract query string parameters from the `page_location` field into new columns. This can be used to extract advertising click IDs into columns that can be joined with advertising data sets. Ex:
