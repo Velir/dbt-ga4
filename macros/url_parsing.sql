@@ -10,7 +10,7 @@
 {% if "*all*" in parameters %}
     regexp_replace({{url}}, r'(\?|&|#).*', '')
 {% else %}
-    regexp_replace({{ url }}, r'([&|#|\?]{1}{{ parameters|join("|") }}=[^\?&#]*)', '')
+    regexp_replace({{ url }}, r'([&|#|\?]{1}({{ parameters|join("|") }})=[^\?&#]*)', '')
 {% endif %}
 {% endmacro %}
 
