@@ -27,7 +27,8 @@ include_event_key as (
     select 
         *,
         to_base64(md5(ARRAY_TO_STRING([
-            session_key,
+            client_key,
+            CAST(session_id as STRING),
             event_name,
             CAST(event_timestamp as STRING),
             to_json_string(event_params)
