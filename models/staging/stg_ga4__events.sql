@@ -22,11 +22,16 @@ include_session_partition_key as (
         CONCAT(session_key, CAST(event_date_dt as STRING)) as session_partition_key
     from include_session_key
 ),
--- Add unique key for events
+-- Add unique key for events. Potential to not be unique if session_key is null and uniqueness depends on differentiation by that value.
 include_event_key as (
     select 
         *,
-        to_base64(md5(CONCAT(session_key, event_name, CAST(event_timestamp as STRING), to_json_string(event_params)))) as event_key -- Surrogate key for unique events.  
+        to_base64(md5(ARRAY_TO_STRING([
+            session_key,
+            event_name,
+            CAST(event_timestamp as STRING),
+            to_json_string(event_params)
+        ], ""))) as event_key -- Surrogate key for unique events.  
     from include_session_partition_key
 ),
 detect_gclid as (
