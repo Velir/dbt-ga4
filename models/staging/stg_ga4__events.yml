@@ -7,6 +7,9 @@ models:
       - name: client_key
         description: Surrogate key created from stream_id and user_pseudo_id. Provides a way to uniquely identify a user's device within a stream. Important when using the package to combine data across properties and streams.
       - name: event_key
+        description: >
+          Surrogate key for events. Potential for uniqueness test to fail if session_key is null and uniqueness 
+          depends on differentiation by that value.
         tests:
           - unique
       - name: page_path
