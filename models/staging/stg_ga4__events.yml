@@ -58,3 +58,78 @@ unit_tests:
       rows:
         - {page_location: https://asite.com/page,    page_referrer: https://asite.com/previous_page}
         - {page_location: https://asite.com/anotherpage,    page_referrer: https://asite.com/previous_page}
+
+  - name: query_parameter_extraction
+    description: "Check that query parameters get extracted from the model and added as new fields."
+    model: stg_ga4__events
+    given:
+      - input: ref('base_ga4__events')
+        rows:
+          - {page_location: https://asite.com/page?param1=value1}
+          - {page_location: https://asite.com/anotherpage?param1=value%20with%20encoded%20spaces}
+          - {page_location: https://sitetwo.com/page?param1=value1&param2=value2}
+          - {page_location: https://anothersite.com/page?not_included_param=value&param1=val&param=also_not_included}
+          - {page_location: https://threeparams.com/page&param1=another_val&param2=second_val&param3=value3}
+          - {page_location: https://noparams.com/}
+    overrides:
+      vars:
+        query_parameter_extraction: ["param1", "param2", "param3"]
+    expect:
+      rows:
+        - {query_param_param1: value1, query_param_param2: null, query_param_param3: null}
+        - {query_param_param1: value%20with%20encoded%20spaces, query_param_param2: null, query_param_param3: null}
+        - {query_param_param1: value1, query_param_param2: value2, query_param_param3: null}
+        - {query_param_param1: val, query_param_param2: null, query_param_param3: null}
+        - {query_param_param1: another_val, query_param_param2: second_val, query_param_param3: value3}
+        - {query_param_param1: null, query_param_param2: null, query_param_param3: null}
+
+  - name: hostname_extraction_from_url
+    description: "Check that the hostname is extracted from the URL"
+    model: stg_ga4__events
+    given:
+      - input: ref('base_ga4__events')
+        rows:
+          - {page_location: https://fakesite.com/}
+          - {page_location: https://www.mock.sitehub.io/}
+          - {page_location: https://cool-site.com/with/this-path}
+          - {page_location: https://example.site.app/?parameter=this}
+          - {page_location: https://madeup.org/page?param=true&other_param=sure}
+    expect:
+      rows:
+        - {page_hostname: fakesite.com}
+        - {page_hostname: mock.sitehub.io}
+        - {page_hostname: cool-site.com}
+        - {page_hostname: example.site.app}
+        - {page_hostname: madeup.org}
+
+  - name: query_string_extraction_from_url
+    description: "Check that the query string is extracted from the URL"
+    model: stg_ga4__events
+    given:
+      - input: ref('base_ga4__events')
+        rows:
+          - {page_location: https://fakesite.com/?query_string=something}
+          - {page_location: https://www.no.query.string/but-has-this-path}
+          - {page_location: https://cool-site.com/even-cooler-path?utm_term=test-term&utm_source=test-source}
+    expect:
+      rows:
+        - {page_query_string: query_string=something}
+        - {page_query_string: null}
+        - {page_query_string: utm_term=test-term&utm_source=test-source}
+
+  - name: page_path_extraction
+    description: "Check that the page path is extracted from the URL"
+    model: stg_ga4__events
+    given:
+      - input: ref('base_ga4__events')
+        rows:
+          - {page_location: https://fakesite.com/}
+          - {page_location: https://cool-site.com/with/this-path}
+          - {page_location: https://example.site.app/?parameter=no-path}
+          - {page_location: https://madeup.org/page?param=true&other_param=sure}
+    expect:
+      rows:
+        - {page_path: /}
+        - {page_path: /with/this-path}
+        - {page_path: /}
+        - {page_path: /page}
