@@ -10,3 +10,27 @@ models:
           - not_null
           - unique
 
+unit_tests:
+  - name: test_user_id_mapping
+    description: Test whether the latest client_key to user_id mapping logic is correct
+    model: stg_ga4__user_id_mapping
+    given:
+      - input: ref('stg_ga4__events')
+        format: csv
+        rows: |
+          client_key,user_id,event_timestamp
+          a1,,100
+          a1,A,101
+          b1,B,102
+          c1,C,103
+          c2,C,104
+          c2,,105
+          d1,,100
+    expect:
+      format: csv
+      rows: |
+        last_seen_user_id,client_key,last_seen_user_id_timestamp
+        A,a1,101
+        B,b1,102
+        C,c1,103
+        C,c2,104
