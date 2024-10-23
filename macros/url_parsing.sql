@@ -6,8 +6,16 @@
     REGEXP_EXTRACT({{ url }}, '\\?(.+)')
 {% endmacro %}
 
-{% macro remove_query_parameters(url, parameters)%}
-REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE({{url}}, '(\\?|&)({{ parameters|join("|") }})=[^&]*', '\\1'), '\\?&+', '?'), '&+', '&'), '\\?$|&$', '')
+{% macro remove_query_parameters(url, parameters) %}
+  {{ return(adapter.dispatch('remove_query_parameters', 'ga4')(url, parameters)) }}
+{% endmacro %}
+
+{% macro default__remove_query_parameters(url, parameters)%}
+{% if "*all*" in parameters %}
+    regexp_replace({{url}}, r'(\?|&|#).*', '')
+{% else %}
+    regexp_replace({{ url }}, r'([&|#|\?]{1}({{ parameters|join("|") }})=[^\?&#]*)', '')
+{% endif %}
 {% endmacro %}
 
 {% macro extract_page_path(url) %}
