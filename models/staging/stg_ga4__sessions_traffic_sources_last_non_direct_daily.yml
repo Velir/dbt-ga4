@@ -24,6 +24,7 @@ models:
           - not_null
 unit_tests:
   - name: test_stg_ga4__sessions_traffic_sources_last_non_direct_daily
+    description: Test pulling the last non direct session parameters per client_key
     model: stg_ga4__sessions_traffic_sources_last_non_direct_daily
     given:
       - input : ref('stg_ga4__sessions_traffic_sources_daily')

@@ -5,6 +5,7 @@ models:
     description: This model pivots the query string parameters contained within the event's page_location field to become rows. Each row is a single parameter/value combination contained in a single event's query string.
 unit_tests:
   - name: test_stg_ga4__event_to_query_string_params
+    description: Test whether event query strings are flattened for each query string parameter
     model: stg_ga4__event_to_query_string_params
     given:
       - input: ref('stg_ga4__events')

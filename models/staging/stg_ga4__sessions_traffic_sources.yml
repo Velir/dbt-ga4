@@ -18,6 +18,7 @@ models:
 
 unit_tests:
   - name: test_default_channel_grouping
+    description: Test whether the defaul_channel_grouping macro is assigning channels correctly
     model: stg_ga4__sessions_traffic_sources
     given:
       - input: ref('stg_ga4__events')
