@@ -15,3 +15,79 @@ models:
         description: First non-null source value of the session
         tests:
           - not_null
+
+unit_tests:
+  - name: test_default_channel_grouping
+    model: stg_ga4__sessions_traffic_sources
+    given:
+      - input: ref('stg_ga4__events')
+        format: csv
+        rows: |
+          session_key,event_timestamp,event_name,event_source,event_medium,event_campaign
+          A,172000000000000,event,(direct),(none),
+          B,172000000000000,event,(direct),(not set),
+          C,172000000000000,event,some-source,some-medium,some-cross-network-campaign
+          D,172000000000000,event,some-source,some-medium,cross-network
+          E,172000000000000,event,alibaba,cpc,
+          F,172000000000000,event,some-source,retargeting,shopping
+          G,172000000000000,event,google,ppc,
+          H,172000000000000,event,facebook,retargeting,
+          I,172000000000000,event,youtube.com,paid-something,
+          J,172000000000000,event,youtube.com,display,
+          K,172000000000000,event,some-source,cpc,
+          L,172000000000000,event,Google Shopping,,
+          M,172000000000000,event,some-source,,some-shopping-campaign
+          N,172000000000000,event,facebook,,
+          O,172000000000000,event,some-source,social,
+          P,172000000000000,event,youtube.com,,
+          Q,172000000000000,event,some-source,video,
+          R,172000000000000,event,bing,,
+          S,172000000000000,event,some-source,organic,
+          T,172000000000000,event,some-source,referral,
+          U,172000000000000,event,email,,
+          V,172000000000000,event,,e mail,
+          W,172000000000000,event,some-source,affiliate,
+          X,172000000000000,event,some-source,audio,
+          Y,172000000000000,event,sms,,
+          Z,172000000000000,event,,sms,
+          AA,172000000000000,event,some-source,something-push,
+          AB,172000000000000,event,some-source,mobile-notification,
+          AC,172000000000000,event,firebase,,
+          AD,172000000000000,event,some-source,some-medium,some-campaign
+      - input: ref('ga4_source_categories')
+        format: csv
+        fixture: ga4_source_categories
+    expect: 
+      format: csv
+      rows: |
+        session_default_channel_grouping
+        Direct
+        Direct
+        Cross-network
+        Cross-network
+        Paid Shopping
+        Paid Shopping
+        Paid Search
+        Paid Social
+        Paid Video
+        Display
+        Paid Other
+        Organic Shopping
+        Organic Shopping
+        Organic Social
+        Organic Social
+        Organic Video
+        Organic Video
+        Organic Search
+        Organic Search
+        Referral
+        Email
+        Email
+        Affiliates
+        Audio
+        SMS
+        SMS
+        Mobile Push Notifications
+        Mobile Push Notifications
+        Mobile Push Notifications
+        Unassigned
