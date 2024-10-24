@@ -15,7 +15,6 @@ models:
         description: First non-null source value of the session
         tests:
           - not_null
-
 unit_tests:
   - name: test_default_channel_grouping
     description: Test whether the defaul_channel_grouping macro is assigning channels correctly

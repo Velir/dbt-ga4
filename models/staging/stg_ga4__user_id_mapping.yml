@@ -9,7 +9,6 @@ models:
         tests:
           - not_null
           - unique
-
 unit_tests:
   - name: test_user_id_mapping
     description: Test whether the latest client_key to user_id mapping logic is correct

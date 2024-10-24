@@ -21,7 +21,6 @@ models:
           the data shows that this is not always the case. When a user_engagement event does not fire, the engagement_time_msec parameter is assigned to the next page_view. 
           This engagement time should be credited to the previous page, 
           so for page_view events this field uses the session_key and page_referrer as the key while all other events use the session_key and page_location.
-
 unit_tests:
   - name: query_parameter_removal
     description: "Check that query parameters get removed from the model."
@@ -42,7 +41,6 @@ unit_tests:
         - {page_location: https://asite.com/anotherpage,    page_referrer: https://asite.com/previous_page?utm_source=source_value}
         - {page_location: https://anothersite.com/page?not_excluded_param=val&param=also_not_excluded, page_referrer: https://anothersite.com/previous_page#utm_source=source_value#hash=hash_value}
         - {page_location: https://twoparams.com/page, page_referrer: https://twoparams.com/previous_page#hash=hash_value}
-
   - name: query_parameter_remove_all
     description: "Check that the '*all*' flag removes all query parameters from the model."
     model: stg_ga4__events
@@ -58,7 +56,6 @@ unit_tests:
       rows:
         - {page_location: https://asite.com/page,    page_referrer: https://asite.com/previous_page}
         - {page_location: https://asite.com/anotherpage,    page_referrer: https://asite.com/previous_page}
-
   - name: query_parameter_extraction
     description: "Check that query parameters get extracted from the model and added as new fields."
     model: stg_ga4__events
@@ -82,7 +79,6 @@ unit_tests:
         - {query_param_param1: val, query_param_param2: null, query_param_param3: null}
         - {query_param_param1: another_val, query_param_param2: second_val, query_param_param3: value3}
         - {query_param_param1: null, query_param_param2: null, query_param_param3: null}
-
   - name: hostname_extraction_from_url
     description: "Check that the hostname is extracted from the URL"
     model: stg_ga4__events
@@ -101,7 +97,6 @@ unit_tests:
         - {page_hostname: cool-site.com}
         - {page_hostname: example.site.app}
         - {page_hostname: madeup.org}
-
   - name: query_string_extraction_from_url
     description: "Check that the query string is extracted from the URL"
     model: stg_ga4__events
@@ -116,7 +111,6 @@ unit_tests:
         - {page_query_string: query_string=something}
         - {page_query_string: null}
         - {page_query_string: utm_term=test-term&utm_source=test-source}
-
   - name: page_path_extraction
     description: "Check that the page path is extracted from the URL"
     model: stg_ga4__events
@@ -133,7 +127,6 @@ unit_tests:
         - {page_path: /with/this-path}
         - {page_path: /}
         - {page_path: /page}
-
   - name: test_base_to_stg_ga4__events
     description: "Check whether a given row from base_ga4__events produces the expected row in stg_ga4__events"
     model: stg_ga4__events
