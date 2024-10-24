@@ -8,16 +8,6 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-profile: 'bq_ga4'
-
-vars:
-  start_date: "20230306" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model.
-  source_project: "analytics"
-  property_ids: [id]
-  frequency: "daily"
-  conversion_events: ['add_to_cart', 'large_button_clicked']
-  static_incremental_days: 3
-
 target-path: "target"  # directory which will store compiled SQL files
 clean-targets:         # directories to be removed by `dbt clean`
   - "target"
