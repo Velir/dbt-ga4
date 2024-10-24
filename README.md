@@ -304,7 +304,26 @@ gcloud auth application-default login --scopes=https://www.googleapis.com/auth/b
 ```
 # Unit Testing
 
-This package uses `pytest` as a method of unit testing individual models. More details can be found in the [unit_tests/README.md](unit_tests) folder.
+The dbt-ga4 package treats each model and macro as a 'unit' of code. If we fix the input to each unit, we can test that we received the expected output.
+
+This package currently uses a combination of dbt unit tests and `pytest` as a method of unit testing individual models. The remaining `pytest` unit test will be refactored to a dbt unit test when possible - progress on the bug preventing that work can be tracked [here](https://github.com/dbt-labs/dbt-core/issues/10353).
+
+### dbt unit tests
+
+dbt's documentation on unit tests can be found [here](https://docs.getdbt.com/docs/build/unit-tests). Unit tests are performed the same way other types of dbt tests are executed.
+
+Execute a specific test:
+```
+dbt test -s <test_name>
+```
+Execute all tests configured for a model:
+```
+dbt test -s <model_name>
+```
+
+### pytest
+
+More details on using `pytest` for unit testing can be found in the [unit_tests/README.md](unit_tests) folder.
 
 # Overriding Default Channel Groupings
 
