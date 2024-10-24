@@ -17,17 +17,6 @@ vars:
   frequency: "daily"
   conversion_events: ['add_to_cart', 'large_button_clicked']
   static_incremental_days: 3
-  derived_session_properties:
-    - event_parameter: "ga_session_id"
-      session_property_name: "ga_session_id"
-      value_type: "int_value"
-    - event_parameter: "page_title"
-      session_property_name: "page_title"
-      value_type: "string_value"
-  derived_user_properties:
-    - event_parameter: "page_title"
-      user_property_name: "page_title"
-      value_type: "string_value"
 
 target-path: "target"  # directory which will store compiled SQL files
 clean-targets:         # directories to be removed by `dbt clean`
