@@ -133,6 +133,7 @@ unit_tests:
         - {page_path: /with/this-path}
         - {page_path: /}
         - {page_path: /page}
+
   - name: test_base_to_stg_ga4__events
     description: "Check whether a given row from base_ga4__events produces the expected row in stg_ga4__events"
     model: stg_ga4__events
@@ -140,133 +141,84 @@ unit_tests:
       - input: ref('base_ga4__events')
         format: sql
         rows: |
-          with mock_event_params as (
-
-            select 'ga_session_number' as key, struct(cast(null as string) as string_value, 1 as int_value, cast(null as FLOAT64) as float_value, cast(null as FLOAT64) as double_value) as value
-            union all
-            select 'engaged_session_event' as key, struct(cast(null as string) as string_value, 1 as int_value, cast(null as FLOAT64) as float_value, cast(null as FLOAT64) as double_value) as value
-            union all
-            select 'ga_session_id' as key, struct(cast(null as string) as string_value, 1617691775 as int_value, cast(null as FLOAT64) as float_value, cast(null as FLOAT64) as double_value) as value
-            union all
-            select 'source' as key, struct('bing' as string_value, null as int_value, cast(null as FLOAT64) as float_value, cast(null as FLOAT64) as double_value) as value
-            union all
-            select 'page_title' as key, struct('Velir | Behavior-Driven Testing in Drupal 8' as string_value, null as int_value, cast(null as FLOAT64) as float_value, cast(null as FLOAT64) as double_value) as value
-            union all
-            select 'page_location' as key, struct('https://www.velir.com/blog/2016/08/25/behavior-driven-testing-drupal-8?utm_term=test' as string_value, null as int_value, cast(null as FLOAT64) as float_value, cast(null as FLOAT64) as double_value) as value
-            union all
-            select 'session_engaged' as key, struct(cast(null as string) as string_value, 1 as int_value, cast(null as FLOAT64) as float_value, cast(null as FLOAT64) as double_value) as value
-            union all
-            select 'engagement_time_msec' as key, struct(cast(null as string) as string_value, 30000 as int_value, cast(null as FLOAT64) as float_value, cast(null as FLOAT64) as double_value) as value
-
-          )
-
-          , mock_row as (
-
-            select
-
-              date('2021-04-06') as event_date_dt
-              , 1617691790431476 as event_timestamp
-              , 'first_visit' as event_name
-              , array_agg((select as struct mock_event_params.*)) as event_params
-              , null as event_previous_timestamp
-              , null as event_value_in_usd
-              , 948327668 as event_bundle_sequence_id
-              , null as event_server_timestamp_offset
-              , cast(null as string) as user_id
-              , '1166526666.1617691776' as user_pseudo_id -- Added
-              , cast(null as string) as privacy_info_analytics_storage -- Added
-              , cast(null as string) as privacy_info_ads_storage -- Added
-              , cast(null as string) as privacy_info_uses_transient_token -- Added
-              , null as user_properties
-              , 1617691790431476 as user_first_touch_timestamp
-              , 0.0 as user_ltv_revenue -- Added
-              , 'USD' as user_ltv_currency -- Added
-              , 'desktop' as device_category -- Added
-              , cast(null as string) as device_mobile_brand_name -- Added
-              , cast(null as string) as device_mobile_model_name -- Added
-              , cast(null as string) as device_mobile_marketing_name -- Added
-              , cast(null as string) as device_mobile_os_hardware_model -- Added
-              , 'Windows' as device_operating_system -- Added
-              , 'Windows 10' as device_operating_system_version -- Added
-              , cast(null as string) as device_vendor_id -- Added
-              , cast(null as string) as device_advertising_id -- Added
-              , 'en-us' as device_language -- Added
-              , 'No' as device_is_limited_ad_tracking -- Added
-              , null as device_time_zone_offset_seconds -- Added
-              , cast(null as string) as device_browser -- Added
-              , cast(null as string) as device_browser_version -- Added
-              , 'Chrome' as device_web_info_browser -- Added
-              , '89.0.4389.114' as device_web_info_browser_version -- Added
-              , 'www.velir.com' as device_web_info_hostname -- Added
-              , 'Asia' as geo_continent -- Added
-              , 'Vietnam' as geo_country -- Added
-              , 'Ho Chi Minh City' as geo_region -- Added
-              , 'Ho Chi Minh City' as geo_city -- Added
-              , 'Southeast Asia' as geo_sub_continent -- Added
-              , '(not set)' as geo_metro -- Added
-              , cast(null as string) as app_info_id -- Added
-              , cast(null as string) as app_info_version -- Added
-              , cast(null as string) as app_info_install_store -- Added
-              , cast(null as string) as app_info_firebase_app_id -- Added
-              , cast(null as string) as app_info_install_source -- Added
-              , '(direct)' as user_campaign -- Added
-              , '(none)' as user_medium -- Added
-              , '(direct)' as user_source -- Added
-              , '1966637064' as stream_id
-              , 'WEB' as platform
-              , null as ecommerce
-              , null as items
-              , 12345 as property_id
-              , 1617691775 as session_id
-              , 'https://www.velir.com/blog/2016/08/25/behavior-driven-testing-drupal-8?utm_term=test' as page_location
-              , 1 as session_number
-              , 1 as session_engaged
-              , 30000 as engagement_time_msec -- Added
-              , 'Velir | Behavior-Driven Testing in Drupal 8' as page_title
-              , cast(null as string) as page_referrer
-              , 'bing' as event_source -- Added
-              , cast(null as string) as event_medium -- Added
-              , cast(null as string) as event_campaign -- Added
-              , cast(null as string) as event_content -- Added
-              , cast(null as string) as event_term -- Added
-              , 0 as is_page_view
-              , 0 as is_purchase
-
-            from mock_event_params
-
-          )
-          select * from mock_row
-    expect:
-      format: sql
-      rows: |
-        with mock_event_params as (
-
-          select 'ga_session_number' as key, struct(cast(null as string) as string_value, 1 as int_value, cast(null as FLOAT64) as float_value, cast(null as FLOAT64) as double_value) as value
-          union all
-          select 'engaged_session_event' as key, struct(cast(null as string) as string_value, 1 as int_value, cast(null as FLOAT64) as float_value, cast(null as FLOAT64) as double_value) as value
-          union all
-          select 'ga_session_id' as key, struct(cast(null as string) as string_value, 1617691775 as int_value, cast(null as FLOAT64) as float_value, cast(null as FLOAT64) as double_value) as value
-          union all
-          select 'source' as key, struct('bing' as string_value, null as int_value, cast(null as FLOAT64) as float_value, cast(null as FLOAT64) as double_value) as value
-          union all
-          select 'page_title' as key, struct('Velir | Behavior-Driven Testing in Drupal 8' as string_value, null as int_value, cast(null as FLOAT64) as float_value, cast(null as FLOAT64) as double_value) as value
-          union all
-          select 'page_location' as key, struct('https://www.velir.com/blog/2016/08/25/behavior-driven-testing-drupal-8?utm_term=test' as string_value, null as int_value, cast(null as FLOAT64) as float_value, cast(null as FLOAT64) as double_value) as value
-          union all
-          select 'session_engaged' as key, struct(cast(null as string) as string_value, 1 as int_value, cast(null as FLOAT64) as float_value, cast(null as FLOAT64) as double_value) as value
-          union all
-          select 'engagement_time_msec' as key, struct(cast(null as string) as string_value, 30000 as int_value, cast(null as FLOAT64) as float_value, cast(null as FLOAT64) as double_value) as value
-
-        )
-        
-        , expected_row as (
-
           select
-
             date('2021-04-06') as event_date_dt
             , 1617691790431476 as event_timestamp
             , 'first_visit' as event_name
-            , array_agg((select as struct mock_event_params.*)) as event_params
+            , array[
+              struct(
+                'ga_session_number' as key
+                , struct(
+                  cast(null as string) as string_value
+                  , 1 as int_value
+                  , cast(null as FLOAT64) as float_value
+                  , cast(null as FLOAT64) as double_value
+                ) as value
+              )
+              , struct(
+                'engaged_session_event' as key
+                , struct(
+                  cast(null as string) as string_value
+                  , 1 as int_value
+                  , cast(null as FLOAT64) as float_value
+                  , cast(null as FLOAT64) as double_value
+                )
+              )
+              , struct(
+                'ga_session_id' as key
+                , struct(
+                  cast(null as string) as string_value
+                  , 1617691775 as int_value
+                  , cast(null as FLOAT64) as float_value
+                  , cast(null as FLOAT64) as double_value
+                )
+              )
+              , struct(
+                'source' as key
+                , struct(
+                  'bing' as string_value
+                  , null as int_value
+                  , cast(null as FLOAT64) as float_value
+                  , cast(null as FLOAT64) as double_value
+                )
+              )
+              , struct(
+                'page_title' as key
+                , struct(
+                  'Velir | Behavior-Driven Testing in Drupal 8' as string_value
+                  , null as int_value
+                  , cast(null as FLOAT64) as float_value
+                  , cast(null as FLOAT64) as double_value
+                )
+              )
+              , struct(
+                'page_location' as key
+                , struct(
+                  'https://www.velir.com/blog/2016/08/25/behavior-driven-testing-drupal-8?utm_term=test' as string_value
+                  , null as int_value
+                  , cast(null as FLOAT64) as float_value
+                  , cast(null as FLOAT64) as double_value
+                )
+              )
+              , struct(
+                'session_engaged' as key
+                , struct(
+                  cast(null as string) as string_value
+                  , 1 as int_value
+                  , cast(null as FLOAT64) as float_value
+                  , cast(null as FLOAT64) as double_value
+                )
+              )
+              , struct(
+                'engagement_time_msec' as key
+                , struct(
+                  cast(null as string) as string_value
+                  , 30000 as int_value
+                  , cast(null as FLOAT64) as float_value
+                  , cast(null as FLOAT64) as double_value
+                )
+              )
+            ] as event_params
             , null as event_previous_timestamp
             , null as event_value_in_usd
             , 948327668 as event_bundle_sequence_id
@@ -317,36 +269,175 @@ unit_tests:
             , null as items
             , 12345 as property_id
             , 1617691775 as session_id
+            , 'https://www.velir.com/blog/2016/08/25/behavior-driven-testing-drupal-8?utm_term=test' as page_location
             , 1 as session_number
             , 1 as session_engaged
             , 30000 as engagement_time_msec -- Added
             , 'Velir | Behavior-Driven Testing in Drupal 8' as page_title
+            , cast(null as string) as page_referrer
+            , 'bing' as event_source -- Added
+            , cast(null as string) as event_medium -- Added
+            , cast(null as string) as event_campaign -- Added
             , cast(null as string) as event_content -- Added
             , cast(null as string) as event_term -- Added
             , 0 as is_page_view
             , 0 as is_purchase
-            , 'KXZY+6kA4bpHda1EzHaVvw==' as client_key
-            , '90mFUqw4xBzU+Xx9/4ycCQ==' as session_key
-            , '90mFUqw4xBzU+Xx9/4ycCQ==2021-04-06' as session_partition_key
-            , '7HoiVpTakjsH3DJ1t4HGNw==' as event_key
-            , 'bing' as event_source -- Added
-            , cast(null as string) as event_medium -- Added
-            , cast(null as string) as event_campaign -- Added
-            , 'test' as query_param_utm_term
-            , 'https://www.velir.com/blog/2016/08/25/behavior-driven-testing-drupal-8?utm_term=test' as original_page_location
-            , cast(null as string) as original_page_referrer
-            , '/blog/2016/08/25/behavior-driven-testing-drupal-8' as page_path
-            , 'https://www.velir.com/blog/2016/08/25/behavior-driven-testing-drupal-8' as page_location
-            , cast(null as string) as page_referrer
-            , 'velir.com' as page_hostname
-            , cast(null as string) as page_query_string
-            , '2021-04-06https://www.velir.com/blog/2016/08/25/behavior-driven-testing-drupal-8' as page_key
-            , 'il76Ej2ywBpSKKyYSAkOlQ==' as page_engagement_key
-
-          from mock_event_params
-
-        )
-        select * from expected_row
+    expect:
+      format: sql
+      rows: |
+        select
+          date('2021-04-06') as event_date_dt
+          , 1617691790431476 as event_timestamp
+          , 'first_visit' as event_name
+          , array[
+              struct(
+                'ga_session_number' as key
+                , struct(
+                  cast(null as string) as string_value
+                  , 1 as int_value
+                  , cast(null as FLOAT64) as float_value
+                  , cast(null as FLOAT64) as double_value
+                ) as value
+              )
+              , struct(
+                'engaged_session_event' as key
+                , struct(
+                  cast(null as string) as string_value
+                  , 1 as int_value
+                  , cast(null as FLOAT64) as float_value
+                  , cast(null as FLOAT64) as double_value
+                )
+              )
+              , struct(
+                'ga_session_id' as key
+                , struct(
+                  cast(null as string) as string_value
+                  , 1617691775 as int_value
+                  , cast(null as FLOAT64) as float_value
+                  , cast(null as FLOAT64) as double_value
+                )
+              )
+              , struct(
+                'source' as key
+                , struct(
+                  'bing' as string_value
+                  , null as int_value
+                  , cast(null as FLOAT64) as float_value
+                  , cast(null as FLOAT64) as double_value
+                )
+              )
+              , struct(
+                'page_title' as key
+                , struct(
+                  'Velir | Behavior-Driven Testing in Drupal 8' as string_value
+                  , null as int_value
+                  , cast(null as FLOAT64) as float_value
+                  , cast(null as FLOAT64) as double_value
+                )
+              )
+              , struct(
+                'page_location' as key
+                , struct(
+                  'https://www.velir.com/blog/2016/08/25/behavior-driven-testing-drupal-8?utm_term=test' as string_value
+                  , null as int_value
+                  , cast(null as FLOAT64) as float_value
+                  , cast(null as FLOAT64) as double_value
+                )
+              )
+              , struct(
+                'session_engaged' as key
+                , struct(
+                  cast(null as string) as string_value
+                  , 1 as int_value
+                  , cast(null as FLOAT64) as float_value
+                  , cast(null as FLOAT64) as double_value
+                )
+              )
+              , struct(
+                'engagement_time_msec' as key
+                , struct(
+                  cast(null as string) as string_value
+                  , 30000 as int_value
+                  , cast(null as FLOAT64) as float_value
+                  , cast(null as FLOAT64) as double_value
+                )
+              )
+          ] as event_params
+          , null as event_previous_timestamp
+          , null as event_value_in_usd
+          , 948327668 as event_bundle_sequence_id
+          , null as event_server_timestamp_offset
+          , cast(null as string) as user_id
+          , '1166526666.1617691776' as user_pseudo_id -- Added
+          , cast(null as string) as privacy_info_analytics_storage -- Added
+          , cast(null as string) as privacy_info_ads_storage -- Added
+          , cast(null as string) as privacy_info_uses_transient_token -- Added
+          , null as user_properties
+          , 1617691790431476 as user_first_touch_timestamp
+          , 0.0 as user_ltv_revenue -- Added
+          , 'USD' as user_ltv_currency -- Added
+          , 'desktop' as device_category -- Added
+          , cast(null as string) as device_mobile_brand_name -- Added
+          , cast(null as string) as device_mobile_model_name -- Added
+          , cast(null as string) as device_mobile_marketing_name -- Added
+          , cast(null as string) as device_mobile_os_hardware_model -- Added
+          , 'Windows' as device_operating_system -- Added
+          , 'Windows 10' as device_operating_system_version -- Added
+          , cast(null as string) as device_vendor_id -- Added
+          , cast(null as string) as device_advertising_id -- Added
+          , 'en-us' as device_language -- Added
+          , 'No' as device_is_limited_ad_tracking -- Added
+          , null as device_time_zone_offset_seconds -- Added
+          , cast(null as string) as device_browser -- Added
+          , cast(null as string) as device_browser_version -- Added
+          , 'Chrome' as device_web_info_browser -- Added
+          , '89.0.4389.114' as device_web_info_browser_version -- Added
+          , 'www.velir.com' as device_web_info_hostname -- Added
+          , 'Asia' as geo_continent -- Added
+          , 'Vietnam' as geo_country -- Added
+          , 'Ho Chi Minh City' as geo_region -- Added
+          , 'Ho Chi Minh City' as geo_city -- Added
+          , 'Southeast Asia' as geo_sub_continent -- Added
+          , '(not set)' as geo_metro -- Added
+          , cast(null as string) as app_info_id -- Added
+          , cast(null as string) as app_info_version -- Added
+          , cast(null as string) as app_info_install_store -- Added
+          , cast(null as string) as app_info_firebase_app_id -- Added
+          , cast(null as string) as app_info_install_source -- Added
+          , '(direct)' as user_campaign -- Added
+          , '(none)' as user_medium -- Added
+          , '(direct)' as user_source -- Added
+          , '1966637064' as stream_id
+          , 'WEB' as platform
+          , null as ecommerce
+          , null as items
+          , 12345 as property_id
+          , 1617691775 as session_id
+          , 1 as session_number
+          , 1 as session_engaged
+          , 30000 as engagement_time_msec -- Added
+          , 'Velir | Behavior-Driven Testing in Drupal 8' as page_title
+          , cast(null as string) as event_content -- Added
+          , cast(null as string) as event_term -- Added
+          , 0 as is_page_view
+          , 0 as is_purchase
+          , 'KXZY+6kA4bpHda1EzHaVvw==' as client_key
+          , '90mFUqw4xBzU+Xx9/4ycCQ==' as session_key
+          , '90mFUqw4xBzU+Xx9/4ycCQ==2021-04-06' as session_partition_key
+          , '7HoiVpTakjsH3DJ1t4HGNw==' as event_key
+          , 'bing' as event_source -- Added
+          , cast(null as string) as event_medium -- Added
+          , cast(null as string) as event_campaign -- Added
+          , 'test' as query_param_utm_term
+          , 'https://www.velir.com/blog/2016/08/25/behavior-driven-testing-drupal-8?utm_term=test' as original_page_location
+          , cast(null as string) as original_page_referrer
+          , '/blog/2016/08/25/behavior-driven-testing-drupal-8' as page_path
+          , 'https://www.velir.com/blog/2016/08/25/behavior-driven-testing-drupal-8' as page_location
+          , cast(null as string) as page_referrer
+          , 'velir.com' as page_hostname
+          , cast(null as string) as page_query_string
+          , '2021-04-06https://www.velir.com/blog/2016/08/25/behavior-driven-testing-drupal-8' as page_key
+          , 'il76Ej2ywBpSKKyYSAkOlQ==' as page_engagement_key
     overrides:
       vars:
         query_parameter_exclusions: ["utm_term"]
