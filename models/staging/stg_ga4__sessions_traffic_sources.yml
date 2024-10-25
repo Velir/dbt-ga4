@@ -55,8 +55,6 @@ unit_tests:
           AC,172000000000000,event,firebase,,
           AD,172000000000000,event,some-source,some-medium,some-campaign
       - input: ref('ga4_source_categories')
-        format: csv
-        fixture: ga4_source_categories
     expect: 
       format: csv
       rows: |
