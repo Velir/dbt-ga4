@@ -35,6 +35,7 @@
     , ecommerce.unique_items
     , ecommerce.transaction_id
     , items
+    , session_traffic_source_last_click
     , {%- if  var('combined_dataset', false) != false %} cast(left(regexp_replace(_table_suffix, r'^(intraday_)?\d{8}', ''), 100) as int64)
         {%- else %} {{ var('property_ids')[0] }}
         {%- endif %} as property_id
@@ -93,6 +94,15 @@
     , traffic_source.name as user_campaign
     , traffic_source.medium as user_medium
     , traffic_source.source as user_source
+    , session_traffic_source_last_click.manual_campaign.campaign_id as session_traffic_source_last_click_manual_campaign_id
+    , session_traffic_source_last_click.manual_campaign.campaign_name as session_traffic_source_last_click_manual_campaign_name
+    , session_traffic_source_last_click.manual_campaign.source as session_traffic_source_last_click_manual_source
+    , session_traffic_source_last_click.manual_campaign.medium as session_traffic_source_last_click_manual_medium
+    , session_traffic_source_last_click.manual_campaign.term as session_traffic_source_last_click_manual_term
+    , session_traffic_source_last_click.manual_campaign.content as session_traffic_source_last_click_manual_content
+    , session_traffic_source_last_click.manual_campaign.source_platform as session_traffic_source_last_click_manual_source_polatform
+    , session_traffic_source_last_click.manual_campaign.creative_format as session_traffic_source_last_click_creative_format
+    , session_traffic_source_last_click.manual_campaign.marketing_tactic as session_traffic_source_last_click_manual_marketing_tactic
     , stream_id
     , platform
     , struct(
