@@ -3,42 +3,42 @@ version: 2
 models:  
   - name: stg_ga4__page_conversions
     description: Model that calculates the number of conversions per page. Conversions are defined as variables in the project configurations. 
-#unit_tests:
-#  - name: test_page_conversion_count
-#    description: Test whether the page-level count of conversions is correct
-#    model: stg_ga4__page_conversions
-#    given:
-#      - input: ref('stg_ga4__events')
-#        format: csv
-#        rows: |
-#          event_name,page_key
-#          page_view,A
-#          page_view,A
-#          page_view,B
-#    expect:
-#      format: csv
-#      rows: |
-#        page_key,page_view_count
-#        A,2
-#        B,1
-#    overrides:
-#      vars: {conversion_events: ['page_view']}
-#  - name: test_page_conversion_count_non_event_name
-#    description: Test whether the page-level count of conversions is correct
-#    model: stg_ga4__page_conversions
-#    given:
-#      - input: ref('stg_ga4__events')
-#        format: csv
-#        rows: |
-#          event_name,page_key
-#          page-view,A
-#          page-view,A
-#          page-view,B
-#    expect:
-#      format: csv
-#      rows: |
-#        page_key,page_view_count
-#        A,2
-#        B,1
-#    overrides:
-#      vars: {conversion_events: ['page-view']}
+unit_tests:
+  - name: test_page_conversion_count
+    description: Test whether the page-level count of conversions is correct
+    model: stg_ga4__page_conversions
+    given:
+      - input: ref('stg_ga4__events')
+        format: csv
+        rows: |
+          event_name,page_key
+          page_view,A
+          page_view,A
+          page_view,B
+    expect:
+      format: csv
+      rows: |
+        page_key,page_view_count
+        A,2
+        B,1
+    overrides:
+      vars: {conversion_events: ['page_view']}
+  - name: test_page_conversion_count_non_event_name
+    description: Test whether the page-level count of conversions is correct
+    model: stg_ga4__page_conversions
+    given:
+      - input: ref('stg_ga4__events')
+        format: csv
+        rows: |
+          event_name,page_key
+          page-view,A
+          page-view,A
+          page-view,B
+    expect:
+      format: csv
+      rows: |
+        page_key,page_view_count
+        A,2
+        B,1
+    overrides:
+      vars: {conversion_events: ['page-view']}

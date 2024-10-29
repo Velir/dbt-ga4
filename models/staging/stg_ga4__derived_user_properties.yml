@@ -8,35 +8,35 @@ models:
         description: Hashed combination of user_pseudo_id and stream_id
         tests:
           - unique  
-# unit_tests:
-#   - name: test_derived_user_properties
-#     description: Test whether a derived user property is successfully retrieved from multiple event payloads
-#     model: stg_ga4__derived_user_properties
-#     given:
-#       - input: ref('stg_ga4__events')
-#         format: sql
-#         rows: |
-#           select 
-#           'AAA' as client_key
-#           , 1617691790431476 as event_timestamp
-#           , 'first_visit' as event_name
-#           , ARRAY[STRUCT('my_param' as key, STRUCT(1 as int_value) as value)] as event_params
-#           union all
-#           select
-#           'AAA' as client_key
-#           , 1617691790431477 as event_timestamp
-#           , 'first_visit' as event_name
-#           , ARRAY[STRUCT('my_param' as key, STRUCT(2 as int_value) as value)] as event_params
-#           union all
-#           select 
-#           'BBB' as client_key
-#           , 1617691790431477 as event_timestamp
-#           , 'first_visit' as event_name
-#           , ARRAY[STRUCT('my_param' as key, STRUCT(1 as int_value) as value)] as event_params
-#     expect:
-#       format: dict
-#       rows:
-#         - {client_key: AAA, my_derived_property: 2}
-#         - {client_key: BBB, my_derived_property: 1}
-#     overrides:
-#       vars: {derived_user_properties: [{event_parameter: 'my_param',user_property_name: 'my_derived_property',value_type: 'int_value'}]}
+unit_tests:
+  - name: test_derived_user_properties
+    description: Test whether a derived user property is successfully retrieved from multiple event payloads
+    model: stg_ga4__derived_user_properties
+    given:
+      - input: ref('stg_ga4__events')
+        format: sql
+        rows: |
+          select 
+          'AAA' as client_key
+          , 1617691790431476 as event_timestamp
+          , 'first_visit' as event_name
+          , ARRAY[STRUCT('my_param' as key, STRUCT(1 as int_value) as value)] as event_params
+          union all
+          select
+          'AAA' as client_key
+          , 1617691790431477 as event_timestamp
+          , 'first_visit' as event_name
+          , ARRAY[STRUCT('my_param' as key, STRUCT(2 as int_value) as value)] as event_params
+          union all
+          select 
+          'BBB' as client_key
+          , 1617691790431477 as event_timestamp
+          , 'first_visit' as event_name
+          , ARRAY[STRUCT('my_param' as key, STRUCT(1 as int_value) as value)] as event_params
+    expect:
+      format: dict
+      rows:
+        - {client_key: AAA, my_derived_property: 2}
+        - {client_key: BBB, my_derived_property: 1}
+    overrides:
+      vars: {derived_user_properties: [{event_parameter: 'my_param',user_property_name: 'my_derived_property',value_type: 'int_value'}]}
