@@ -58,8 +58,6 @@ jobs:
         env:
           KEYFILE: ${{ secrets.GCP_BIGQUERY_USER_KEYFILE }}
 
-      - name: 
-
       - name: Install dbt
         run: |
           pip install dbt-core
