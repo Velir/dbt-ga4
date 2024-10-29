@@ -1,6 +1,10 @@
 name: Run Unit Tests on Pull Request
 
-on: [pull_request_target,workflow_dispatch]
+# on: [pull_request_target,workflow_dispatch]
+on:
+  push:
+    branches:
+      - 'feature/add_dbt_unit_tests'
 env:
   BIGQUERY_PROJECT: ${{ secrets.BIGQUERY_PROJECT }}
   BIGQUERY_PROPERTY_ID: ${{ secrets.BIGQUERY_PROPERTY_ID }}
@@ -19,7 +23,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
 
       - uses: actions/setup-python@v1
         with:
@@ -48,7 +51,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
 
       - uses: actions/setup-python@v1
         with:
