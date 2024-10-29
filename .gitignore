@@ -3,6 +3,7 @@ target/
 dbt_packages/
 logs/
 package-lock.yml
+.user.yml
 
 google-cloud-sdk/
 unit_tests/.env
