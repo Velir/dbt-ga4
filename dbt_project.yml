@@ -11,8 +11,6 @@ snapshot-paths: ["snapshots"]
 profile: 'default'
 
 vars:
-  source_project: "{{ env_var('BIGQUERY_PROJECT') }}"
-  property_ids: ["{{ env_var('BIGQUERY_PROPERTY_ID') }}"]
   start_date: "20230306"
   static_incremental_days: 3
   derived_session_properties:
