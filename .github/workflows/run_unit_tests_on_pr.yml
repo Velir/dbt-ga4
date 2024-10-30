@@ -68,5 +68,10 @@ jobs:
           pip install dbt-bigquery
           dbt deps
 
+      - name: Materialize necessary dbt resources
+        run: |
+          dbt seed -f
+          dbt run -s +test_type:unit -f --empty
+
       - name: Run dbt unit tests
         run: dbt test -s test_type:unit
