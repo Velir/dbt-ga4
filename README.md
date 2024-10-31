@@ -72,8 +72,7 @@ packages:
 ```
 ## Required Variables
 
-This package assumes that you have an existing DBT project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded. Source data is defined using the `project` and `property_ids` variables below. The `static_incremental_days` variable defines how many days' worth of data to reprocess during incremental runs. 
-The `start_date` variable defines the earliest date for which data is included and loaded into the models in this package.
+This package assumes that you have an existing DBT project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded. Source data is defined using the `project` and `property_ids` variables below. The `static_incremental_days` variable defines how many days' worth of data to reprocess during incremental runs. The `start_date` variable defines the earliest date for which data is included and loaded into the models in this package.
 
 ```
 vars:
@@ -215,8 +214,7 @@ vars:
         value_type: "string_value"
 ```
 
-The `derived_user_properties` set in `dbt_project.yml` should either be updated to reflect the derived user properties for your project
-or they should be removed if you don't wish to set any derived user properties.
+The `derived_user_properties` set in `dbt_project.yml` should either be updated to reflect the derived user properties for your project or they should be removed if you don't wish to set any derived user properties.
 
 ### Derived Session Properties
 
@@ -251,8 +249,7 @@ vars:
         value_type: "int_value"
 ```
 
-The `derived_session_properties` set in `dbt_project.yml` should either be updated to reflect the derived session properties for your project
-or they should be removed if you don't wish to set any derived session properties.
+The `derived_session_properties` set in `dbt_project.yml` should either be updated to reflect the derived session properties for your project or they should be removed if you don't wish to set any derived session properties.
 
 ### GA4 Recommended Events
 
@@ -268,8 +265,7 @@ vars:
     conversion_events: ['purchase','download']
 ```
 
-The `conversion_events` set in `dbt_project.yml` should either be updated to reflect the conversion events for your project
-or they should be removed if you don't wish to set any conversion events.
+The `conversion_events` set in `dbt_project.yml` should either be updated to reflect the conversion events for your project or they should be removed if you don't wish to set any conversion events.
 
 ### Session Attribution Lookback Window
 
