@@ -10,9 +10,9 @@ snapshot-paths: ["snapshots"]
 
 profile: 'default'
 
+# These variables are used for unit tests during CI for the package
+# These variables should either be removed or updated to reflect the needs of your GA data and dbt project
 vars:
-  source_project: "{{ env_var('BIGQUERY_PROJECT') }}"
-  property_ids: ["{{ env_var('BIGQUERY_PROPERTY_ID') }}"]
   start_date: "20230306"
   static_incremental_days: 3
   derived_session_properties:
@@ -24,7 +24,6 @@ vars:
       user_property_name: "most_recent_page_title"
       value_type: "string_value"
   conversion_events: ['large_button_clicked', 'add_to_cart']
-  session_attribution_lookback_window_days: 30
 
 target-path: "target"  # directory which will store compiled SQL files
 clean-targets:         # directories to be removed by `dbt clean`

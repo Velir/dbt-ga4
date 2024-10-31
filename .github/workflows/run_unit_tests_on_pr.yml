@@ -1,10 +1,6 @@
 name: Run Unit Tests on Pull Request
 
-# on: [pull_request_target,workflow_dispatch]
-on:
-  push:
-    branches:
-      - 'feature/dbt-unit-tests'
+on: [pull_request_target,workflow_dispatch]
 env:
   BIGQUERY_PROJECT: ${{ secrets.BIGQUERY_PROJECT }}
   BIGQUERY_PROPERTY_ID: ${{ secrets.BIGQUERY_PROPERTY_ID }}
@@ -67,6 +63,11 @@ jobs:
           pip install dbt-core
           pip install dbt-bigquery
           dbt deps
+
+      - name: Materialize necessary dbt resources
+        run: |
+          dbt seed -f
+          dbt run -s +test_type:unit -f --empty
 
       - name: Run dbt unit tests
         run: dbt test -s test_type:unit
