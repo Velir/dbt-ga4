@@ -1,0 +1,9 @@
+version: 2
+
+models:  
+  - name: stg_ga4__users
+    description: >
+        Staging model for the base_ga4__users table which pulls data from the user export.
+        This model is keyed on user_id field. Unlike most keys in the package, this key is not hashed.
+        This model unnests user properties and audience using variables of the same name that match the user property 
+        or audience name and prefixing the unnested fields with those names.
