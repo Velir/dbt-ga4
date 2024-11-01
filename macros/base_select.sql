@@ -35,6 +35,7 @@
     , ecommerce.unique_items
     , ecommerce.transaction_id
     , items
+    , collected_traffic_source
     , {%- if  var('combined_dataset', false) != false %} cast(left(regexp_replace(_table_suffix, r'^(intraday_)?\d{8}', ''), 100) as int64)
         {%- else %} {{ var('property_ids')[0] }}
         {%- endif %} as property_id
@@ -93,6 +94,18 @@
     , traffic_source.name as user_campaign
     , traffic_source.medium as user_medium
     , traffic_source.source as user_source
+    , collected_traffic_source.manual_campaign_id as collected_traffic_source_manual_campaign_id
+    , collected_traffic_source.manual_campaign_name as collected_traffic_source_manual_campaign_name
+    , collected_traffic_source.manual_source as collected_traffic_source_manual_source
+    , collected_traffic_source.manual_medium as collected_traffic_source_manual_medium
+    , collected_traffic_source.manual_term as collected_traffic_source_manual_term
+    , collected_traffic_source.manual_content as collected_traffic_source_manual_content
+    , collected_traffic_source.manual_source_platform as collected_traffic_source_manual_source_platform
+    , collected_traffic_source.manual_creative_format as collected_traffic_source_manual_creative_format
+    , collected_traffic_source.manual_marketing_tactic as collected_traffic_source_manual_marketing_tactic
+    , collected_traffic_source.gclid as collected_traffic_source_gclid
+    , collected_traffic_source.dclid as collected_traffic_source_dclid
+    , collected_traffic_source.srsltid as collected_traffic_source_srsltid
     , stream_id
     , platform
     , struct(
