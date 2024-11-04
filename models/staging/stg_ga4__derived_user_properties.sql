@@ -1,5 +1,5 @@
 {{ config(
-  enabled = true if var('derived_user_properties', false) else false,
+  enabled = true if var('derived_user_properties', false) or env_var('GA4_DERIVED_USER_PROPERTIES', false) else false,
   materialized = "table"
 ) }}
 
