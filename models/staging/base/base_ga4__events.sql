@@ -1,5 +1,5 @@
 {% set partitions_to_replace = ['current_date'] %}
-{% for i in range(var('static_incremental_days')) %}
+{% for i in range(env_var('GA4_INCREMENTAL_DAYS')|int if env_var('GA4_INCREMENTAL_DAYS', false) else var('static_incremental_days')) %}
     {% set partitions_to_replace = partitions_to_replace.append('date_sub(current_date, interval ' + (i+1)|string + ' day)') %}
 {% endfor %}
 
@@ -22,7 +22,7 @@ with source as (
         {{ ga4.base_select_source() }}
     from {{ source('ga4', 'events') }}
     {% if not flags.EMPTY %}
-        where cast(left(replace(_table_suffix, 'intraday_', ''), 8) as int64) >= {{var('start_date')}}
+        where cast(left(replace(_table_suffix, 'intraday_', ''), 8) as int64) >= {{ env_var('GA4_START_DATE') if env_var('GA4_START_DATE', false) else var('start_date') }}
         {% if is_incremental() %}
             and parse_date('%Y%m%d', left(replace(_table_suffix, 'intraday_', ''), 8)) in ({{ partitions_to_replace | join(',') }})
         {% endif %}
