@@ -10,21 +10,6 @@ snapshot-paths: ["snapshots"]
 
 profile: 'default'
 
-# These variables are used for unit tests during CI for the package
-# These variables should either be removed or updated to reflect the needs of your GA data and dbt project
-vars:
-  start_date: "20230306"
-  static_incremental_days: 3
-  derived_session_properties:
-    - event_parameter: "page_location"
-      session_property_name: "most_recent_page_location"
-      value_type: "string_value"
-  derived_user_properties:
-    - event_parameter: "page_title"
-      user_property_name: "most_recent_page_title"
-      value_type: "string_value"
-  conversion_events: ['large_button_clicked', 'add_to_cart']
-
 target-path: "target"  # directory which will store compiled SQL files
 clean-targets:         # directories to be removed by `dbt clean`
   - "target"
