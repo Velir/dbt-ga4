@@ -1,0 +1,10 @@
+default:
+  target: bigquery
+  outputs:
+    bigquery:
+      type: bigquery
+      method: service-account
+      keyfile: "{{ env_var('BIGQUERY_KEYFILE') }}"
+      project: "{{ env_var('BIGQUERY_PROJECT') }}"
+      dataset: "{{ env_var('BIGQUERY_DATASET') }}"
+      timeout_seconds: 300
