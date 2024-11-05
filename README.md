@@ -214,8 +214,6 @@ vars:
         value_type: "string_value"
 ```
 
-The `derived_user_properties` set in `dbt_project.yml` should either be updated to reflect the derived user properties for your project or they should be removed if you don't wish to set any derived user properties.
-
 ### Derived Session Properties
 
 Derived session properties are similar to derived user properties, but on a per-session basis, for properties that change slowly over time. This provides additional flexibility in allowing users to turn any event parameter into a session property. 
@@ -249,8 +247,6 @@ vars:
         value_type: "int_value"
 ```
 
-The `derived_session_properties` set in `dbt_project.yml` should either be updated to reflect the derived session properties for your project or they should be removed if you don't wish to set any derived session properties.
-
 ### GA4 Recommended Events
 
 See the README file at /dbt_packages/models/staging/recommended_events for instructions on enabling [Google's recommended events](https://support.google.com/analytics/answer/9267735?hl=en).
@@ -264,8 +260,6 @@ vars:
   ga4:
     conversion_events: ['purchase','download']
 ```
-
-The `conversion_events` set in `dbt_project.yml` should either be updated to reflect the conversion events for your project or they should be removed if you don't wish to set any conversion events.
 
 ### Session Attribution Lookback Window
 
@@ -308,8 +302,6 @@ The easiest option is using OAuth with your Google Account. Summarized instructi
 ```
 gcloud auth application-default login --scopes=https://www.googleapis.com/auth/bigquery,https://www.googleapis.com/auth/iam.test
 ```
-
-The `profiles.yml` file included in this package should be removed. The `profile: 'default'` line in `dbt_project.yml` in this package should also be removed.
 
 # Unit Testing
 
