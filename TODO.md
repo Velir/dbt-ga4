@@ -22,6 +22,7 @@
 - Configuration and dynamic templates to create custom event tables and dimensions
 - Configuration to create custom dimensions (session, user, event_*) from event parameters
 - Use Fivetran's `union_data` method (or something similar) to handle multiple, unioned GA4 exports. https://github.com/fivetran/dbt_xero_source/blob/main/models/tmp/stg_xero__account_tmp.sql
+- Un-comment unit test in `stg_ga4__sessions_traffic_sources_last_non_direct_daily.yml` once [this bug](https://github.com/dbt-labs/dbt-core/issues/10353) is resolved. Once that is complete, the `unit_tests` folder pertaining to the `pytest` unit tests should be removed along with the `pytest_run_all` job in `run_unit_tests_on_pr.yml`.
 
 ## Misc
 
