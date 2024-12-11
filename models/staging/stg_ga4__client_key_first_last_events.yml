@@ -8,3 +8,19 @@ models:
         description: Hashed combination of user_pseudo_id and stream_id
         tests: 
           - unique
+unit_tests:
+  - name: test_stg_ga4__client_key_first_last_events
+    description: Test pulling the first and last event per client key
+    model: stg_ga4__client_key_first_last_events
+    given:
+      - input: ref('stg_ga4__events')
+        format: csv
+        rows: |
+          stream_id,client_key,event_key,event_timestamp
+          1,IX+OyYJBgjwqML19GB/XIQ==,H06dLW6OhNJJ6SoEPFsSyg==,1661339279816517
+          1,IX+OyYJBgjwqML19GB/XIQ==,gt1SoAtrxDv33uDGwVeMVA==,1661339279816518
+    expect:
+      format: csv
+      rows: |
+        client_key,first_event,last_event
+        IX+OyYJBgjwqML19GB/XIQ==,H06dLW6OhNJJ6SoEPFsSyg==,gt1SoAtrxDv33uDGwVeMVA==
