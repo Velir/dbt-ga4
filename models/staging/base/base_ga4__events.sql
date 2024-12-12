@@ -60,6 +60,14 @@ with source as (
     {% if is_incremental() and var('end_date') is none %}
         and parse_date('%Y%m%d', left(replace(_table_suffix, 'intraday_', ''), 8)) in ({{ partitions_to_replace | join(',') }})
     {% endif %}
+        -- Add property ID filter
+    {% set property_ids = var('brand_properties')[var('brands')[0]] %}
+    and (
+        {% for property_id in property_ids %}
+        _table_suffix like '%{{ property_id }}'
+        {%- if not loop.last %} or {% endif -%}
+        {% endfor %}
+    )
 ),
 renamed as (
     select
