@@ -60,6 +60,22 @@ with source as (
     {% if is_incremental() and var('end_date') is none %}
         and parse_date('%Y%m%d', left(replace(_table_suffix, 'intraday_', ''), 8)) in ({{ partitions_to_replace | join(',') }})
     {% endif %}
+    -- Add property ID filter for multiple brands
+    {% set selected_properties = [] %}
+    {% if 'all' in var('brands') %}
+        {% do selected_properties.extend(var('brand_properties')['all']) %}
+    {% else %}
+        {% for brand in var('brands') %}
+            {% do selected_properties.extend(var('brand_properties')[brand]) %}
+        {% endfor %}
+    {% endif %}
+    {{ log("Processing properties: " ~ selected_properties, info=True) }}
+    and (
+        {% for property_id in selected_properties %}
+        _table_suffix like '%{{ property_id }}'
+        {%- if not loop.last %} or {% endif -%}
+        {% endfor %}
+    )
 ),
 renamed as (
     select
