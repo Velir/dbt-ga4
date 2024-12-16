@@ -49,7 +49,7 @@ To pull the latest stable release along with minor updates, add the following to
 ```
 packages:
   - package: Velir/ga4
-    version: [">=6.0.0", "<6.1.0"]
+    version: [">=6.1.0", "<6.2.0"]
 ```
 
 ## Install From main branch on GitHub
@@ -108,6 +108,16 @@ vars:
   ga4: 
     query_parameter_exclusions: ["gclid","fbclid","_ga"] 
 ```
+
+You can remove all query parameters by setting `query_parameter_exclusions` to `*all*`.
+
+```
+vars:
+  ga4:
+    query_parameter_exclusions: ["*all*"]
+```
+
+By default, parameters are removed from URL fragments (elements after the hash # symbol). If you wish to exclude query parameters but keep URL fragments with the same key, you will need to override the `remove_query_parameters` macro.
 
 ### Query Parameter Extraction
 

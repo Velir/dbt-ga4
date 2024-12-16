@@ -7,6 +7,9 @@ models:
       - name: client_key
         description: Surrogate key created from stream_id and user_pseudo_id. Provides a way to uniquely identify a user's device within a stream. Important when using the package to combine data across properties and streams.
       - name: event_key
+        description: >
+          Surrogate key for events. Potential for uniqueness test to fail if client_key or session_id is null
+          and uniqueness depends on differentiation by that value.
         tests:
           - unique
       - name: page_path
@@ -18,3 +21,40 @@ models:
           the data shows that this is not always the case. When a user_engagement event does not fire, the engagement_time_msec parameter is assigned to the next page_view. 
           This engagement time should be credited to the previous page, 
           so for page_view events this field uses the session_key and page_referrer as the key while all other events use the session_key and page_location.
+
+unit_tests:
+  - name: query_parameter_removal
+    description: "Check that query parameters get removed from the model."
+    model: stg_ga4__events
+    given:
+      - input: ref('base_ga4__events')
+        rows:
+          - {page_location: https://asite.com/page?parameter=this_param,    page_referrer: https://asite.com/previous_page?parameter=previous_value}
+          - {page_location: https://asite.com/anotherpage?parameter=param%20with%20encoded%20spaces,    page_referrer: https://asite.com/previous_page?utm_source=source_value}
+          - {page_location: https://anothersite.com/page?not_excluded_param=val&parameter=someval&param=also_not_excluded, page_referrer: https://anothersite.com/previous_page#utm_source=source_value#parameter=previous_value#hash=hash_value}
+          - {page_location: https://twoparams.com/page&parameter=someval&second_param=1value, page_referrer: https://twoparams.com/previous_page?second_param=a_value#parameter=previous_value#hash=hash_value}
+    overrides:
+      vars:
+        query_parameter_exclusions: ["parameter","second_param"]
+    expect:
+      rows:
+        - {page_location: https://asite.com/page,    page_referrer: https://asite.com/previous_page}
+        - {page_location: https://asite.com/anotherpage,    page_referrer: https://asite.com/previous_page?utm_source=source_value}
+        - {page_location: https://anothersite.com/page?not_excluded_param=val&param=also_not_excluded, page_referrer: https://anothersite.com/previous_page#utm_source=source_value#hash=hash_value}
+        - {page_location: https://twoparams.com/page, page_referrer: https://twoparams.com/previous_page#hash=hash_value}
+
+  - name: query_parameter_remove_all
+    description: "Check that the '*all*' flag removes all query parameters from the model."
+    model: stg_ga4__events
+    given:
+      - input: ref('base_ga4__events')
+        rows:
+          - {page_location: https://asite.com/page?parameter=this_param,    page_referrer: https://asite.com/previous_page?parameter=previous_value}
+          - {page_location: https://asite.com/anotherpage?parameter=param%20with%20encoded%20spaces,    page_referrer: https://asite.com/previous_page?utm_source=source_value}
+    overrides:
+      vars:
+        query_parameter_exclusions: ["*all*"]
+    expect:
+      rows:
+        - {page_location: https://asite.com/page,    page_referrer: https://asite.com/previous_page}
+        - {page_location: https://asite.com/anotherpage,    page_referrer: https://asite.com/previous_page}
