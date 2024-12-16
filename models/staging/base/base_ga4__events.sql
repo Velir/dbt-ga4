@@ -65,9 +65,9 @@ with source as (
 renamed as (
     select
         {{ ga4.base_select_renamed() }},
-        CAST(COALESCE(REGEXP_EXTRACT(select value.string_value from unnest(event_params) where key = 'ga_session_id'), r'^GS\d\.\d\.(\d+)'), NULL) AS INT64 as session_id_mp
+        CAST(REGEXP_EXTRACT((select value.string_value from unnest(event_params) where key = 'ga_session_id'), r'^GS\d\.\d\.(\d+)') AS INT64) as session_id_mp
     from source
 )
 
-select *, replace(COALESCE(session_id, session_id_mp) as session_id) from renamed
-qualify row_number() over(partition by event_date_dt, stream_id, user_pseudo_id, session_id, session_id_mp, event_name, event_timestamp, to_json_string(ARRAY(SELECT params FROM UNNEST(event_params) AS params ORDER BY key))) = 1
+select * except(session_id), COALESCE(session_id, session_id_mp) as session_id from renamed
+qualify row_number() over(partition by event_date_dt, stream_id, user_pseudo_id, session_id, event_name, event_timestamp, to_json_string(ARRAY(SELECT params FROM UNNEST(event_params) AS params ORDER BY key))) = 1
