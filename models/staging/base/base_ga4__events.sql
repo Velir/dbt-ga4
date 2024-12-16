@@ -63,7 +63,8 @@ with source as (
 ),
 renamed as (
     select
-        {{ ga4.base_select_renamed() }}
+        {{ ga4.base_select_renamed() }},
+        COALESCE(session_id, mp_session_id) as session_id -- if session_id is empty fill in the measurement protocol session_id
     from source
 )
 
