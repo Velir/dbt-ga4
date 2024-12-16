@@ -141,7 +141,6 @@
     ) items
     , property_id
     , {{ ga4.unnest_key('event_params', 'ga_session_id', 'int_value', 'session_id') }}
-    , {{ ga4.unnest_key('event_params', 'ga_session_id', 'string_value', 'session_id_string') }}
     , {{ ga4.unnest_key('event_params', 'page_location') }}
     , {{ ga4.unnest_key('event_params', 'ga_session_number',  'int_value', 'session_number') }}
     , COALESCE(
