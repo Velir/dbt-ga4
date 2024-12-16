@@ -79,10 +79,9 @@ with source as (
 ),
 renamed as (
     select
-        {{ ga4.base_select_renamed() }}, 
-        COALESCE(session_id, mp_session_id) as session_id
+        {{ ga4.base_select_renamed() }}
     from source
 )
 
 select * from renamed
-qualify row_number() over(partition by event_date_dt, stream_id, user_pseudo_id, session_id, event_name, event_timestamp, to_json_string(ARRAY(SELECT params FROM UNNEST(event_params) AS params ORDER BY key))) = 1
+qualify row_number() over(partition by event_date_dt, stream_id, user_pseudo_id, session_id, session_id_string, event_name, event_timestamp, to_json_string(ARRAY(SELECT params FROM UNNEST(event_params) AS params ORDER BY key))) = 1
