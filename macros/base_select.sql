@@ -140,23 +140,7 @@
         )) from unnest(items) as unnested_items 
     ) items
     , property_id
-    , COALESCE(
-    -- Use int_value if available and not None
-    NULLIF(
-        {{ ga4.unnest_key('event_params', 'ga_session_id', 'int_value', 'session_id') }},
-        'None'
-    ),
-    -- Extract the second section (numeric part) from the string_value format, ensure it's not None
-    CAST(
-        REGEXP_EXTRACT(
-            COALESCE(
-                {{ ga4.unnest_key('event_params', 'ga_session_id', 'string_value', 'session_id_string') }},
-                ''
-            ),
-            r'^GS\d\.\d\.(\d+)'
-        ) AS INT64
-    )
-) AS session_id
+    , COALESCE({{ ga4.unnest_key('event_params', 'ga_session_id', 'int_value', 'session_id') }}, COALESCE(CAST(REGEXP_EXTRACT({{ ga4.unnest_key('event_params', 'ga_session_id', 'string_value', 'session_id_string') }}, r'^GS\d\.\d\.(\d+)') AS INT64), NULL)) as session_id
     , {{ ga4.unnest_key('event_params', 'page_location') }}
     , {{ ga4.unnest_key('event_params', 'ga_session_number',  'int_value', 'session_number') }}
     , COALESCE(
