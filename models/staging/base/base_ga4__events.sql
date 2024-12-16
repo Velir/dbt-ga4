@@ -60,28 +60,14 @@ with source as (
     {% if is_incremental() and var('end_date') is none %}
         and parse_date('%Y%m%d', left(replace(_table_suffix, 'intraday_', ''), 8)) in ({{ partitions_to_replace | join(',') }})
     {% endif %}
-    -- Add property ID filter for multiple brands
-    {% set selected_properties = [] %}
-    {% if 'all' in var('brands') %}
-        {% do selected_properties.extend(var('brand_properties')['all']) %}
-    {% else %}
-        {% for brand in var('brands') %}
-            {% do selected_properties.extend(var('brand_properties')[brand]) %}
-        {% endfor %}
-    {% endif %}
-    {{ log("Processing properties: " ~ selected_properties, info=True) }}
-    and (
-        {% for property_id in selected_properties %}
-        _table_suffix like '%{{ property_id }}'
-        {%- if not loop.last %} or {% endif -%}
-        {% endfor %}
-    )
-),
+    ),
+
 renamed as (
     select
-        {{ ga4.base_select_renamed() }}
+        {{ ga4.base_select_renamed() }},
+        COALESCE(session_id, CAST(COALESCE(REGEXP_EXTRACT(session_id_string, r'^GS\d\.\d\.(\d+)'), NULL) AS INT64)) as session_id
     from source
 )
 
 select * from renamed
-qualify row_number() over(partition by event_date_dt, stream_id, user_pseudo_id, session_id, session_id_string, event_name, event_timestamp, to_json_string(ARRAY(SELECT params FROM UNNEST(event_params) AS params ORDER BY key))) = 1
+qualify row_number() over(partition by event_date_dt, stream_id, user_pseudo_id, session_id, event_name, event_timestamp, to_json_string(ARRAY(SELECT params FROM UNNEST(event_params) AS params ORDER BY key))) = 1
