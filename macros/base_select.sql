@@ -140,7 +140,8 @@
         )) from unnest(items) as unnested_items 
     ) items
     , property_id
-    , {{ ga4.unnest_key('event_params', 'ga_session_id', 'int_value', 'session_id') }}
+    , COALESCE({{ ga4.unnest_key('event_params', 'ga_session_id', 'int_value', 'session_id') }}, 
+                CAST(REGEXP_EXTRACT(COALESCE((select value.string_value from unnest(event_params) where key = 'ga_session_id') , ""), r'^GS\d\.\d\.(\d+)') AS INT64)) as session_id
     , {{ ga4.unnest_key('event_params', 'page_location') }}
     , {{ ga4.unnest_key('event_params', 'ga_session_number',  'int_value', 'session_number') }}
     , COALESCE(
