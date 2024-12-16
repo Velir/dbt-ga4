@@ -65,7 +65,7 @@ with source as (
 renamed as (
     select
         {{ ga4.base_select_renamed() }},
-        CAST(COALESCE(REGEXP_EXTRACT(select value.string_value from unnest(event_params) where key = 'ga_session_id'), r'^GS\d\.\d\.(\d+)'), NULL) AS INT64)) as session_id_mp
+        CAST(COALESCE(REGEXP_EXTRACT(select value.string_value from unnest(event_params) where key = 'ga_session_id'), r'^GS\d\.\d\.(\d+)'), NULL) AS INT64 as session_id_mp
     from source
 )
 
