@@ -8,10 +8,29 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
+#profile: 'bq_ga4' # bq
+profile: 'sf_ga4' # sf
+
 target-path: "target"  # directory which will store compiled SQL files
 clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
+
+vars:
+  start_date: "20230306" # Defines the earliest GA4 _TABLE_SUFFIX to load into base events model.
+  #source_project: "analytics" # bq
+  source_project: "analytics" # sf
+  source_schema: "schema"
+  property_ids: [id]
+  frequency: "daily"
+  conversion_events: ['sign_up','video_complete', 'video_start', 'goalkeepers_download_report']
+  static_incremental_days: 3
+  page_view_custom_parameters:
+    - name: "article_published_date"
+      value_type: "string_value"
+    - name: "days_since_published_date"
+      value_type: "string_value"
+  ga4_incremental_strategy: "{% if target.type == 'bigquery' %}insert_overwrite{% elif target.type == 'snowflake' %}delete+insert{% endif %}"
 
 models:
   ga4:

@@ -3,7 +3,12 @@
 {% endmacro %}
 
 {% macro default__base_select_source() %}
-    parse_date('%Y%m%d',event_date) as event_date_dt
+
+    {%- if target.type == 'bigquery' %}
+        parse_date('%Y%m%d', event_date) as event_date_dt
+    {%- elif target.type == 'snowflake' %}
+        event_date as event_date_dt
+    {%- endif %}
     , event_timestamp
     , event_name
     , event_params
