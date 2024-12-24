@@ -13,3 +13,21 @@ models:
     columns:
       - name: client_key
         description: Hashed combination of user_pseudo_id and stream_id
+unit_tests:
+  - name: test_stg_ga4__client_keys_audiences
+    description: >
+      Testing that audiences process properly when configured.
+    model: stg_ga4__client_keys
+    given: 
+      - input: ref('base_ga4__pseudonymous_users')
+        rows:
+          - audiences: ['struct(111111111 as id, "my_test_audience" as name, 1731573754000000 as membership_start_timestamp_micros, 1731998727000000
+ as membership_expiry_timestamp_micros, false as npa)', 'struct(222222222 as id, "my_second_audience" as name, 1731573754000000 as membership_start_timestamp_micros, 1731998727000000
+ as membership_expiry_timestamp_micros, true as npa)']
+    overrides:
+      vars:
+        audiences: ['my_test_audience', 'my_second_audience']
+    expect:
+      rows:
+        - {audience_my_test_audience_id: 111111111, audience_my_test_audience_name: 'my_test_audience', audience_my_test_audience_membership_start_timestamp_micros: 1731573754000000, audience_my_test_audience_membership_expiry_timestamp_micros: 1731998727000000, audience_my_test_audience_npa: False}
+        - {audience_my_second_audience_id: 222222222, audience_my_second_audience_name: 'my_second_audience', audience_my_second_audience_membership_start_timestamp_micros: 1731573754000000, audience_my_second_audience_membership_expiry_timestamp_micros: 1731998727000000, audience_my_second_audience_npa: True}
