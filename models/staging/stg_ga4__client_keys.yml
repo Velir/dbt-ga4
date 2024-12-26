@@ -88,7 +88,7 @@ as membership_expiry_timestamp_micros, true as npa)']
             ] as audiences
     overrides:
       vars:
-        user_properties: ['First Prop Name']
+        user_export_user_properties: ['First Prop Name']
         audiences: ['All Users']
     expect:
       format: sql

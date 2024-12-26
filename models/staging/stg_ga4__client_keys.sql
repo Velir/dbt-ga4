@@ -8,7 +8,7 @@
 select
     *
     , to_base64(md5(concat(pseudo_user_id, stream_id))) as client_key
-    {% for up in var('user_properties', []) %}
+    {% for up in var('user_export_user_properties', []) %}
         , (select value.string_value from unnest(user_properties) where value.user_property_name = '{{up}}') as {{up | lower | replace(" ", "_")}}_string_value 
         , (select value.set_timestamp_micros from unnest(user_properties) where value.user_property_name = '{{up}}') as {{up | lower | replace(" ", "_")}}_set_timestamp_micros
         , (select value.user_property_name from unnest(user_properties) where value.user_property_name = '{{up}}') as {{up | lower | replace(" ", "_")}}_user_property_name 
