@@ -330,6 +330,37 @@ vars:
 
 With these variables set, the `combine_property_data` macro will run as a pre-hook to `base_ga4_events` and clone shards to the target dataset.  The number of days' worth of data to clone during incremental runs will be based on the `static_incremental_days` variable. 
 
+# Disabling Models to Optimize Costs
+
+Some user and session models in this package are designed to have one entry per user or session. This offers maximum data accuracy but it means that these models can not be partitioned which can get expensive.
+
+High-traffic sites may wish to disable these models using the following settings in your `dbt_project.yml` file. Note that disabling these models will disable some features, like derived session and user properties.
+
+```
+models:
+  ga4:
+    staging:
+      stg_ga4__client_key_first_last_events:
+        +enabled: false
+      stg_ga4__derived_session_properties:
+        +enabled: false
+      stg_ga4__derived_user_properties:
+        +enabled: false
+      stg_ga4__client_key_first_last_pageviews:
+        +enabled: false
+    marts:
+      core:
+        dim_ga4__sessions:
+          +enabled: false
+        fct_ga4__pages:
+          +enabled: false
+        fct_ga4__user_ids:
+          +enabled: false
+        dim_ga4__client_keys:
+          +enabled: false
+
+```
+
 # dbt Style Guide
 
 This package attempts to adhere to the Brooklyn Data style guide found [here](https://github.com/brooklyn-data/co/blob/main/sql_style_guide.md). This work is in-progress. 
