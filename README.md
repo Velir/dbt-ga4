@@ -334,7 +334,7 @@ With these variables set, the `combine_property_data` macro will run as a pre-ho
 
 Some user and session models in this package are designed to have one entry per user or session. This offers maximum data accuracy but it means that these models can not be partitioned which can get expensive.
 
-High-traffic sites may wish to disable these models using th following settings in your `dbt_project.yml` file. Note that disabling these models will disable some features, like derived session and user properties.
+High-traffic sites may wish to disable these models using the following settings in your `dbt_project.yml` file. Note that disabling these models will disable some features, like derived session and user properties.
 
 ```
 models:
