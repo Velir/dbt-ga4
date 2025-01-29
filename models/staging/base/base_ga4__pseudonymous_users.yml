@@ -1,0 +1,85 @@
+version: 2
+
+models:  
+  - name: base_ga4__pseudonymous_users
+    description: >
+      Base pseudo-user (client) model that pulls all fields from the pseudonymous user table of the user export. The pseudonymous user table is keyed on 
+      the user_pseudo_id which is the cid parameter in Gtag calls and is the main parameter in the from which the dbt-GA4 client_id is
+      created. The table is partitioned by occurence_date. This model also flattens some fields.
+    columns:
+      - name: pseudo_user_id
+        description: >
+          The user_pseudo_id is a unique identifier for a user that is not tied to any personal information. This is the main identifier 
+          used in the GA4 property. This is the cid parameter in Gtag calls and is the main parameter in the from which the dbt-GA4 client_id is
+          created.
+      - name: stream_id
+        description: The numeric ID of the data stream from which the event originated.
+      - name: user_info_last_active_timestamp_micros
+        description: Date of the user's last activity (timestamp in microseconds). Flattened version of user_info.last_active_timestamp_micros.
+      - name: user_info_user_first_touch_timestamp_micros   
+        description: Date of the user's first_open or first_visit event, whichever is earlier (timestamp in microseconds). Flattened version of user_info.user_first_touch_timestamp_micros.
+      - name: user_info_first_purchase_date
+        description: Date of the user's first purchase (YYYYMMDD). Flattened version of user_info.first_purchase_date.
+      - name: device_operating_system
+        description: Flattened version of device.operating_system.
+      - name: device_category
+        description: Category of the device (mobile, tablet, desktop). Flattened version of device.category.
+      - name: device_mobile_brand_name
+        description: Flattened version of device.mobile_brand_name.
+      - name: device_mobile_model_name
+        description: Flattened version of device.mobile_model_name.
+      - name: device_unified_sceen_name
+        description: Flattened version of device.unified_screen_name.
+      - name: geo_city
+        description: Flattened version of geo.city.
+      - name: geo_country
+        description: Flattened version of geo.country.
+      - name: geo_continent
+        description: Flattened version of geo.continent.
+      - name: geo_region
+        description: Flattened version of geo.region.
+      - name: user_ltv_revenue_in_usd
+        description: Flattened version of user_ltv.revenue_in_usd.
+      - name: user_ltv_sessions
+        description: Flattened version of user_ltv.sessions
+      - name: user_ltv_engagement_time_millis
+        description: Flattened version of user_ltv.engagement_time_millis
+      - name: user_ltv_purchases
+        description: Flattened version of user_ltv.purchases
+      - name: user_ltv_engaged_sessions
+        description: Flattened version of user_ltv.engaged_sessions
+      - name: user_ltv_session_duration_micros
+        description: Flattened version of user_ltv.session_duration_micros
+      - name: predictions_in_app_purchase_score_7d
+        description: >
+            Probability that a user who was active in the last 28 days will log an in_app_purchase event within the next 7 days. 
+            Flattened ersion of predictions.in_app_purchase_score_7d.
+      - name: predictions_purchase_score_7d
+        description: >
+            Probability that a user who was active in the last 28 days will log a purchase event within the next 7 days. 
+            Flattened version of predictions.purchase_score_7d.
+      - name: predictions_churn_score_7d
+        description: >
+            Probability that a user who was active on your app or site within the last 7 days will not be active within the next 7 days. 
+            Flattened version of predictions.churn_score_7d.
+      - name: predictions_revenue_28d_in_usd
+        description: >
+            Revenue expected (in USD) from all purchase events within the next 28 days from a user who was active in the last 28 days. 
+            Flattened version of predictions.revenue_28d_in_usd.
+      - name: privacy_info_is_limited_ad_tracking
+        description: >
+            The device's Limit Ad Tracking setting. Possible values include: 'true', 'false', and '(not set)'. isLimitedAdTracking returns '(not set)' if Google Analytics is not 
+            currently able to return this device's Limit Ad Tracking setting. Flattened version of privacy_info.is_limited_ad_tracking.
+      - name: privacy_info_is_ads_personalization_allowed
+        description: >
+            If a user is eligible for ads personalization, isAdsPersonalizationAllowed returns 'true'. If a user is not eligible for ads personalization, 
+            isAdsPersonalizationAllowed returns 'false'. isAdsPersonalizationAllowed returns '(not set)' if Google Analytics is not currently able to 
+            return whether this user is eligible for ads personalization; users where isAdsPersonalizationAllowed returns '(not set)' may or may not be 
+            eligible for personalized ads. For personalized ads, you should treat users where isAdsPersonalizationAllowed = '(not set)' as isAdsPersonalizationAllowed = 'false' 
+            because, in the most general case, some of the '(not set)' rows will include users that are not eligible for ads personalization. Users where 
+            isAdsPersonalizationAllowed = 'false' may still be used for non-advertising use cases like A/B testing & data explorations. Flattened version of 
+            privacy_info.is_ads_personalization_allowed.
+      - name: occurence_date
+        description: Date when the record change was triggered. This is the partitioning column.
+      - name: last_updated_date
+        desctiption: Date when the record was updated in the table.

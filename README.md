@@ -20,6 +20,8 @@ Features include:
 | stg_ga4__event_* | 1 model per event (ex: page_view, purchase) which flattens event parameters specific to that event |
 | stg_ga4__event_items | Contains item data associated with e-commerce events (Purchase, add to cart, etc) |
 | stg_ga4__event_to_query_string_params | Mapping between each event and any query parameters & values that were contained in the event's `page_location` field |
+| stg_ga4__users | User ID table built from the GA4 User export table. Flattens user properties and audiences using the `user_properties` and `audiences` variables in your `dbt_project.yml` file. Disabled by default. |
+| stg_ga4__client_keys | Clint key table built from the GA4 User export pseudonymous users table. Flattens user properties and audiences using the `user_properties` and `audiences` variables in your `dbt_project.yml` file. Disabled by default. |
 | stg_ga4__user_properties | Finds the most recent occurance of specified user_properties for each user |
 | stg_ga4__derived_user_properties | Finds the most recent occurance of specific event_params value and assigns them to a client_key. Derived user properties are specified as variables (see documentation below) |
 | stg_ga4__derived_session_properties | Finds the most recent occurance of specific event_params or user_properties value and assigns them to a session's session_key. Derived session properties are specified as variables (see documentation below) |
@@ -173,47 +175,6 @@ vars:
         value_type: "int_value"
 ```
 
-### User Properties
-
-User properties are provided by GA4 in the `user_properties` repeated field. The most recent user property for each user will be extracted and included in the `dim_ga4__users` model by configuring the `user_properties` variable in your project as follows:
-
-```
-vars:
-  ga4:
-    user_properties:
-      - user_property_name: "membership_level"
-        value_type: "int_value"
-      - user_property_name: "account_status"
-        value_type: "string_value"
-```
-
-### Derived User Properties
-
-Derived user properties are different from "User Properties" in that they are derived from event parameters. This provides additional flexibility in allowing users to turn any event parameter into a user property. 
-
-Derived User Properties are included in the `dim_ga4__users` model and contain the latest event parameter value per user. 
-
-```
-derived_user_properties:
-  - event_parameter: "[your event parameter]"
-    user_property_name: "[a unique name for the derived user property]"
-    value_type: "[string_value|int_value|float_value|double_value]"
-```
-
-For example: 
-
-```
-vars:
-  ga4:
-    derived_user_properties:
-      - event_parameter: "page_location"
-        user_property_name: "most_recent_page_location"
-        value_type: "string_value"
-      - event_parameter: "another_event_param"
-        user_property_name: "most_recent_param"
-        value_type: "string_value"
-```
-
 ### Derived Session Properties
 
 Derived session properties are similar to derived user properties, but on a per-session basis, for properties that change slowly over time. This provides additional flexibility in allowing users to turn any event parameter into a session property. 
@@ -290,6 +251,122 @@ vars:
       - name: "some_other_parameter"
         value_type: "string_value"
 ```
+
+# User Tables
+
+This package contains two sets of user tables: an original set of user tables implemented from the inception of this package and a new set of user tables designed to use the GA4 BigQuery user export tables that were released after this package was first launched.
+
+The original user tables build one-row-per-user tables and include data like first and last device, first and last geo, user properties, and derived user properties. They need to process all-time data to build these tables. Large sites might want to consider disabling these tables to save costs.
+
+The newer user tables leverage the GA4 user export setting. They are partitioned tables so they are more appropriate for high-traffic sites. They lose the first and last columns and derived user properties, but include user properties, audiences, user LTV, and predictive data.
+
+The GA4 user export tables do not currently support multi-site. There is a multi-site branch that needs testing. If you have a multi-site implementation and wish to use the GA4 user export tables, then please install the [user branch](https://github.com/Velir/dbt-ga4/tree/user) in your development environment, configure the various user-specific settings, run dbt, and report any issues or successes on this [draft PR](https://github.com/Velir/dbt-ga4/pull/317). Reach out on the draft PR if you need help with any of this.
+
+## Settings Common to Both Sets of User Tables
+
+The `user_properties` fields in the `events_*` and `events_intraday_*` tables, and the `users_*` and `pseudonymous_users_*` tables are in different formats. No settings are shared between the two sets of user tables.
+
+## dbt-GA4 Original User Table Settings
+
+### User Properties
+
+User properties are provided by GA4 in the `user_properties` repeated field at the event-level in the `events_*` and `events_intraday_*` tables. The most recent user property for each user will be extracted and included in the `dim_ga4__users` model by configuring the `user_properties` variable in your project as follows:
+
+```
+vars:
+  ga4:
+    user_properties:
+      - user_property_name: "membership_level"
+        value_type: "int_value"
+      - user_property_name: "account_status"
+        value_type: "string_value"
+```
+
+### Derived User Properties
+
+Derived user properties are different from "User Properties" in that they are derived from event parameters. This provides additional flexibility in allowing users to turn any event parameter into a user property. 
+
+Derived User Properties are included in the `dim_ga4__users` model and contain the latest event parameter value per user. 
+
+```
+derived_user_properties:
+  - event_parameter: "[your event parameter]"
+    user_property_name: "[a unique name for the derived user property]"
+    value_type: "[string_value|int_value|float_value|double_value]"
+```
+
+For example: 
+
+```
+vars:
+  ga4:
+    derived_user_properties:
+      - event_parameter: "page_location"
+        user_property_name: "most_recent_page_location"
+        value_type: "string_value"
+      - event_parameter: "another_event_param"
+        user_property_name: "most_recent_param"
+        value_type: "string_value"
+```
+
+## GA4 User Export Settings
+
+The GA4 user export models are disabled by default.
+
+Enable them by adding the following model configs:
+
+```
+models:
+  ga4:
+    staging:
+      base:
+        base_ga4__pseudonymous_users:
+          +enabled: true
+        base_ga4__users:
+          +enabled: true
+      stg_ga4__client_keys:
+        +enabled: true
+      stg_ga4__users:
+        +enabled: true
+```
+
+### User Properties
+
+The GA4 User Export includes a user properties repeated record that stores the user property details. User properties are enabled by adding a list of user property names that match values in the `user_properties.value.user_property_name` fields of your `pseudonymous_users_` and `users__` tables as shown below.
+
+```
+vars:
+  ga4:
+    user_export_user_properties: ['All Users', 'Purchasers']
+```
+
+Unlike the `event_params` and `user_properties` event-level fields, the user-level user properties are keyed off of `user_properties.value.user_property_name` rather than `user_properties.key`. Tshe `user_properties.key` in the user tables is the slot that GA4 uses, `slot_01` for example, rather than the name. As a result, `user_properties.value.user_property_name` in the user tables should be the same as `user_properties.key` in the event tables.
+
+
+### Audiences
+
+The GA4 User Export includes an Audiences repeated record that stores the audience membership details. Audiences are enabled by adding a list of audience names that match values in the `audiences.name` fields of your `psuedonymous_users_` and `users__` tables as shown below.
+
+```
+vars:
+  ga4:
+    audiences: ['Purchases', 'All Users']
+```
+
+This example will add the following columns to the relevant dbt-GA4 models:
+
+- purchases_id
+- purchases_name
+- purchases_membership_start_timestamp_micros
+- purchases_membership_expiry_timestamp_micros
+- purchases_npa
+- all_users_id
+- all_users_name
+- all_users_membership_start_timestamp_micros
+- all_users_membership_expiry_timestamp_micros
+- all_users_npa
+
+
 # Connecting to BigQuery
 
 This package assumes that BigQuery is the source of your GA4 data. Full instructions for connecting DBT to BigQuery are here: https://docs.getdbt.com/reference/warehouse-profiles/bigquery-profile
