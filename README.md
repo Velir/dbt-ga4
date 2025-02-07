@@ -174,6 +174,18 @@ vars:
       - name: "country_code"
         value_type: "int_value"
 ```
+### Custom Item Parameters
+
+If you are capturing custom parameters at the item level (within items.item_params), you can specify these parameters and make them available in the `stg_ga4__event_items` model. This uses a similar syntax as the "Custom Parameters" feature described above:
+
+```
+vars:
+  ga4:
+    custom_item_parameters:
+      - name: "item_variant_color"
+        value_type: "string_value"
+        rename_to: "color"
+```
 
 ### Derived Session Properties
 
