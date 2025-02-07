@@ -1,5 +1,5 @@
 {{ config(
-  enabled= var('conversion_events', false) != false
+  enabled= var('conversion_events', false) != false or env_var('GA4_CONVERSION_EVENTS', false) != false
 ) }}
 
 select 
