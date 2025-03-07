@@ -13,4 +13,4 @@ sources:
     tables:
       - name: events
         identifier: events
-        description: Main events table exported by GA4. Sharded by date. 
+        description: Main events table exported by GA4. Sharded by date.
