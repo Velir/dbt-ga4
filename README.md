@@ -435,8 +435,27 @@ models:
           +enabled: false
         dim_ga4__client_keys:
           +enabled: false
-
 ```
+
+# Version 2 Session Cookies and ga_session_id
+
+A new format for GA4 session cookie values has been observed and, in some isolated cases, the full cookie value is being sent to BigQuery as the session ID, minus a prefix. This causes the `ga_session_id` field to be sent as a string containing both the session ID and other information rather than just the session ID itself in integer form. 
+
+We are uncertain if this is a slow rollout of un-announced updates to the GA4 client library or artifacts of the specific implementations where this has been observed.
+
+The new cookie values are identified by the `GS2` prefix (`GS2.1.s1747193510$o1$g1$t1747194763$j60$l0$h0`). When they are sent to BigQuery in `string_value` format, they will be stripped of the prefix (`s1747193510$o1$g1$t1747194763$j60$l0$h0`).
+
+Here is a breakdown of the components of the `string_value` `ga_session_id` field:
+
+- s1747193510: Session ID
+- $o1: Session Count
+- $g1: Session Engaged
+- $t1747194763: Timestamp of first event in session
+- $j0: Countdown
+- $l0: Unknown
+- $h0: Enhanced Client ID (User ID?)
+
+The dbt-GA4 package automatically extracts the session ID portion of the string and converts it to an integer before storing it when a `string_value` type of `ga_session_id` is detected.
 
 # dbt Style Guide
 

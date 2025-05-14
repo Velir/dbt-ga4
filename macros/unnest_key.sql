@@ -14,7 +14,7 @@
 {%- endmacro -%}
 
 {%- macro default__unnest_key(column_to_unnest, key_to_extract, value_type = "string_value", rename_column = "default") -%}
-    {% if var('integrate_string_value_ga_session_id', false) == true and key_to_extract == "ga_session_id" and column_to_unnest == "event_params"  %}
+    {% if key_to_extract == "ga_session_id" and column_to_unnest == "event_params"  %}
     coalesce(
         (select value.int_value from unnest(event_params) where key = 'ga_session_id')
         , safe_cast(
