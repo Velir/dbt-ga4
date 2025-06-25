@@ -15,6 +15,12 @@ clean-targets:         # directories to be removed by `dbt clean`
 
 models:
   ga4:
-    +materialized: view
+    staging:
+      events:
+        +enabled: false   
+      stg_ga4__client_key_first_last_pageviews:
+        +enabled: false
+      +materialized: view
+
     marts:
-      +materialized: table
+      +enabled: false
