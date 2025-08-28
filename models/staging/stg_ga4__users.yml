@@ -1,0 +1,149 @@
+version: 2
+
+models:  
+  - name: stg_ga4__users
+    description: >
+        Staging model for the base_ga4__users table which pulls data from the user export.
+        This model is keyed on user_id field. Unlike most keys in the package, this key is not hashed.
+        This model unnests user properties and audience using variables of the same name that match the user property 
+        or audience name and prefixing the unnested fields with those names.
+    tests:
+      - unique:
+          column_name: "(user_id || occurrence_date)"
+    columns:
+      - name: user_id
+        description: The user_id as passed to Google Analytics using the native user ID feature.
+unit_tests:
+  - name: test_stg_ga4__users_audiences
+    description: >
+      Testing that audiences process properly when configured.
+    model: stg_ga4__users
+    given: 
+      - input: ref('base_ga4__users')
+        rows:
+          - audiences: ['struct(111111111 as id, "my_test_audience" as name, 1731573754000000 as membership_start_timestamp_micros, 1731998727000000
+as membership_expiry_timestamp_micros, false as npa)', 'struct(222222222 as id, "my_second_audience" as name, 1731573754000000 as membership_start_timestamp_micros, 1731998727000000
+as membership_expiry_timestamp_micros, true as npa)']
+    overrides:
+      vars:
+        audiences: ['my_test_audience', 'my_second_audience']
+    expect:
+      rows:
+        - {audience_my_test_audience_id: 111111111, audience_my_test_audience_name: 'my_test_audience', audience_my_test_audience_membership_start_timestamp_micros: 1731573754000000, audience_my_test_audience_membership_expiry_timestamp_micros: 1731998727000000, audience_my_test_audience_npa: False, audience_my_second_audience_id: 222222222, audience_my_second_audience_name: 'my_second_audience', audience_my_second_audience_membership_start_timestamp_micros: 1731573754000000, audience_my_second_audience_membership_expiry_timestamp_micros: 1731998727000000, audience_my_second_audience_npa: True}
+  - name: test_base_to_stg_ga4__users
+    description: >
+      Testing that a given row of base_ga4__psuedonymous_users produces the expected output in stg_ga4__users.
+    model: stg_ga4__users
+    given:
+      - input: ref('base_ga4__users')
+        format: sql
+        rows: |
+          select
+            'mycustomuserID' as user_id
+            , 1694444444444444 as user_info_last_active_timestamp_micros 
+            , 1664444444444444 as user_info_user_first_touch_timestamp_micros
+            , 20241201 as user_info_first_purchase_date 
+            , 'web' as device_operating_system 
+            , 'mobile' as device_category 
+            , 'Samsung' as device_mobile_brand_name 
+            , 'SM-J337V' as device_mobile_model_name 
+            , 'My page title' as device_unified_screen_name 
+            , 'Vancouver' as geo_city 
+            , 'Canada' as geo_country 
+            , 'Americas' as geo_continent 
+            , 'British Columbia' as geo_region 
+            , 200.0 as user_ltv_revenue_in_usd 
+            , 3 as user_ltv_sessions 
+            , 346517 as user_ltv_engagement_time_millis 
+            , 1  as user_ltv_purchases
+            , 3 as user_ltv_engaged_sessions 
+            , 6582608513 as user_ltv_session_duration_micros 
+            , cast(null as float64) as predictions_in_app_purchase_score_7d
+            , 0.4 as predictions_purchase_score_7d
+            , 0.08 as predictions_churn_score_7d
+            , 321.0 as predictions_revenue_28d_in_usd
+            , false as privacy_info_is_limited_ad_tracking
+            , false as privacy_info_is_ads_personalization_allowed
+            , date('2024-12-10') as occurence_date
+            , date('2024-12-12') as last_updated_date 
+            , array[
+              struct(
+                'slot_01' as key
+                , struct(
+                  'first_prop_val' as string_value 
+                  , 1695183380000000 as set_timestamp_micros
+                  , 'First Prop Name' as user_property_name
+                ) as value
+              )
+            ] as user_properties
+            , array[
+              struct(
+                2366216494 as id
+                , 'All Users' as name
+                , 1695183380000000 as membership_start_timestamp_micros
+                , 1715183380000000 as membership_expiry_timestamp_micros
+                , false as npa
+              )
+            ] as audiences
+    overrides:
+      vars:
+        user_export_user_properties: ['First Prop Name']
+        audiences: ['All Users']
+    expect:
+      format: sql
+      rows: |
+          select
+            'mycustomuserID' as user_id
+            , 1694444444444444 as user_info_last_active_timestamp_micros 
+            , 1664444444444444 as user_info_user_first_touch_timestamp_micros
+            , 20241201 as user_info_first_purchase_date 
+            , 'web' as device_operating_system 
+            , 'mobile' as device_category 
+            , 'Samsung' as device_mobile_brand_name 
+            , 'SM-J337V' as device_mobile_model_name 
+            , 'My page title' as device_unified_screen_name 
+            , 'Vancouver' as geo_city 
+            , 'Canada' as geo_country 
+            , 'Americas' as geo_continent 
+            , 'British Columbia' as geo_region 
+            , 200.0 as user_ltv_revenue_in_usd 
+            , 3 as user_ltv_sessions 
+            , 346517 as user_ltv_engagement_time_millis 
+            , 1  as user_ltv_purchases
+            , 3 as user_ltv_engaged_sessions 
+            , 6582608513 as user_ltv_session_duration_micros 
+            , cast(null as float64) as predictions_in_app_purchase_score_7d
+            , 0.4 as predictions_purchase_score_7d
+            , 0.08 as predictions_churn_score_7d
+            , 321.0 as predictions_revenue_28d_in_usd
+            , false as privacy_info_is_limited_ad_tracking
+            , false as privacy_info_is_ads_personalization_allowed
+            , date('2024-12-10') as occurence_date
+            , date('2024-12-12') as last_updated_date 
+            , array[
+              struct(
+                'slot_01' as key
+                , struct(
+                  'first_prop_val' as string_value 
+                  , 1695183380000000 as set_timestamp_micros
+                  , 'First Prop Name' as user_property_name
+                ) as value
+              )
+            ] as user_properties
+            , array[
+              struct(
+                2366216494 as id
+                , 'All Users' as name
+                , 1695183380000000 as membership_start_timestamp_micros
+                , 1715183380000000 as membership_expiry_timestamp_micros
+                , false as npa
+              )
+            ] as audiences
+            , 'first_prop_val' as first_prop_name_string_value
+            , 1695183380000000 as first_prop_name_set_timestamp_micros
+            , 'First Prop Name' as first_prop_name_user_property_name
+            , 2366216494 as audience_all_users_id
+            , 'All Users' as audience_all_users_name
+            , 1695183380000000 as audience_all_users_membership_start_timestamp_micros
+            , 1715183380000000 as audience_all_users_membership_expiry_timestamp_micros
+            , false as audience_all_users_npa

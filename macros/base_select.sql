@@ -35,6 +35,8 @@
     , ecommerce.unique_items
     , ecommerce.transaction_id
     , items
+    , session_traffic_source_last_click
+    , collected_traffic_source
     , {%- if  var('combined_dataset', false) != false %} cast(left(regexp_replace(_table_suffix, r'^(intraday_)?\d{8}', ''), 100) as int64)
         {%- else %} {{ var('property_ids')[0] }}
         {%- endif %} as property_id
@@ -93,6 +95,27 @@
     , traffic_source.name as user_campaign
     , traffic_source.medium as user_medium
     , traffic_source.source as user_source
+    , session_traffic_source_last_click.manual_campaign.campaign_id as session_traffic_source_last_click_manual_campaign_id
+    , session_traffic_source_last_click.manual_campaign.campaign_name as session_traffic_source_last_click_manual_campaign_name
+    , session_traffic_source_last_click.manual_campaign.source as session_traffic_source_last_click_manual_source
+    , session_traffic_source_last_click.manual_campaign.medium as session_traffic_source_last_click_manual_medium
+    , session_traffic_source_last_click.manual_campaign.term as session_traffic_source_last_click_manual_term
+    , session_traffic_source_last_click.manual_campaign.content as session_traffic_source_last_click_manual_content
+    , session_traffic_source_last_click.manual_campaign.source_platform as session_traffic_source_last_click_manual_source_polatform
+    , session_traffic_source_last_click.manual_campaign.creative_format as session_traffic_source_last_click_creative_format
+    , session_traffic_source_last_click.manual_campaign.marketing_tactic as session_traffic_source_last_click_manual_marketing_tactic
+    , collected_traffic_source.manual_campaign_id as collected_traffic_source_manual_campaign_id
+    , collected_traffic_source.manual_campaign_name as collected_traffic_source_manual_campaign_name
+    , collected_traffic_source.manual_source as collected_traffic_source_manual_source
+    , collected_traffic_source.manual_medium as collected_traffic_source_manual_medium
+    , collected_traffic_source.manual_term as collected_traffic_source_manual_term
+    , collected_traffic_source.manual_content as collected_traffic_source_manual_content
+    , collected_traffic_source.manual_source_platform as collected_traffic_source_manual_source_platform
+    , collected_traffic_source.manual_creative_format as collected_traffic_source_manual_creative_format
+    , collected_traffic_source.manual_marketing_tactic as collected_traffic_source_manual_marketing_tactic
+    , collected_traffic_source.gclid as collected_traffic_source_gclid
+    , collected_traffic_source.dclid as collected_traffic_source_dclid
+    , collected_traffic_source.srsltid as collected_traffic_source_srsltid
     , stream_id
     , platform
     , struct(
@@ -163,4 +186,40 @@
         WHEN event_name = 'purchase' THEN 1
         ELSE 0
     END AS is_purchase
+{% endmacro %}
+
+
+{% macro base_select_usr_source() %}
+    {{ return(adapter.dispatch('base_select_usr_source', 'ga4')()) }}
+{% endmacro %}
+
+{% macro default__base_select_usr_source() %}
+    , user_info.last_active_timestamp_micros as user_info_last_active_timestamp_micros
+    , user_info.user_first_touch_timestamp_micros as user_info_user_first_touch_timestamp_micros
+    , user_info.first_purchase_date as user_info_first_purchase_date
+    , device.operating_system as device_operating_system
+    , device.category as device_category
+    , device.mobile_brand_name as device_mobile_brand_name
+    , device.mobile_model_name as device_mobile_model_name
+    , device.unified_screen_name as device_unified_sceen_name
+    , geo.city as geo_city 
+    , geo.country as geo_country 
+    , geo.continent as geo_continent 
+    , geo.region as geo_region 
+    , user_ltv.revenue_in_usd as user_ltv_revenue_in_usd
+    , user_ltv.sessions  as user_ltv_sessions 
+    , user_ltv.engagement_time_millis  as user_ltv_engagement_time_millis
+    , user_ltv.purchases  as user_ltv_purchases
+    , user_ltv.engaged_sessions  as user_ltv_engaged_sessions
+    , user_ltv.session_duration_micros as user_ltv_session_duration_micros
+    , predictions.in_app_purchase_score_7d as predictions_in_app_purchase_score_7d
+    , predictions.purchase_score_7d as predictions_purchase_score_7d
+    , predictions.churn_score_7d as predictions_churn_score_7d 
+    , predictions.revenue_28d_in_usd as predictions_revenue_28d_in_usd
+    , privacy_info.is_limited_ad_tracking as privacy_info_is_limited_ad_tracking
+    , privacy_info.is_ads_personalization_allowed as privacy_info_is_ads_personalization_allowed
+    , parse_date('%Y%m%d' , occurrence_date) as occurrence_date
+    , parse_date('%Y%m%d' , last_updated_date) as last_updated_date 
+    , user_properties
+    , audiences
 {% endmacro %}
