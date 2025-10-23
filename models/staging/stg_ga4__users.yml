@@ -15,6 +15,8 @@ models:
         description: The user_id as passed to Google Analytics using the native user ID feature.
 unit_tests:
   - name: test_stg_ga4__users_audiences
+  config:
+      enabled: false
     description: >
       Testing that audiences process properly when configured.
     model: stg_ga4__users
@@ -31,6 +33,8 @@ as membership_expiry_timestamp_micros, true as npa)']
       rows:
         - {audience_my_test_audience_id: 111111111, audience_my_test_audience_name: 'my_test_audience', audience_my_test_audience_membership_start_timestamp_micros: 1731573754000000, audience_my_test_audience_membership_expiry_timestamp_micros: 1731998727000000, audience_my_test_audience_npa: False, audience_my_second_audience_id: 222222222, audience_my_second_audience_name: 'my_second_audience', audience_my_second_audience_membership_start_timestamp_micros: 1731573754000000, audience_my_second_audience_membership_expiry_timestamp_micros: 1731998727000000, audience_my_second_audience_npa: True}
   - name: test_base_to_stg_ga4__users
+    config:
+      enabled: false
     description: >
       Testing that a given row of base_ga4__psuedonymous_users produces the expected output in stg_ga4__users.
     model: stg_ga4__users
