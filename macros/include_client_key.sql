@@ -8,4 +8,3 @@
         from {{ source_cte }}
     )
 {% endmacro %}
-    
