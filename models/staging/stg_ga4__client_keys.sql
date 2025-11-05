@@ -5,6 +5,12 @@
         
     )
 }}
+
+with base_users as (
+    select * from {{ref('base_ga4__pseudonymous_users')}}
+),
+
+{{ include_client_key("base_ga4__pseudonymous_users") }}
 select
     *
     , to_base64(md5(concat(pseudo_user_id, stream_id))) as client_key
@@ -20,4 +26,4 @@ select
         , (select membership_expiry_timestamp_micros from unnest(audiences) where name = '{{aud}}') as audience_{{aud | lower | replace(" ", "_")}}_membership_expiry_timestamp_micros
         , (select npa from unnest(audiences) where name = '{{aud}}') as audience_{{aud | lower | replace(" ", "_")}}_npa
     {% endfor %}
-from {{ref('base_ga4__pseudonymous_users')}}
+from 
