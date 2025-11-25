@@ -348,6 +348,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "dbt-bigquery" },
+    { name = "dbt-core" },
 ]
 
 [package.dev-dependencies]
@@ -357,7 +358,10 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "dbt-bigquery", specifier = ">=1.10.3" }]
+requires-dist = [
+    { name = "dbt-bigquery", specifier = ">=1.10.3" },
+    { name = "dbt-core", specifier = ">=1.10.15" },
+]
 
 [package.metadata.requires-dev]
 dev = [
