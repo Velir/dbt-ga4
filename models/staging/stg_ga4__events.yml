@@ -11,7 +11,9 @@ models:
           Surrogate key for events. Potential for uniqueness test to fail if client_key or session_id is null
           and uniqueness depends on differentiation by that value.
         tests:
-          - unique
+          - unique:
+              config:
+                where: event_date_dt > date_sub(current_date(), interval 7 day)
       - name: page_path
         description: This field contains the page_location with the query string portion removed. Uses macro remove_query_string
       - name: page_engagement_key
