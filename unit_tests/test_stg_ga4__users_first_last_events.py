@@ -1,5 +1,8 @@
 import pytest
 from dbt.tests.util import read_file,check_relations_equal,run_dbt
+from definitions import get_test_configs
+
+TEST_CONFIGS = get_test_configs(__file__)
 
 # Define mocks via CSV (seeds) or SQL (models)
 mock_stg_ga4__events_csv = """stream_id,client_key,event_key,event_timestamp,geo_continent,geo_country,geo_region,geo_city,geo_sub_continent,geo_metro,device_category,device_mobile_brand_name,device_mobile_model_name,device_mobile_marketing_name,device_mobile_os_hardware_model,device_operating_system,device_operating_system_version,device_vendor_id,device_advertising_id,device_language,device_is_limited_ad_tracking,device_time_zone_offset_seconds,device_browser,device_browser_version,device_web_info_browser,device_web_info_browser_version,device_web_info_hostname,user_campaign,user_medium,user_source
@@ -11,7 +14,7 @@ expected_csv = """client_key,first_event,last_event,stream_id,first_geo_continen
 IX+OyYJBgjwqML19GB/XIQ==,H06dLW6OhNJJ6SoEPFsSyg==,gt1SoAtrxDv33uDGwVeMVA==,1,Asia,India,Maharashtra,Mumbai,Southern Asia,(not set),desktop,Google,Chrome,,,Windows,Windows 10,,,en-us,No,,,,Chrome,104.0.0.0,www.velir.com,,,,USA,Massachusetts,Maharashtra,Mumbai,Southern Asia,(not set),mobile,Google,Chrome,,,Windows,Windows 10,,,en-us,No,,,,Chrome,104.0.0.0,www.velir.com,,,
 """.lstrip()
 
-actual = read_file('../models/staging/stg_ga4__client_key_first_last_events.sql')
+actual = read_file(TEST_CONFIGS.get("actual"))
 
 class TestUsersFirstLastEvents():
     # everything that goes in the "seeds" directory (= CSV format)
@@ -28,7 +31,7 @@ class TestUsersFirstLastEvents():
         return {
             "actual.sql": actual,
         }
-    
+
     def test_mock_run_and_check(self, project):
         run_dbt(["build"])
         #breakpoint()

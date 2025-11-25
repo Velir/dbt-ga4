@@ -1,5 +1,4 @@
 import pathlib
-from typing import Union
 
 __PACKAGE_ROOT__ = pathlib.Path(__file__).parent
 
@@ -8,6 +7,12 @@ def _construct_filepaths(filepath: str, package_root: pathlib.Path = __PACKAGE_R
 
 def resolve_filename(filename: str) -> str:
     return pathlib.Path(filename).stem.lower()
+
+def get_test_configs(filename: str) -> dict:
+    test_configs = TEST_FILE_PATHS.get(resolve_filename(filename))
+    if test_configs is None:
+        raise ValueError(f"Test config not found for {resolve_filename(filename)}")
+    return test_configs
 
 TEST_FILE_PATHS = {
     "test_macro_default_channel_grouping": {

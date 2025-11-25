@@ -1,5 +1,8 @@
 import pytest
 from dbt.tests.util import read_file,check_relations_equal,run_dbt
+from definitions import get_test_configs
+
+TEST_CONFIGS = get_test_configs(__file__)
 
 mock_stg_ga4__events_json = """
 {  "session_key": "AAA",  "event_timestamp": "1617691790431476",  "event_name": "first_visit",  "event_params": [{    "key": "my_param",    "value": {      "string_value": null,      "int_value": 1,      "float_value": null,      "double_value": null    }}],  "user_properties": [{    "key": "my_property",    "value": {      "string_value": "value1",      "int_value": null,      "float_value": null,      "double_value": null    }}]}
@@ -42,14 +45,14 @@ class TestDerivedSessionProperties():
         return {
             "config.yml": models__config_yml,
             "stg_ga4__events.sql": "select * from {{source('fixture','mock_stg_ga4__events_json')}}",
-            "actual.sql": read_file('../models/staging/stg_ga4__derived_session_properties.sql')
+            "actual.sql": read_file(TEST_CONFIGS.get("actual"))
         }
 
     # everything that goes in the "macros"
     @pytest.fixture(scope="class")
     def macros(self):
         return {
-            "unnest_key.sql": read_file('../macros/unnest_key.sql'),
+            "unnest_key.sql": read_file(TEST_CONFIGS.get("unnest_key")),
         }
 
     def upload_json_fixture(self, project, file_name, json, table_name):
@@ -66,7 +69,7 @@ class TestDerivedSessionProperties():
                 "autodetect":"true"
             }
         )
-    
+
     def test_mock_run_and_check(self, project):
         self.upload_json_fixture(project, "source.json", mock_stg_ga4__events_json, "mock_stg_ga4__events_json" )
         run_dbt(["build", "--vars", "derived_session_properties: [{'event_parameter':'my_param','session_property_name':'my_derived_property','value_type':'int_value'},{'user_property':'my_property','session_property_name':'my_derived_property2','value_type':'string_value'}]"])
