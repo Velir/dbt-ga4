@@ -17,12 +17,9 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v6
-
       - uses: actions/setup-python@v1
         with:
-          python-version-file: .python-version
+          python-version: "3.11.x"
 
       - name: Authenticate using service account
         run: 'echo "$KEYFILE" > ./dbt-service-account.json'
@@ -32,7 +29,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          uv sync
+          pip install dbt-core
+          pip install dbt-bigquery
+          pip install pytest
 
       - name: Run tests
-        run: uv run python -m pytest .
+        run: python -m pytest .
