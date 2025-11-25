@@ -22,7 +22,7 @@ jobs:
           python-version: "3.11.x"
 
       - name: Authenticate using service account
-        run: 'echo "$KEYFILE" > ./dbt-service-account.json'
+        run: 'echo "$KEYFILE" > ./unit_tests/dbt-service-account.json'
         shell: bash
         env:
           KEYFILE: ${{secrets.GCP_BIGQUERY_USER_KEYFILE}}
