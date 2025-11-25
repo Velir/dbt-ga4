@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./unit_tests
+        working-directory: ./
     steps:
       - name: Check out
         uses: actions/checkout@v3
@@ -34,4 +34,4 @@ jobs:
           pip install pytest
 
       - name: Run tests
-        run: python -m pytest .
+        run: python -m pytest unit_tests
