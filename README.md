@@ -21,7 +21,7 @@ Features include:
 | stg_ga4__event_items | Contains item data associated with e-commerce events (Purchase, add to cart, etc) |
 | stg_ga4__event_to_query_string_params | Mapping between each event and any query parameters & values that were contained in the event's `page_location` field |
 | stg_ga4__users | User ID table built from the GA4 User export table. Flattens user properties and audiences using the `user_properties` and `audiences` variables in your `dbt_project.yml` file. Disabled by default. |
-| stg_ga4__client_keys | Clint key table built from the GA4 User export pseudonymous users table. Flattens user properties and audiences using the `user_properties` and `audiences` variables in your `dbt_project.yml` file. Disabled by default. |
+| stg_ga4__client_keys | Client key table built from the GA4 User export pseudonymous users table. Flattens user properties and audiences using the `user_properties` and `audiences` variables in your `dbt_project.yml` file. Disabled by default. |
 | stg_ga4__user_properties | Finds the most recent occurance of specified user_properties for each user |
 | stg_ga4__derived_user_properties | Finds the most recent occurance of specific event_params value and assigns them to a client_key. Derived user properties are specified as variables (see documentation below) |
 | stg_ga4__derived_session_properties | Finds the most recent occurance of specific event_params or user_properties value and assigns them to a session's session_key. Derived session properties are specified as variables (see documentation below) |
