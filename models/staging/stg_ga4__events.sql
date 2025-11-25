@@ -2,12 +2,10 @@
 with base_events as (
     select * from {{ ref('base_ga4__events')}}
 ),
+
 -- Add key that captures a combination of stream_id and user_pseudo_id to uniquely identify a 'client' (aka. a device) within a single stream
-include_client_key as (
-    select *
-    , to_base64(md5(concat(user_pseudo_id, stream_id))) as client_key
-    from base_events
-),
+{{ include_client_key("base_events") }},
+
 -- Add key for sessions. session_key will be null if client_key is null due to consent being denied. ga_session_id may be null during audience trigger events. 
 include_session_key as (
     select 
