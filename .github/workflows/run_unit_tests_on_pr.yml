@@ -1,6 +1,6 @@
 name: Run Unit Tests on Pull Request
 
-on: [pull_request_target,workflow_dispatch]
+on: [pull_request_target,workflow_dispatch,push]
 env:
   BIGQUERY_PROJECT: ${{ secrets.BIGQUERY_PROJECT }}
 
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./unit_tests
+        working-directory: ./
     steps:
       - name: Check out
         uses: actions/checkout@v3
@@ -22,7 +22,7 @@ jobs:
           python-version: "3.11.x"
 
       - name: Authenticate using service account
-        run: 'echo "$KEYFILE" > ./dbt-service-account.json'
+        run: 'echo "$KEYFILE" > ./unit_tests/dbt-service-account.json'
         shell: bash
         env:
           KEYFILE: ${{secrets.GCP_BIGQUERY_USER_KEYFILE}}
@@ -32,6 +32,6 @@ jobs:
           pip install dbt-core
           pip install dbt-bigquery
           pip install pytest
-      
+
       - name: Run tests
-        run: python -m pytest .
+        run: python -m pytest unit_tests
