@@ -1,5 +1,8 @@
 import pytest
 from dbt.tests.util import read_file,check_relations_equal,run_dbt
+from definitions import get_test_configs
+
+TEST_CONFIGS = get_test_configs(__file__)
 
 # Define mocks via CSV (seeds) or SQL (models)
 urls_to_test_csv = """url
@@ -19,7 +22,7 @@ www.website.com/?foo=bar&another=parameter&exclude=nope
 """.lstrip()
 
 actual = """
-select 
+select
 {{remove_query_parameters('url', ['param_to_exclude'])}} as url
 from {{ref('urls_to_test')}}
 """
@@ -39,14 +42,14 @@ class TestUsersFirstLastEvents():
         return {
             "actual.sql": actual,
         }
-    
+
     # everything that goes in the "macros"
     @pytest.fixture(scope="class")
     def macros(self):
         return {
-            "macro_to_test.sql": read_file('../macros/url_parsing.sql'),
+            "macro_to_test.sql": read_file(TEST_CONFIGS.get("macro_to_test")),
         }
-    
+
     def test_mock_run_and_check(self, project):
         run_dbt(["build"])
         check_relations_equal(project.adapter, ["actual", "expected"])
