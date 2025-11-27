@@ -7,4 +7,5 @@ models:
       - name: page_location
         tests:
           - not_null:
-              severity: warn
+              config:
+                severity: warn
