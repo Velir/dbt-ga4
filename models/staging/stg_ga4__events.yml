@@ -36,6 +36,7 @@ unit_tests:
     overrides:
       vars:
         query_parameter_exclusions: ["parameter","second_param"]
+        query_parameter_extraction: []
     expect:
       rows:
         - {page_location: https://asite.com/page,    page_referrer: https://asite.com/previous_page}
@@ -54,6 +55,7 @@ unit_tests:
     overrides:
       vars:
         query_parameter_exclusions: ["*all*"]
+        query_parameter_extraction: []
     expect:
       rows:
         - {page_location: https://asite.com/page,    page_referrer: https://asite.com/previous_page}
