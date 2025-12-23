@@ -1,5 +1,8 @@
 import pytest
 from dbt.tests.util import check_relations_equal, read_file, run_dbt
+from definitions import get_test_configs
+
+TEST_CONFIGS = get_test_configs(__file__)
 
 # Define mocks via CSV (seeds) or SQL (models)
 mock_stg_ga4__events_csv = """event_name,page_key
@@ -19,7 +22,7 @@ A,2
 B,1
 """.lstrip()
 
-actual = read_file("../models/staging/stg_ga4__page_conversions.sql")
+actual = read_file(TEST_CONFIGS.get("actual"))
 
 
 class TestPageConversions:
@@ -32,7 +35,7 @@ class TestPageConversions:
     @pytest.fixture(scope="class")
     def macros(self):
         return {
-            "valid_column_name.sql": read_file("../macros/valid_column_name.sql"),
+            "valid_column_name.sql": read_file(TEST_CONFIGS.get("valid_column_name")),
         }
 
     # everything that goes in the "seeds" directory (= CSV format)
@@ -69,7 +72,7 @@ class TestPageConversionsNonStandardEventName:
     @pytest.fixture(scope="class")
     def macros(self):
         return {
-            "valid_column_name.sql": read_file("../macros/valid_column_name.sql"),
+            "valid_column_name.sql": read_file(TEST_CONFIGS.get("valid_column_name")),
         }
 
     # everything that goes in the "models" directory (= SQL)

@@ -1,5 +1,8 @@
 import pytest
 from dbt.tests.util import read_file,check_relations_equal,run_dbt
+from definitions import get_test_configs
+
+TEST_CONFIGS = get_test_configs(__file__)
 
 traffic_data_with_expected_channels = [
     # Direct: Source exactly matches "(direct)" AND Medium is one of ("(not set)", "(none)")
@@ -277,7 +280,7 @@ class TestDefaultChannelGrouping():
     @pytest.fixture(scope="class")
     def seeds(self):
         return {
-            "source_category_mapping.csv": read_file('../seeds/ga4_source_categories.csv'),
+            "source_category_mapping.csv": read_file(TEST_CONFIGS.get("source_category_mapping")),
             "traffic_input.csv": traffic_input,
             "expected.csv": expected_csv,
         }
@@ -288,14 +291,14 @@ class TestDefaultChannelGrouping():
         return {
             "actual.sql": actual,
         }
-    
+
     # everything that goes in the "macros"
     @pytest.fixture(scope="class")
     def macros(self):
         return {
-            "macro_to_test.sql": read_file('../macros/default_channel_grouping.sql'),
+            "macro_to_test.sql": read_file(TEST_CONFIGS.get("macro_to_test")),
         }
-    
+
     def test_mock_run_and_check(self, project):
         #breakpoint()
         run_dbt(["build"])

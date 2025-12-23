@@ -1,5 +1,8 @@
 import pytest
 from dbt.tests.util import read_file,check_relations_equal,run_dbt
+from definitions import get_test_configs
+
+TEST_CONFIGS = get_test_configs(__file__)
 
 # Define mocks via CSV (seeds) or SQL (models)
 mock_stg_ga4__events_csv = """client_key,user_id,event_timestamp
@@ -19,7 +22,7 @@ C,c1,103
 C,c2,104
 """.lstrip()
 
-actual = read_file('../models/staging/stg_ga4__user_id_mapping.sql')
+actual = read_file(TEST_CONFIGS.get("actual"))
 
 class TestUserIdMapping():
     # everything that goes in the "seeds" directory (= CSV format)
@@ -36,7 +39,7 @@ class TestUserIdMapping():
         return {
             "actual.sql": actual,
         }
-    
+
     def test_mock_run_and_check(self, project):
         run_dbt(["build"])
         #breakpoint()
