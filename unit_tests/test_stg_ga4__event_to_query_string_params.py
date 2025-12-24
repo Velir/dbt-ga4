@@ -1,5 +1,8 @@
 import pytest
 from dbt.tests.util import read_file,check_relations_equal,run_dbt
+from definitions import get_test_configs
+
+TEST_CONFIGS = get_test_configs(__file__)
 
 
 PARAMS_CSV = """event_key,page_query_string
@@ -15,7 +18,7 @@ bbb,param1,
 ccc,param1,
 """.lstrip()
 
-actual = read_file('../models/staging/stg_ga4__event_to_query_string_params.sql').replace(
+actual = read_file(TEST_CONFIGS.get("actual")).replace(
     "ref('stg_ga4__events')",
     "ref('params')"
 )
@@ -29,7 +32,7 @@ class TestEventToQueryStringParams():
         return {
             "params.csv": PARAMS_CSV,
             "expected.csv": EXPECTED_CSV,
-            
+
         }
 
     # everything that goes in the "models" directory (= SQL)
@@ -38,7 +41,7 @@ class TestEventToQueryStringParams():
         return {
             "actual.sql": actual
         }
-    
+
     def test_mock_run_and_check(self, project):
         #self.upload_json_fixture(project, "source.json", SOURCE_JSON, "SOURCE_JSON" )
         run_dbt(["build"])

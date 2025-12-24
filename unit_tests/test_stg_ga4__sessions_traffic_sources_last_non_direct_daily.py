@@ -1,5 +1,8 @@
 import pytest
 from dbt.tests.util import read_file,check_relations_equal,run_dbt
+from definitions import get_test_configs
+
+TEST_CONFIGS = get_test_configs(__file__)
 
 # Define mocks via CSV (seeds) or SQL (models)
 mock_stg_ga4__sessions_traffic_sources_daily_csv = """client_key,session_partition_key,session_partition_date,session_partition_timestamp,session_source,session_medium,session_source_category,session_campaign,session_content,session_term,session_default_channel_grouping,non_direct_session_partition_key
@@ -16,7 +19,7 @@ A,C,20230507,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,def
 A,D,20230508,(direct),,,,,,,C,source_a,medium_a,source_category_a,campaign_a,content_a,term_a,default_channel_grouping_a
 """.lstrip()
 
-actual = read_file('../models/staging/stg_ga4__sessions_traffic_sources_last_non_direct_daily.sql')
+actual = read_file(TEST_CONFIGS.get("actual"))
 
 class TestSessionsTrafficSourcesLastNonDirectDaily():
     # everything that goes in the "seeds" directory (= CSV format)
@@ -31,10 +34,10 @@ class TestSessionsTrafficSourcesLastNonDirectDaily():
     @pytest.fixture(scope="class")
     def models(self):
         return {
-            # Hack-y solution to ensure the model is not partitioned. Loading mock data (date columns) from a seed file + partitioning don't work well together. 
+            # Hack-y solution to ensure the model is not partitioned. Loading mock data (date columns) from a seed file + partitioning don't work well together.
             "actual.sql": actual.replace("materialized = 'incremental',","materialized = 'view',"),
         }
-    
+
     def test_mock_run_and_check(self, project):
         run_dbt(["build"])
         check_relations_equal(project.adapter, ["actual", "expected"])
