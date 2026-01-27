@@ -136,7 +136,13 @@ CREATE SCHEMA IF NOT EXISTS `{{ project }}.{{ schema }}`;
         {% do run_query(combine_specified_property_data_query) %}
 
         {% if execute %}
-            {{ log("Cloned from `" ~ var('source_project') ~ ".analytics_" ~ property_id ~ ".events_*` to `" ~ target.project ~ "." ~ var('combined_dataset') ~ ".events_YYYYMMDD" ~ property_id ~ "`.", True) }}
+            {# Calculate counts and date range for logging #}
+            {%- set daily_count = tables | selectattr('type', 'equalto', 'daily') | list | length -%}
+            {%- set intraday_count = tables | selectattr('type', 'equalto', 'intraday') | list | length -%}
+            {%- set date_shards = tables | map(attribute='date_shard') | list | sort -%}
+            {%- set min_date = date_shards | first if date_shards else 'none' -%}
+            {%- set max_date = date_shards | last if date_shards else 'none' -%}
+            {{ log("Cloned " ~ daily_count ~ " daily + " ~ intraday_count ~ " intraday tables (" ~ min_date ~ " to " ~ max_date ~ ") from `" ~ var('source_project') ~ ".analytics_" ~ property_id ~ "` to `" ~ target.project ~ "." ~ var('combined_dataset') ~ "`", True) }}
         {% endif %}
     {% endfor %}
 {% endmacro %}
