@@ -405,7 +405,23 @@ vars:
     combined_dataset: "my_combined_dataset"
 ```
 
-With these variables set, the `combine_property_data` macro will run as a pre-hook to `base_ga4_events` and clone shards to the target dataset.  The number of days' worth of data to clone during incremental runs will be based on the `static_incremental_days` variable. 
+With these variables set, the `combine_property_data` macro will run as a pre-hook to `base_ga4_events` and clone shards to the target dataset.  The number of days' worth of data to clone during incremental runs will be based on the `static_incremental_days` variable.
+
+## Backfilling Clone Operations
+
+When adding a new property to an existing multi-property setup, or when performing a large initial clone that would otherwise timeout, you can use the `clone_backfill` analysis to generate BigQuery scripting that clones tables in batches.
+
+See [analyses/README.md](analyses/README.md) for detailed usage instructions.
+
+## Disabling Automatic Cloning
+
+After manually running a backfill, or in scenarios where you want to skip the automatic clone operation, use the `clone_disabled` variable:
+
+```bash
+dbt run --select base_ga4__events+ --full-refresh --vars '{clone_disabled: true}'
+```
+
+This prevents the `combine_property_data` pre-hook from running, allowing you to process already-cloned data without triggering another clone operation. 
 
 # Disabling Models to Optimize Costs
 
