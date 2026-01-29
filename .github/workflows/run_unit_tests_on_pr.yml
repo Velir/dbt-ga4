@@ -29,9 +29,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install dbt-core
-          pip install dbt-bigquery
-          pip install pytest
+          pip install dbt-core dbt-bigquery
+          pip install -r unit_tests/requirements.txt
 
       - name: Run tests
         run: python -m pytest unit_tests
