@@ -7,7 +7,8 @@ connection, making them fast and suitable for CI/CD.
 """
 
 import pytest
-import sqlglot
+
+sqlglot = pytest.importorskip("sqlglot", reason="sqlglot required for SQL syntax validation tests")
 
 
 class TestGenerateCloneStatementSyntax:
