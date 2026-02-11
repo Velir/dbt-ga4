@@ -96,6 +96,99 @@ CREATE SCHEMA IF NOT EXISTS `{{ project }}.{{ schema }}`;
     {{ return(adapter.dispatch('combine_property_data', 'ga4')()) }}
 {%- endmacro -%}
 
+{# ============================================================
+   Run-Operation: clone_backfill
+   ============================================================ #}
+
+{%- macro clone_backfill(clone_property_id, clone_start_date, clone_end_date=none) -%}
+    {{ return(adapter.dispatch('clone_backfill', 'ga4')(clone_property_id, clone_start_date, clone_end_date)) }}
+{%- endmacro -%}
+
+{% macro default__clone_backfill(clone_property_id, clone_start_date, clone_end_date) %}
+{#
+    Clones GA4 event tables one at a time via run_query(), avoiding the timeout
+    that occurs when batching all clones into a single query.
+
+    Each clone is an individual run_query() call with natural round-trip latency,
+    so no explicit delay is needed between operations.
+
+    Usage:
+        dbt run-operation clone_backfill --args '{
+            clone_property_id: 123456789,
+            clone_start_date: 20240101,
+            clone_end_date: 20241231
+        }'
+
+    Args:
+        clone_property_id (required): GA4 property ID
+        clone_start_date (required): YYYYMMDD integer
+        clone_end_date (optional): YYYYMMDD integer, defaults to today
+#}
+    {%- set earliest_shard = clone_start_date|int -%}
+    {%- set latest_shard = (clone_end_date if clone_end_date else modules.datetime.date.today()|string|replace("-", "")|int)|int -%}
+
+    {%- set tables = ga4.get_source_tables_to_clone(clone_property_id, earliest_shard, latest_shard, var('source_project')) -%}
+    {%- set source_schema = "analytics_" ~ clone_property_id|string -%}
+    {%- set total = tables | length -%}
+
+    {% if execute %}
+        {{ log("", True) }}
+        {{ log("============================================================", True) }}
+        {{ log("GA4 Clone Backfill", True) }}
+        {{ log("============================================================", True) }}
+        {{ log("Property:    " ~ clone_property_id, True) }}
+        {{ log("Date Range:  " ~ earliest_shard ~ " to " ~ latest_shard, True) }}
+        {{ log("Tables:      " ~ total, True) }}
+        {{ log("============================================================", True) }}
+        {{ log("", True) }}
+    {% endif %}
+
+    {% if total == 0 %}
+        {{ log("WARNING: No tables found for property " ~ clone_property_id ~ " in date range " ~ earliest_shard ~ " to " ~ latest_shard, True) }}
+        {{ log("Please verify:", True) }}
+        {{ log("  1. The clone_property_id is correct", True) }}
+        {{ log("  2. The source_project variable is set correctly (current: " ~ var('source_project') ~ ")", True) }}
+        {{ log("  3. Tables exist in the specified date range", True) }}
+    {% else %}
+        {# Create destination schema #}
+        {%- set create_schema_sql = ga4.generate_create_schema_statement(target.project, var('combined_dataset')) -%}
+        {% do run_query(create_schema_sql) %}
+
+        {% for table in tables %}
+            {%- set dest_table_suffix = table.date_shard ~ clone_property_id -%}
+
+            {% if table.type == 'intraday' %}
+                {%- set clone_sql = ga4.generate_clone_statement(
+                    var('source_project'), source_schema, table.source_table,
+                    target.project, var('combined_dataset'), 'events_intraday_' ~ dest_table_suffix
+                ) -%}
+                {% do run_query(clone_sql) %}
+            {% elif table.type == 'daily' %}
+                {%- set clone_sql = ga4.generate_clone_statement(
+                    var('source_project'), source_schema, table.source_table,
+                    target.project, var('combined_dataset'), 'events_' ~ dest_table_suffix
+                ) -%}
+                {% do run_query(clone_sql) %}
+
+                {# Drop corresponding intraday clone #}
+                {%- set drop_sql = ga4.generate_drop_statement(
+                    target.project, var('combined_dataset'), 'events_intraday_' ~ dest_table_suffix
+                ) -%}
+                {% do run_query(drop_sql) %}
+            {% endif %}
+
+            {% if execute %}
+                {{ log("[" ~ loop.index ~ "/" ~ total ~ "] Cloned " ~ table.type ~ ": " ~ table.date_shard, True) }}
+            {% endif %}
+        {% endfor %}
+
+        {% if execute %}
+            {{ log("", True) }}
+            {{ log("Clone backfill complete. Processed " ~ total ~ " tables for property " ~ clone_property_id ~ ".", True) }}
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
 {% macro default__combine_property_data() %}
     {% if not should_full_refresh() %}
         {# If incremental, then use static_incremental_days variable to find earliest shard to copy #}

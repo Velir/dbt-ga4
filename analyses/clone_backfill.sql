@@ -52,7 +52,7 @@
 
 DECLARE operation_count INT64 DEFAULT 0;
 DECLARE batch_size INT64 DEFAULT {{ batch_size }};
-DECLARE delay_ms INT64 DEFAULT {{ delay_seconds * 1000 }};
+DECLARE _sleep_until TIMESTAMP;
 
 -- Create destination schema if not exists
 {{ ga4.generate_create_schema_statement(target.project, var('combined_dataset')) }}
@@ -88,7 +88,9 @@ SELECT FORMAT('Starting clone backfill: %d tables for property %s', {{ tables | 
 SET operation_count = operation_count + 1;
 IF MOD(operation_count, batch_size) = 0 THEN
     SELECT FORMAT('Completed %d of %d operations. Pausing %d seconds...', operation_count, {{ tables | length }}, {{ delay_seconds }}) AS status;
-    CALL BQ.SLEEP(delay_ms);
+    SET _sleep_until = TIMESTAMP_ADD(CURRENT_TIMESTAMP(), INTERVAL {{ delay_seconds }} SECOND);
+    WHILE CURRENT_TIMESTAMP() < _sleep_until DO
+    END WHILE;
 END IF;
 
 {% endfor %}
