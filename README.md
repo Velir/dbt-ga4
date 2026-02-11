@@ -1,11 +1,11 @@
-# GA4 DBT Package 
+# GA4 DBT Package
 
 This [dbt](https://www.getdbt.com/) package connects to an exported GA4 dataset and provides useful transformations as well as report-ready dimensional models that can be used to build reports.
 
 Features include:
 - Flattened models to access common events and event parameters such as `page_view`, `session_start`, and `purchase`
 - Conversion of sharded event tables into a single partitioned table
-- Incremental loading of GA4 data into your staging tables 
+- Incremental loading of GA4 data into your staging tables
 - Page, session and user dimensional models with conversion counts
 - Last non-direct session attribution
 - Simple methods for accessing query parameters (like UTM params) or filtering query parameters (like click IDs)
@@ -29,7 +29,7 @@ Features include:
 | stg_ga4__sessions_traffic_sources | Finds the first source, medium, campaign, content, paid search term (from UTM tracking), and default channel grouping for each session. |
 | stg_ga4__sessions_traffic_sources_daily | Same data as stg_ga4__sessions_traffic_sources, but partitioned by day to allow for efficient loading and querying of data. |
 | stg_ga4__sessions_traffic_sources_last_non_direct_daily | Finds the last non-direct source attributed to each session within a 30-day lookback window. Assumes each session is contained within a day. |
-| dim_ga4__client_keys | Dimension table for user devices as indicated by client_keys. Contains attributes such as first and last page viewed.| 
+| dim_ga4__client_keys | Dimension table for user devices as indicated by client_keys. Contains attributes such as first and last page viewed.|
 | dim_ga4__sessions | Dimension table for sessions which contains useful attributes such as geography, device information, and acquisition data. Can be expensive to run on large installs (see `dim_ga4__sessions_daily`) |
 | dim_ga4__sessions_daily | Query-optimized session dimension table that is incremental and partitioned on date. Assumes that each partition is contained within a single day |
 | fct_ga4__pages | Fact table for pages which aggregates common page metrics by date, stream_id and page_location. |
@@ -51,7 +51,7 @@ To pull the latest stable release along with minor updates, add the following to
 ```
 packages:
   - package: Velir/ga4
-    version: [">=6.1.0", "<6.2.0"]
+    version: [">=6.2.0", "<6.3.0"]
 ```
 
 ## Install From main branch on GitHub
@@ -74,7 +74,7 @@ packages:
 ```
 ## Required Variables
 
-This package assumes that you have an existing DBT project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded. Source data is defined using the `project` and `dataset` variables below. The `static_incremental_days` variable defines how many days' worth of data to reprocess during incremental runs. 
+This package assumes that you have an existing DBT project with a BigQuery profile and a BigQuery GCP instance available with GA4 event data loaded. Source data is defined using the `project` and `dataset` variables below. The `static_incremental_days` variable defines how many days' worth of data to reprocess during incremental runs.
 
 ```
 vars:
@@ -107,8 +107,8 @@ Setting `query_parameter_exclusions` will remove query string parameters from th
 
 ```
 vars:
-  ga4: 
-    query_parameter_exclusions: ["gclid","fbclid","_ga"] 
+  ga4:
+    query_parameter_exclusions: ["gclid","fbclid","_ga"]
 ```
 
 You can remove all query parameters by setting `query_parameter_exclusions` to `*all*`.
@@ -127,8 +127,8 @@ Setting `query_parameter_extraction` will extract query string parameters from t
 
 ```
 vars:
-  ga4: 
-    query_parameter_extraction: ["gclid","fbclid","keyword"] 
+  ga4:
+    query_parameter_extraction: ["gclid","fbclid","keyword"]
 ```
 
 
@@ -142,7 +142,7 @@ Within GA4, you can add custom parameters to any event. These custom parameters 
     value_type: "[string_value|int_value|float_value|double_value]"
 ```
 
-For example: 
+For example:
 
 ```
 vars:
@@ -177,7 +177,7 @@ vars:
 
 ### Derived Session Properties
 
-Derived session properties are similar to derived user properties, but on a per-session basis, for properties that change slowly over time. This provides additional flexibility in allowing users to turn any event parameter into a session property. 
+Derived session properties are similar to derived user properties, but on a per-session basis, for properties that change slowly over time. This provides additional flexibility in allowing users to turn any event parameter into a session property.
 
 Derived Session Properties are included in the `dim_ga4__sessions` and `dim_ga4__sessions_daily` models and contain the latest event parameter or user property value per session.
 
@@ -191,7 +191,7 @@ derived_session_properties:
     value_type: "[string_value|int_value|float_value|double_value]"
 ```
 
-For example: 
+For example:
 
 ```
 vars:
@@ -284,9 +284,9 @@ vars:
 
 ### Derived User Properties
 
-Derived user properties are different from "User Properties" in that they are derived from event parameters. This provides additional flexibility in allowing users to turn any event parameter into a user property. 
+Derived user properties are different from "User Properties" in that they are derived from event parameters. This provides additional flexibility in allowing users to turn any event parameter into a user property.
 
-Derived User Properties are included in the `dim_ga4__users` model and contain the latest event parameter value per user. 
+Derived User Properties are included in the `dim_ga4__users` model and contain the latest event parameter value per user.
 
 ```
 derived_user_properties:
@@ -295,7 +295,7 @@ derived_user_properties:
     value_type: "[string_value|int_value|float_value|double_value]"
 ```
 
-For example: 
+For example:
 
 ```
 vars:
@@ -372,7 +372,7 @@ This example will add the following columns to the relevant dbt-GA4 models:
 This package assumes that BigQuery is the source of your GA4 data. Full instructions for connecting DBT to BigQuery are here: https://docs.getdbt.com/reference/warehouse-profiles/bigquery-profile
 
 The easiest option is using OAuth with your Google Account. Summarized instructions are as follows:
- 
+
 1. Download and initialize gcloud SDK with your Google Account (https://cloud.google.com/sdk/docs/install)
 2. Run the following command to provide default application OAuth access to BigQuery:
 
@@ -407,22 +407,6 @@ vars:
 
 With these variables set, the `combine_property_data` macro will run as a pre-hook to `base_ga4_events` and clone shards to the target dataset.  The number of days' worth of data to clone during incremental runs will be based on the `static_incremental_days` variable.
 
-## Backfilling Clone Operations
-
-When adding a new property to an existing multi-property setup, or when performing a large initial clone that would otherwise timeout, you can use the `clone_backfill` analysis to generate BigQuery scripting that clones tables in batches.
-
-See [analyses/README.md](analyses/README.md) for detailed usage instructions.
-
-## Disabling Automatic Cloning
-
-After manually running a backfill, or in scenarios where you want to skip the automatic clone operation, use the `clone_disabled` variable:
-
-```bash
-dbt run --select base_ga4__events+ --full-refresh --vars '{clone_disabled: true}'
-```
-
-This prevents the `combine_property_data` pre-hook from running, allowing you to process already-cloned data without triggering another clone operation. 
-
 # Disabling Models to Optimize Costs
 
 Some user and session models in this package are designed to have one entry per user or session. This offers maximum data accuracy but it means that these models can not be partitioned which can get expensive.
@@ -455,7 +439,7 @@ models:
 
 # Version 2 Session Cookies and ga_session_id
 
-A new format for GA4 session cookie values has been observed and, in some isolated cases, the full cookie value is being sent to BigQuery as the session ID, minus a prefix. This causes the `ga_session_id` field to be sent as a string containing both the session ID and other information rather than just the session ID itself in integer form. 
+A new format for GA4 session cookie values has been observed and, in some isolated cases, the full cookie value is being sent to BigQuery as the session ID, minus a prefix. This causes the `ga_session_id` field to be sent as a string containing both the session ID and other information rather than just the session ID itself in integer form.
 
 We are uncertain if this is a slow rollout of un-announced updates to the GA4 client library or artifacts of the specific implementations where this has been observed.
 
@@ -475,4 +459,4 @@ The dbt-GA4 package automatically extracts the session ID portion of the string 
 
 # dbt Style Guide
 
-This package attempts to adhere to the Brooklyn Data style guide found [here](https://github.com/brooklyn-data/co/blob/main/sql_style_guide.md). This work is in-progress. 
+This package attempts to adhere to the Brooklyn Data style guide found [here](https://github.com/brooklyn-data/co/blob/main/sql_style_guide.md). This work is in-progress.
