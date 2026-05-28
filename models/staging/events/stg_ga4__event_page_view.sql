@@ -13,6 +13,9 @@
       {% if var("page_view_custom_parameters", "none") != "none" %}
         {{ ga4.stage_custom_parameters( var("page_view_custom_parameters") )}}
       {% endif %}
+      {% if var("user_properties", "none") != "none" %}
+        {{ ga4.stage_user_properties( var("user_properties") )}}
+      {% endif %}
  from {{ref('stg_ga4__events')}}    
  where event_name = 'page_view'
 )
