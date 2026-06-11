@@ -104,4 +104,14 @@ page_key as (
         end as page_engagement_key
     from enrich_params
 )
+{% if var('default_user_properties', 'none') != 'none' %}
+,include_user_properties as (
+    select
+        *
+        {{ ga4.stage_user_properties(var('default_user_properties')) }}
+    from page_key
+)
+select * from include_user_properties
+{% else %}
 select * from page_key
+{% endif %}
