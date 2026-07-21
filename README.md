@@ -175,6 +175,31 @@ vars:
         value_type: "int_value"
 ```
 
+### Default User Properties
+
+Setting `default_user_properties` will extract user properties from the `user_properties` repeated field on every event and add them as columns directly to `stg_ga4__events`. This is useful when you need user property values available on each event row for downstream analysis without joining to a separate user properties model.
+
+```
+vars:
+  ga4:
+    default_user_properties:
+      - user_property_name: "membership_level"
+        value_type: "int_value"
+      - user_property_name: "account_status"
+        value_type: "string_value"
+```
+
+You can optionally rename the output column using `rename_to`:
+
+```
+vars:
+  ga4:
+    default_user_properties:
+      - user_property_name: "account_status"
+        value_type: "string_value"
+        rename_to: "acct_status"
+```
+
 ### Derived Session Properties
 
 Derived session properties are similar to derived user properties, but on a per-session basis, for properties that change slowly over time. This provides additional flexibility in allowing users to turn any event parameter into a session property.

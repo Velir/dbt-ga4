@@ -22,6 +22,10 @@ TEST_FILE_PATHS = {
     "test_macro_exclude_query_parameters": {
         "macro_to_test": _construct_filepaths("macros/url_parsing.sql"),
     },
+    "test_macro_stage_user_properties": {
+        "stage_user_properties": _construct_filepaths("macros/stage_user_properties.sql"),
+        "unnest_key": _construct_filepaths("macros/unnest_key.sql"),
+    },
     "test_macro_extract_query_parameter_value": {
         "macro_to_test": _construct_filepaths("macros/url_parsing.sql"),
     },
