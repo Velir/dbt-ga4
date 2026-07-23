@@ -45,3 +45,4 @@ To run a specific test:
 ```bash
 python -m pytest path/to/test.py
 ```
+Note that the `conftest.py` `pytest-plugins` must live in the repository route as pytest 9 refuses to load plugins from any conftest below the rootdir and the dbt fixtures are registered at the root.
