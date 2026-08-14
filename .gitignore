@@ -170,5 +170,9 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
-#mac pc specific - system configuratio files
+#mac pc specific - system configuration files
 .DS_Store
+
+# ai/agent/llm
+CLAUDE.md
+.claude/
