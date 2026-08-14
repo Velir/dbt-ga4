@@ -586,8 +586,8 @@ dataset, but it multiplies concurrent DDL. Defer; measure Tier 2 wall-clock firs
 | **3** | ✅ **Tier 2** `main.yml` + reusable `_checks.yml`. Authenticates with the existing `GCP_BIGQUERY_USER_KEYFILE` secret (decision 9), so nothing is blocked on IAM. Not yet run — first live credential use. | Yes |
 | **4** | ✅ **Tier 3** `release.yml` — four lanes + weekly schedule. Delivered; lanes verified to resolve and collect. Not yet run against BigQuery. | Yes |
 | **5** | ✅ `dependabot.yml` + `scripts/release/cut-candidate.py`. `CODEOWNERS` skipped (decision 10); `cleanup-bq.sh` shipped in Step 1. | No |
-| **6** | `require-dbt-version` ceiling → release as **6.3.0** (decision 3). | No |
-| **7** | Docs: `CONTRIBUTING.md` (new), `docs/dev-workflow.md` (new), README badges, `unit_tests/README.md` (`pip`→`uv`), PR template (`python -m pytest` → `./scripts/ci/test.sh`), `CLAUDE.md` CI-model section. | No |
+| **6** | ✅ `require-dbt-version: [">=1.0.0", "<2.0.0"]` added. Ships whenever the next release is cut. | No |
+| **7** | ✅ Docs. `CONTRIBUTING.md` + `docs/dev-workflow.md` created; README badges, supported-versions and contributing sections; `unit_tests/README.md` and the PR template corrected (both documented commands that fail); `CLAUDE.md` given a CI-model section (untracked locally, so not in the diff). | No |
 
 Steps 1–2 touch no secrets and can merge conservatively. Step 3 is where the
 trust-bearing CI lights up.
