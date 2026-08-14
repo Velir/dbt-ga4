@@ -39,97 +39,12 @@ concurrency:
   group: tier1-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
-# NOTE: there is deliberately no ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION here.
-# The sibling dbt_artifacts repo sets it to keep Node 20-based actions alive,
-# but that escape hatch stops working on 2026-09-16 when Node 20 is removed
-# from the runners. Every action below is pinned to a Node 24 release, verified
-# by reading `using:` in each action.yml at the pinned tag. See spec §11.3.
-
 jobs:
-  # Lockfile integrity + test collection.
-  #
-  # These are one job because `uv sync --locked` (inside setup.sh) IS the
-  # lockfile check, and collection needs a synced environment anyway. Splitting
-  # them would mean paying for a second checkout and sync to run one command.
-  #
-  # Collection is the highest-value credential-free check in this repo:
-  # definitions.py raises on a missing TEST_FILE_PATHS key and read_file raises
-  # on a missing path, so a test pointing at a renamed or deleted model fails
-  # here rather than silently in Tier 2. It is also what would have caught the
-  # pytest 9 conftest breakage that left this suite unrunnable.
-  collect:
-    name: lockfile + pytest collect
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      # Python version comes from .python-version (3.11), which uv reads
-      # natively — one source of truth rather than restating it here.
-      - name: Set up uv
-        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
-        with:
-          enable-cache: true
-
-      # Fails loudly if pyproject.toml was edited without re-locking.
-      - name: Install dependencies (uv sync --locked)
-        run: ./scripts/ci/setup.sh
-
-      - name: Collect tests
-        run: uv run pytest . --collect-only -q
-
-  # `dbt parse` over the whole package via the harness project.
-  #
-  # Catches Jinja syntax errors, bad ref()/source(), malformed .yml, and missing
-  # macro namespaces. This repo is a package, not a project — its dbt_project.yml
-  # declares no vars — so parsing requires the minimal consumer project in
-  # integration_test_project/. dbt parse registers the adapter but never opens a
-  # connection, which is what keeps this credential-free. Verified with
-  # GOOGLE_APPLICATION_CREDENTIALS and BIGQUERY_PROJECT unset.
-  parse:
-    name: dbt parse
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Set up uv
-        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
-        with:
-          enable-cache: true
-
-      - name: Install dependencies (uv sync --locked)
-        run: ./scripts/ci/setup.sh
-
-      - name: Parse the package
-        run: ./scripts/ci/parse.sh
-
-  # Lint the workflow files themselves.
-  #
-  # This is a guard rail on the security model: the workflows in this directory
-  # are what keep secrets away from untrusted code, so syntax errors and
-  # misconfigurations in them matter more than average.
-  #
-  # actionlint ships via PyPI (actionlint-py bundles the binary), so it runs
-  # through uv like everything else — no third-party action, no extra SHA to
-  # pin, no additional supply-chain surface.
-  actionlint:
-    name: actionlint
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Set up uv
-        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
-        with:
-          enable-cache: true
-
-      - name: Lint workflow files
-        run: |
-          uv run --isolated --no-project \
-            --with "actionlint-py==1.7.12.24" \
-            actionlint .github/workflows/*.yml
+  # The whole of Tier 1 is the shared structural check set. No secrets are
+  # passed (and _checks.yml declares none), so nothing this job can do reaches
+  # a credential.
+  checks:
+    name: checks
+    uses: ./.github/workflows/_checks.yml
+    permissions:
+      contents: read

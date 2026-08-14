@@ -1,0 +1,103 @@
+# Tier 2 — Post-merge integration.
+#
+# Runs on every push to `main` (i.e. after a maintainer-reviewed PR merge) and
+# on manual dispatch. This is the first workflow in the repository that touches
+# credentials, and the first tier that runs the test suite at all.
+#
+# TRUST BOUNDARY: what protects these credentials is **branch protection on
+# `main`** requiring PR + approving review. By the time this event fires, a
+# human has read the diff. That matters more here than it does in the sibling
+# dbt_artifacts repo: there, fork PRs get real containerised warehouse tests in
+# Tier 1, so Tier 2 is a second opinion. Here the package is BigQuery-only and
+# every test builds real datasets, so Tier 1 cannot run a single test and this
+# workflow is the *first* execution of any test code.
+#
+# If branch protection on `main` is ever relaxed, this workflow becomes the
+# weak point. See specs/ci-rework/README.md §4 (threat model) and §5.
+#
+# AUTH: Workload Identity Federation, not a service account key. The workflow
+# this replaces wrote a long-lived JSON key to disk; WIF mints a short-lived
+# credential scoped to this repository and ref. There is no static secret to
+# leak. `id-token: write` is granted to the one job that needs it, never at
+# workflow scope.
+
+name: Tier 2 — Post-merge integration
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# Default for the workflow. The BigQuery job opts into `id-token: write`
+# itself; no other job can mint an OIDC token.
+permissions:
+  contents: read
+
+# Do NOT cancel in-progress runs on `main`. Each merge is a distinct state that
+# deserves its own validation — cancelling would leave a commit unverified.
+concurrency:
+  group: tier2-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # Everything Tier 1 runs, re-run post-merge on the merged result. Catches
+  # merge-resolution problems that PR-time validation could not see, since the
+  # merge commit did not exist yet.
+  #
+  # No secrets are passed to the reusable workflow, so these jobs stay
+  # credential-free even here.
+  checks:
+    name: checks
+    uses: ./.github/workflows/_checks.yml
+    permissions:
+      contents: read
+
+  # The actual test suite, against real BigQuery.
+  #
+  # Runs the locked default lane only. The full version matrix is Tier 3's job —
+  # running it on every merge would multiply BigQuery DDL for little signal,
+  # since adapter-version breakage is a release concern, not a per-merge one.
+  integration-bigquery:
+    name: integration (bigquery)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Gate on the structural checks: if the package does not even parse, there
+    # is no point spending BigQuery quota to discover that.
+    needs: checks
+    permissions:
+      contents: read
+      # Required for the runner to mint an OIDC token for WIF. Scoped to this
+      # job deliberately — see the header note.
+      id-token: write
+    env:
+      # Consumed by conftest.py's dbt_profile_target fixture. Not a credential:
+      # it names the sandbox project the tests build throwaway datasets in.
+      BIGQUERY_PROJECT: ${{ secrets.BIGQUERY_PROJECT }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # Exports GOOGLE_APPLICATION_CREDENTIALS pointing at a short-lived
+      # external-account credential file. dbt-bigquery's `method: oauth`
+      # resolves it through Application Default Credentials — the same code
+      # path a developer gets from `gcloud auth application-default login`,
+      # which is why conftest.py needs no CI-specific branch.
+      - name: Authenticate to GCP via Workload Identity Federation
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+
+      - name: Install dependencies (uv sync --locked)
+        run: ./scripts/ci/setup.sh
+
+      # No lane argument = the locked default environment, matching what a
+      # contributor gets from a bare `./scripts/ci/test.sh` on their laptop.
+      - name: Run tests against BigQuery
+        run: ./scripts/ci/test.sh

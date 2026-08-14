@@ -532,7 +532,7 @@ dataset, but it multiplies concurrent DDL. Defer; measure Tier 2 wall-clock firs
 | **0** | Revoke the old SA key, delete the secret (§1.1). | — |
 | **1** | ✅ **Unbreak + foundation.** Delivered — see §11.4. | No |
 | **2** | ✅ **Tier 1** `.github/workflows/pr.yml`. Delivered — see §11.5. | No |
-| **3** | WIF setup (§7) + `conftest.py` simplification + **Tier 2** `main.yml`. First live credential use — verify WIF end-to-end here. | Yes |
+| **3** | **Tier 2** `main.yml` + reusable `_checks.yml`. Workflow delivered; **blocked on WIF setup** — see [wif-setup.md](wif-setup.md). (`conftest.py` simplification already landed in Step 1.) First live credential use. | Yes |
 | **4** | **Tier 3** `release.yml` — four lanes + weekly schedule. | Yes |
 | **5** | `CODEOWNERS`, `dependabot.yml`, `scripts/release/cut-candidate.py`. (`cleanup-bq.sh` already shipped in Step 1 as a manual tool — no workflow needed.) | Mixed |
 | **6** | `require-dbt-version` ceiling → release as **6.3.0** (decision 3). | No |
