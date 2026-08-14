@@ -1,0 +1,4 @@
+packages:
+  # Install the package from the working tree, NOT from the Package Hub, so that
+  # `dbt parse` always validates the code in this checkout.
+  - local: ..

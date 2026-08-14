@@ -1,0 +1,54 @@
+# Minimal consumer project whose only job is to give `dbt parse` something to
+# parse. See ./README.md and specs/ci-rework/README.md §6.1.
+name: 'ga4_integration_tests'
+version: '1.0.0'
+config-version: 2
+
+profile: 'ga4_integration_tests'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Maximise parse coverage: turn on models the package ships disabled by default
+# (opt-in for cost reasons), so a Jinja/yml error in them still fails Tier 1.
+# Several models ship with `config(enabled = false)` — the user-export base
+# models, stg_ga4__client_keys, stg_ga4__users, and everything under
+# models/staging/recommended_events/ (opt-in for cost reasons). Enabling them all
+# here is deliberate:
+#   1. it parses the maximum surface area, so a Jinja or .yml error anywhere in
+#      the package fails Tier 1; and
+#   2. stg_ga4__users.yml declares a dbt unit test against a disabled model,
+#      which dbt rejects as a parsing error unless the model is enabled — and
+#      enabling it in turn requires its disabled parent base_ga4__users.
+models:
+  ga4:
+    +enabled: true
+
+# Required `vars: ga4:` contract. Every var below is read by the package with no
+# default and therefore must be supplied for the package to parse. Values are
+# deliberately dummy — nothing here is ever executed against BigQuery.
+vars:
+  ga4:
+    # Project holding the raw GA4 export. Read by models/staging/src_ga4.yml.
+    source_project: "placeholder-parse-only"
+    # Array of GA4 property IDs. Indexed as property_ids[0] in src_ga4.yml and
+    # macros/base_select.sql, so it must be a non-empty list.
+    property_ids: [11111111]
+    # Earliest shard to scan; cast to int64 in base_ga4__events.sql.
+    start_date: "20240101"
+    # Drives the `partitions_to_replace` preamble on every incremental model;
+    # passed to range() so it must be an int.
+    static_incremental_days: 3
+
+    # NOTE: `combined_dataset` is intentionally unset. It defaults to false, and
+    # leaving it unset exercises the single-property source path. The
+    # multi-property path (combine_property_data) is untested — see spec §12.3.
