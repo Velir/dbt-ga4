@@ -24,7 +24,7 @@ survives the implementation.
 | 6 | Orphaned-dataset cleanup | **Manual script only** — no scheduled workflow, no table expiration | Housekeeping for a sandbox, unrelated to the security work. Volume is ~10–20 stray datasets/month with no cost or quota impact, so a daily workflow is not worth the trigger surface. Table expiration was rejected separately: BigQuery has no project-wide default, and per-dataset would mean overriding the test fixture. |
 | 7 | Tier 4 (on-tag workflow) | **Skipped** | Package Hub indexes tags directly. Residual drift risk on hand-cut releases is accepted — see §10.1. |
 | 8 | E2E DAG test / BQ emulator | **Both deferred** to their own specs | Keeps this rework scoped to security + restoring signal. The harness project still ships in Step 1 (parse-only). |
-| 9 | CI auth method | **Reuse the existing `GCP_BIGQUERY_USER_KEYFILE`**; WIF deferred | Revised 2026-08-14. WIF requires creating a service account, pool and provider — IAM rights the maintainers do not hold. Blocking all test signal on an IT request was the worse trade. The key already exists in repo secrets and needs no permissions to use. WIF stays the target state ([wif-setup.md](wif-setup.md)). |
+| 9 | CI auth method | **Reuse the existing `GCP_BIGQUERY_USER_KEYFILE`**; WIF deferred | Revised 2026-08-14. WIF requires creating a service account, pool and provider — IAM rights the maintainers do not hold. Blocking all test signal on an IT request was the worse trade. The key already exists in repo secrets and needs no permissions to use. WIF stays the target state; the setup runbook is kept locally, outside the repo. |
 
 ---
 
@@ -374,8 +374,9 @@ test (§11.2) and, if it ever happens, dbt-templater lint (§5.1).
 Identity Federation. WIF requires creating a service account, a pool and a
 provider; the maintainers do not hold those IAM rights, and blocking the
 restoration of *all* test signal behind an IT request was the worse trade. WIF
-remains the target state — [wif-setup.md](wif-setup.md) is written and ready for
-whenever someone with IAM access is in the loop.
+remains the target state. A step-by-step setup runbook exists but is kept
+**outside version control** (it carries GCP project specifics); ask a maintainer
+for it when someone with IAM access is in the loop.
 
 ### What actually changes
 
@@ -426,10 +427,17 @@ Accepted because the project is a sandbox.
 
 ### Migrating to WIF later
 
-Follow [wif-setup.md](wif-setup.md), then in `main.yml` (and `release.yml`)
-swap `credentials_json:` for `workload_identity_provider:` + `service_account:`
-and re-add job-scoped `id-token: write`. Roughly ten lines per workflow. No
-change to `conftest.py`, the scripts, or the tests.
+Create a service account, workload identity pool and provider (attribute
+condition scoped to `assertion.repository == 'Velir/dbt-ga4'` **and** to
+`main` / `release-candidate/**` refs), bind `roles/iam.workloadIdentityUser`,
+then add `GCP_WORKLOAD_IDENTITY_PROVIDER` + `GCP_SERVICE_ACCOUNT` secrets. The
+detailed runbook is held locally rather than in the repo.
+
+In `main.yml` and `release.yml`, swap `credentials_json:` for
+`workload_identity_provider:` + `service_account:` and re-add job-scoped
+`id-token: write`. Roughly ten lines per workflow. No change to `conftest.py`,
+the scripts, or the tests — they resolve credentials through ADC and do not care
+which kind was minted.
 
 ---
 
@@ -572,7 +580,7 @@ dataset, but it multiplies concurrent DDL. Defer; measure Tier 2 wall-clock firs
 | **1** | ✅ **Unbreak + foundation.** Delivered — see §11.4. | No |
 | **2** | ✅ **Tier 1** `.github/workflows/pr.yml`. Delivered — see §11.5. | No |
 | **3** | ✅ **Tier 2** `main.yml` + reusable `_checks.yml`. Authenticates with the existing `GCP_BIGQUERY_USER_KEYFILE` secret (decision 9), so nothing is blocked on IAM. Not yet run — first live credential use. | Yes |
-| **4** | **Tier 3** `release.yml` — four lanes + weekly schedule. | Yes |
+| **4** | ✅ **Tier 3** `release.yml` — four lanes + weekly schedule. Delivered; lanes verified to resolve and collect. Not yet run against BigQuery. | Yes |
 | **5** | `CODEOWNERS`, `dependabot.yml`, `scripts/release/cut-candidate.py`. (`cleanup-bq.sh` already shipped in Step 1 as a manual tool — no workflow needed.) | Mixed |
 | **6** | `require-dbt-version` ceiling → release as **6.3.0** (decision 3). | No |
 | **7** | Docs: `CONTRIBUTING.md` (new), `docs/dev-workflow.md` (new), README badges, `unit_tests/README.md` (`pip`→`uv`), PR template (`python -m pytest` → `./scripts/ci/test.sh`), `CLAUDE.md` CI-model section. | No |
