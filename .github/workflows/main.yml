@@ -19,7 +19,7 @@
 # google-github-actions/auth rather than the old `echo "$KEYFILE" > file.json`.
 #
 # Workload Identity Federation is the better design and remains the target state
-# (see specs/ci-rework/wif-setup.md), but standing it up requires creating a
+# (see specs/ci-rework/README.md §7), but standing it up requires creating a
 # service account, pool and provider — IAM rights the maintainers do not have.
 # Blocking the restoration of all test signal on an IT request was the worse
 # trade, so this uses the credential that already exists.

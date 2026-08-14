@@ -176,3 +176,6 @@ cython_debug/
 # ai/agent/llm
 CLAUDE.md
 .claude/
+
+# CI rework: local-only WIF runbook (contains GCP project specifics)
+specs/ci-rework/wif-setup.md
