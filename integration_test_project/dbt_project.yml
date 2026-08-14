@@ -20,16 +20,23 @@ clean-targets:
 
 # Maximise parse coverage: turn on models the package ships disabled by default
 # (opt-in for cost reasons), so a Jinja/yml error in them still fails Tier 1.
-# Several models ship with `config(enabled = false)` — the user-export base
-# models, stg_ga4__client_keys, stg_ga4__users, and everything under
-# models/staging/recommended_events/ (opt-in for cost reasons). Enabling them all
-# here is deliberate:
-#   1. it parses the maximum surface area, so a Jinja or .yml error anywhere in
-#      the package fails Tier 1; and
-#   2. stg_ga4__users.yml declares a dbt unit test against a disabled model,
-#      which dbt rejects as a parsing error unless the model is enabled — and
-#      enabling it in turn requires its disabled parent base_ga4__users.
+# That covers the user-export base models, stg_ga4__client_keys, stg_ga4__users,
+# and everything under models/staging/recommended_events/.
+#
+# CAVEAT: because this enables everything, Tier 1 cannot see a defect that only
+# manifests under the *default* config set — which is exactly the class of bug
+# that shipped in 6.2.0 (unit tests targeting disabled models, breaking
+# `dbt parse` for every consumer). A second parse without these overrides would
+# model a plain consumer install; tracked in specs/ci-rework/README.md §12.5.
 models:
+  ga4:
+    +enabled: true
+
+# The package ships the user-export unit tests disabled, to match the models they
+# target — dbt treats a unit test against a disabled model as a hard parsing
+# error, so they cannot be enabled by default. Here the models ARE enabled, so
+# the tests can be too. This keeps them parsed (and runnable) rather than dead.
+unit_tests:
   ga4:
     +enabled: true
 

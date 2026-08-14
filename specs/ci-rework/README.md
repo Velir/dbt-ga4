@@ -161,14 +161,30 @@ Confirmed in-scope for consumers: the `unit_tests:` blocks arrived in `d14736b`
 — the current release. Any consumer on dbt ≥1.8 (when unit tests landed) fails to
 parse the package unless they enable those models.
 
-Fix: either drop `enabled = false` from the two models, or move their
-`unit_tests:` blocks behind the same gate. This belongs in a **6.2.1 patch**, and
-it should not wait for the CI rework.
+✅ **Fixed.** All four affected unit tests (two per file) now carry
+`config: enabled: false`, matching the models they target.
 
-Note the harness masks this by design — it sets `models: ga4: +enabled: true` to
-maximise parsed surface area. So Tier 1's `dbt-parse` job would **not** catch a
-regression of this class. Worth a second parse invocation with default configs to
-model what a plain consumer actually sees; captured in §12.5.
+Dropping `enabled = false` from the models was rejected: those models are
+opt-in for cost reasons, and enabling them by default would silently start
+building tables for every consumer — a behaviour change, not a bug fix. Gating
+the tests is the minimal change that does not alter consumer-visible behaviour.
+
+The harness re-enables them (`unit_tests: ga4: +enabled: true`), since it also
+force-enables the models, so all 6 unit tests stay parsed and runnable there
+rather than becoming dead code.
+
+**Verified both directions:** a plain consumer project with default configs now
+parses (previously a hard error), and the harness still parses 60 models with
+6 unit tests enabled.
+
+**Still to do:** this needs releasing as **6.2.1** — the fix is on the branch but
+consumers stay broken until a tag exists. Version bumps touch `dbt_project.yml`
+and the README install snippet together; `scripts/release/cut-candidate.py`
+(Step 5) is what writes both.
+
+Note the harness masks this class of bug by design — it force-enables everything
+to maximise parsed surface area, so Tier 1's `dbt-parse` job would **not** have
+caught it. A second parse with default configs is tracked in §12.5.
 
 ### 3.4. The lock is two minors stale
 
