@@ -25,6 +25,8 @@ survives the implementation.
 | 7 | Tier 4 (on-tag workflow) | **Skipped** | Package Hub indexes tags directly. Residual drift risk on hand-cut releases is accepted — see §10.1. |
 | 8 | E2E DAG test / BQ emulator | **Both deferred** to their own specs | Keeps this rework scoped to security + restoring signal. The harness project still ships in Step 1 (parse-only). |
 | 9 | CI auth method | **Reuse the existing `GCP_BIGQUERY_USER_KEYFILE`**; WIF deferred | Revised 2026-08-14. WIF requires creating a service account, pool and provider — IAM rights the maintainers do not hold. Blocking all test signal on an IT request was the worse trade. The key already exists in repo secrets and needs no permissions to use. WIF stays the target state; the setup runbook is kept locally, outside the repo. |
+| 10 | `CODEOWNERS` | **Skipped** | Small team; the review it would force already happens. Consequence: §4's sensitive-path list is guidance for reviewers, not something GitHub enforces. Revisit if the contributor base grows. |
+| 11 | Release cutter delivery | **Local script only**, no `workflow_dispatch` wrapper | A workflow that bumps and pushes needs `contents: write` — the most dangerous permission in this repo, granted to a workflow that writes to branches. Not worth it to save one local command. |
 
 ---
 
@@ -101,7 +103,7 @@ it isn't rediscovered under time pressure.
 ### Goals
 
 - **No `pull_request_target` anywhere, ever.** Documented in `CLAUDE.md` and
-  `CONTRIBUTING.md`, enforced by `CODEOWNERS` review.
+  `CONTRIBUTING.md`. Not machine-enforced — see decision 10.
 - **No static service account keys.** Cloud auth moves to GCP **Workload Identity
   Federation** (short-lived, OIDC-minted, repo/ref-scoped).
 - **A test suite that actually runs.** It does not today — see §3.
@@ -230,7 +232,9 @@ approval click. Arbitrary code execution in Tier 1 gains an attacker nothing.
 ### Sensitive paths
 
 These execute in a credentialed context the moment they land on `main`.
-`CODEOWNERS` requires maintainer review on all of them:
+These warrant careful review. `CODEOWNERS` was considered and skipped
+(decision 10), so this list is guidance for reviewers rather than something
+GitHub blocks on:
 
 - `.github/**`
 - `scripts/ci/**`, `scripts/release/**`
@@ -581,7 +585,7 @@ dataset, but it multiplies concurrent DDL. Defer; measure Tier 2 wall-clock firs
 | **2** | ✅ **Tier 1** `.github/workflows/pr.yml`. Delivered — see §11.5. | No |
 | **3** | ✅ **Tier 2** `main.yml` + reusable `_checks.yml`. Authenticates with the existing `GCP_BIGQUERY_USER_KEYFILE` secret (decision 9), so nothing is blocked on IAM. Not yet run — first live credential use. | Yes |
 | **4** | ✅ **Tier 3** `release.yml` — four lanes + weekly schedule. Delivered; lanes verified to resolve and collect. Not yet run against BigQuery. | Yes |
-| **5** | `CODEOWNERS`, `dependabot.yml`, `scripts/release/cut-candidate.py`. (`cleanup-bq.sh` already shipped in Step 1 as a manual tool — no workflow needed.) | Mixed |
+| **5** | ✅ `dependabot.yml` + `scripts/release/cut-candidate.py`. `CODEOWNERS` skipped (decision 10); `cleanup-bq.sh` shipped in Step 1. | No |
 | **6** | `require-dbt-version` ceiling → release as **6.3.0** (decision 3). | No |
 | **7** | Docs: `CONTRIBUTING.md` (new), `docs/dev-workflow.md` (new), README badges, `unit_tests/README.md` (`pip`→`uv`), PR template (`python -m pytest` → `./scripts/ci/test.sh`), `CLAUDE.md` CI-model section. | No |
 
