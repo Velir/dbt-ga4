@@ -514,8 +514,8 @@ dataset, but it multiplies concurrent DDL. Defer; measure Tier 2 wall-clock firs
 | Step | What | Secrets? |
 |---|---|---|
 | **0** | Revoke the old SA key, delete the secret (§1.1). | — |
-| **1** | **Unbreak + foundation.** Move `conftest.py` to root (§3.1); add `.env.example`; add `<2.0.0` ceiling to `pyproject.toml`; commit `package-lock.yml` (currently untracked — a fresh clone gets a floating `dbt_utils`); `scripts/ci/{_lib,setup,parse,test}.sh`; parse-only harness project. Verify every script locally. | No |
-| **2** | **Tier 1** `.github/workflows/pr.yml`. Validate with `act -n` before merging. | No |
+| **1** | ✅ **Unbreak + foundation.** Delivered — see §11.4. | No |
+| **2** | ✅ **Tier 1** `.github/workflows/pr.yml`. Delivered — see §11.5. | No |
 | **3** | WIF setup (§7) + `conftest.py` simplification + **Tier 2** `main.yml`. First live credential use — verify WIF end-to-end here. | Yes |
 | **4** | **Tier 3** `release.yml` — four lanes + weekly schedule. | Yes |
 | **5** | `CODEOWNERS`, `dependabot.yml`, `scripts/release/cut-candidate.py`. (`cleanup-bq.sh` already shipped in Step 1 as a manual tool — no workflow needed.) | Mixed |
@@ -575,6 +575,52 @@ confirm `using:` in that tag's `action.yml`. Dependabot (§11, Step 5) will open
 grouped PRs as new versions land.
 
 ---
+
+### 11.4. Step 1 as delivered
+
+Commits `67eb368`, `adeac55`, `128a83a`. Built by three parallel agents with
+disjoint file ownership (test suite / scripts / harness).
+
+- `unit_tests/conftest.py` → `conftest.py`, `GITHUB_ACTIONS` branch removed,
+  `.env.example` added, `<2.0.0` ceilings added (resolution unchanged: 108
+  packages, dbt-core 1.10.15), `package-lock.yml` tracked.
+- `scripts/ci/{_lib,setup,test,parse,cleanup-bq}.sh` + README. One addition
+  beyond spec: `load_dotenv` in `_lib.sh`, so the shell-level
+  `require_env BIGQUERY_PROJECT` check agrees with what `pytest-dotenv` gives
+  the tests — otherwise the documented local setup fails its own precondition.
+- `integration_test_project/` harness. The four mandatory vars were derived from
+  unguarded `var()` call sites, not guessed, and match README lines 82–85.
+
+**Verified:** 13 tests collect; `uv lock --check` clean; all scripts pass
+`bash -n` and `shellcheck`; `dbt parse` succeeds with credentials provably absent
+(`CLOUDSDK_CONFIG` pointed at an empty dir), parsing 60 models.
+
+**One interaction bug, found only after merging the three streams.** `dbt deps`
+installs the package into `integration_test_project/dbt_packages/ga4/` — a full
+copy of the repo including the new root `conftest.py`. pytest recursed into it,
+found a `pytest_plugins` declaration below the rootdir, and aborted collection —
+reintroducing the exact error Step 1 had just fixed. Neither change is wrong
+alone. Fixed with `norecursedirs` in `pyproject.toml` (`128a83a`).
+
+Worth recording as a process note: disjoint file ownership makes parallel agents
+safe to run, but it structurally cannot surface defects that live in the
+*interaction* between their outputs. Budget for an integration pass afterwards.
+
+### 11.5. Step 2 as delivered
+
+Commit `0fc5c51`. Three jobs, no secrets: `collect` (`uv sync --locked` +
+`pytest --collect-only`), `parse` (`./scripts/ci/parse.sh`), and `actionlint`.
+
+`actionlint` runs from PyPI (`actionlint-py`) through `uv` rather than a
+third-party action — no extra SHA to pin, no additional supply-chain surface.
+
+**Verified:** `actionlint` clean on the workflow itself; `act --list` enumerates
+all three jobs at stage 0. Docker was unavailable locally, so the steps have
+**not** executed on a runner — first real signal comes when this lands on `main`
+and a PR fires it.
+
+Note the lockfile check and collection are one job, not two: `uv sync --locked`
+*is* the lockfile check, and collection needs a synced environment anyway.
 
 ## 12. Deferred — each needs its own spec
 
