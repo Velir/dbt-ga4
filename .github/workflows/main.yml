@@ -15,11 +15,22 @@
 # If branch protection on `main` is ever relaxed, this workflow becomes the
 # weak point. See specs/ci-rework/README.md §4 (threat model) and §5.
 #
-# AUTH: Workload Identity Federation, not a service account key. The workflow
-# this replaces wrote a long-lived JSON key to disk; WIF mints a short-lived
-# credential scoped to this repository and ref. There is no static secret to
-# leak. `id-token: write` is granted to the one job that needs it, never at
-# workflow scope.
+# AUTH: the pre-existing `GCP_BIGQUERY_USER_KEYFILE` service account key, via
+# google-github-actions/auth rather than the old `echo "$KEYFILE" > file.json`.
+#
+# Workload Identity Federation is the better design and remains the target state
+# (see specs/ci-rework/wif-setup.md), but standing it up requires creating a
+# service account, pool and provider — IAM rights the maintainers do not have.
+# Blocking the restoration of all test signal on an IT request was the worse
+# trade, so this uses the credential that already exists.
+#
+# What this does NOT mean: the vulnerability is still closed. The exposure was
+# never the key's existence, it was `pull_request_target` handing that key to
+# untrusted fork code. This workflow only runs post-merge on reviewed code.
+#
+# Known loose end: the key that was reachable from fork PRs stays in service.
+# Accepted because the target project is a sandbox — but rotation is a real
+# outstanding task needing IT. See spec §1.1.
 
 name: Tier 2 — Post-merge integration
 
@@ -29,8 +40,8 @@ on:
       - main
   workflow_dispatch:
 
-# Default for the workflow. The BigQuery job opts into `id-token: write`
-# itself; no other job can mint an OIDC token.
+# Read-only, and no job escalates. Nothing here needs `id-token: write` while
+# auth is key-based; that returns only if this moves to WIF, and job-scoped.
 permissions:
   contents: read
 
@@ -65,11 +76,10 @@ jobs:
     # Gate on the structural checks: if the package does not even parse, there
     # is no point spending BigQuery quota to discover that.
     needs: checks
+    # No `id-token: write` — nothing here mints an OIDC token. Add it back only
+    # if this moves to Workload Identity Federation, and keep it job-scoped.
     permissions:
       contents: read
-      # Required for the runner to mint an OIDC token for WIF. Scoped to this
-      # job deliberately — see the header note.
-      id-token: write
     env:
       # Consumed by conftest.py's dbt_profile_target fixture. Not a credential:
       # it names the sandbox project the tests build throwaway datasets in.
@@ -78,16 +88,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      # Exports GOOGLE_APPLICATION_CREDENTIALS pointing at a short-lived
-      # external-account credential file. dbt-bigquery's `method: oauth`
-      # resolves it through Application Default Credentials — the same code
-      # path a developer gets from `gcloud auth application-default login`,
-      # which is why conftest.py needs no CI-specific branch.
-      - name: Authenticate to GCP via Workload Identity Federation
+      # Writes the key to a temp credentials file and exports
+      # GOOGLE_APPLICATION_CREDENTIALS. dbt-bigquery's `method: oauth` resolves
+      # that through Application Default Credentials — the same code path a
+      # developer gets from `gcloud auth application-default login`, which is
+      # why conftest.py needs no CI-specific branch and why switching to WIF
+      # later touches only this step.
+      #
+      # Using the action rather than the old `echo "$KEYFILE" > f.json`: it
+      # keeps the key out of shell command construction, writes outside the
+      # workspace so a later step cannot read it back as a repo file, and
+      # removes the file at job end (cleanup_credentials defaults to true).
+      - name: Authenticate to GCP
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          credentials_json: ${{ secrets.GCP_BIGQUERY_USER_KEYFILE }}
 
       - name: Set up uv
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1

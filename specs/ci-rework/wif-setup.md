@@ -1,13 +1,25 @@
-# Workload Identity Federation setup — one-time GCP admin
+# Workload Identity Federation setup — target state, not yet applied
 
-**Prerequisite for:** Tier 2 (`main.yml`) and Tier 3 (`release.yml`).
-**Who runs this:** a maintainer with IAM admin on the CI project.
-**Time:** ~10 minutes.
+> **Status: DEFERRED — this is not a prerequisite for anything.**
+>
+> CI currently authenticates with the pre-existing `GCP_BIGQUERY_USER_KEYFILE`
+> service account key (decision 9). Every step below requires IAM rights the
+> maintainers do not hold — creating a service account, a workload identity
+> pool, and a provider. Blocking the restoration of all test signal on an IT
+> request was the worse trade.
+>
+> **Do this when someone with IAM admin on the CI project is already involved** —
+> most naturally alongside the key rotation in [README.md](README.md) §1.1, since
+> that needs the same person. Doing both at once means one IT request rather than
+> two, and rotating a key you are about to retire is wasted effort.
 
-This replaces the static service account JSON key the old workflow wrote to
-disk. WIF mints a short-lived credential, scoped to this repository and to
-specific refs, so there is no long-lived secret to leak. See
-[README.md](README.md) §7.
+**Who runs this:** someone with IAM admin on the CI project.
+**Time:** ~10 minutes, plus the workflow diff in step 9.
+
+WIF replaces the static key with a short-lived credential, minted per run and
+scoped to this repository and to specific refs, so there is no long-lived secret
+to leak or rotate. See [README.md](README.md) §7 for why this is the target state
+and what the current arrangement leaves open.
 
 ---
 
@@ -145,9 +157,36 @@ per-run from the OIDC token, which is the whole design.
 
 ---
 
-## 7. Delete the old key (spec §1.1, Step 0)
+## 7. Switch the workflows to WIF
 
-Once Tier 2 is green, the old static key has no remaining use:
+Until this step lands, the workflows still use `credentials_json` and WIF is
+inert. In `main.yml` (and `release.yml` once it exists), replace:
+
+```yaml
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          credentials_json: ${{ secrets.GCP_BIGQUERY_USER_KEYFILE }}
+```
+
+with:
+
+```yaml
+      - name: Authenticate to GCP via Workload Identity Federation
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+```
+
+and re-add `id-token: write` to that job's `permissions:` block — **job-scoped,
+never at workflow scope**. Nothing else changes: `conftest.py`, the scripts and
+the tests all resolve credentials through ADC and do not care which kind was
+minted.
+
+## 8. Retire the old key
+
+Only after a WIF-authenticated run is green:
 
 ```bash
 # List keys on whatever SA the old workflow used, then delete the USER_MANAGED one.
@@ -155,11 +194,13 @@ gcloud iam service-accounts keys list --iam-account="<old-sa-email>" --project="
 gcloud iam service-accounts keys delete "<KEY_ID>" --iam-account="<old-sa-email>"
 ```
 
-Then delete the `GCP_BIGQUERY_USER_KEYFILE` GitHub secret.
+Then delete the `GCP_BIGQUERY_USER_KEYFILE` GitHub secret. This supersedes the
+rotation task in [README.md](README.md) §1.1 — a key you have retired does not
+need rotating.
 
 ---
 
-## 8. Verify
+## 9. Verify
 
 Trigger Tier 2 manually (**Actions → Tier 2 → Run workflow**) rather than
 waiting for a merge. Expect:

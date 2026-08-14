@@ -24,6 +24,7 @@ survives the implementation.
 | 6 | Orphaned-dataset cleanup | **Manual script only** — no scheduled workflow, no table expiration | Housekeeping for a sandbox, unrelated to the security work. Volume is ~10–20 stray datasets/month with no cost or quota impact, so a daily workflow is not worth the trigger surface. Table expiration was rejected separately: BigQuery has no project-wide default, and per-dataset would mean overriding the test fixture. |
 | 7 | Tier 4 (on-tag workflow) | **Skipped** | Package Hub indexes tags directly. Residual drift risk on hand-cut releases is accepted — see §10.1. |
 | 8 | E2E DAG test / BQ emulator | **Both deferred** to their own specs | Keeps this rework scoped to security + restoring signal. The harness project still ships in Step 1 (parse-only). |
+| 9 | CI auth method | **Reuse the existing `GCP_BIGQUERY_USER_KEYFILE`**; WIF deferred | Revised 2026-08-14. WIF requires creating a service account, pool and provider — IAM rights the maintainers do not hold. Blocking all test signal on an IT request was the worse trade. The key already exists in repo secrets and needs no permissions to use. WIF stays the target state ([wif-setup.md](wif-setup.md)). |
 
 ---
 
@@ -72,10 +73,26 @@ The workflow was live from `d1f8da0` until `49d365d`. The maintainer has
 **confirmed the target GCP project is a sandbox and nothing significant was at
 risk**, so this is cleanup rather than an incident:
 
-- [ ] Revoke and delete the `GCP_BIGQUERY_USER_KEYFILE` service account key; delete
-      the GitHub secret. The new design has no use for it, so it needs deleting,
-      not replacing.
+**Revised 2026-08-14 (decision 9).** The original plan was to delete the key
+outright, because WIF would have made it redundant. WIF turned out to need IAM
+rights the maintainers do not have, so the key stays **in service** — see §7.
+
+- [ ] **Rotate** (not delete) the `GCP_BIGQUERY_USER_KEYFILE` key. Requires IT:
+      the maintainers cannot create or replace service account keys. Low
+      priority — sandbox project, nothing significant at risk — but it is a real
+      outstanding task, not a closed one. Raise it alongside any other IAM ask.
 - [ ] Keep `BIGQUERY_PROJECT` — still needed, not sensitive.
+
+Worth separating two things that are easy to conflate: **the vulnerability is
+closed regardless.** The exposure was never that a key existed, it was
+`pull_request_target` handing that key to untrusted fork code. Tier 2 runs only
+post-merge on reviewed code, so the key is no longer reachable from a fork PR.
+Rotation is hygiene on a credential that was *potentially* observed, not a fix
+for an open hole.
+
+**Also worth establishing:** who holds IAM admin on the CI project. Not for this
+decision — for the next time a key needs rotating or a permission changing, so
+it isn't rediscovered under time pressure.
 
 ---
 
@@ -351,46 +368,68 @@ test (§11.2) and, if it ever happens, dbt-templater lint (§5.1).
 
 ---
 
-## 7. Auth: replace the service account key with WIF
+## 7. Auth: keep the key, drop the CI-specific code path
 
-The old design wrote `GCP_BIGQUERY_USER_KEYFILE` to disk and pointed
-`conftest.py` at it through a `GITHUB_ACTIONS` branch.
+**Revised 2026-08-14 — decision 9.** This section originally specified Workload
+Identity Federation. WIF requires creating a service account, a pool and a
+provider; the maintainers do not hold those IAM rights, and blocking the
+restoration of *all* test signal behind an IT request was the worse trade. WIF
+remains the target state — [wif-setup.md](wif-setup.md) is written and ready for
+whenever someone with IAM access is in the loop.
 
-**Delete the branch entirely.** `method: oauth` in dbt-bigquery resolves through
-Google Application Default Credentials, which covers both cases:
+### What actually changes
 
-- **Locally:** `gcloud auth application-default login` (already in `CLAUDE.md`).
-- **In CI:** `google-github-actions/auth` writes an external-account credential
-  file and exports `GOOGLE_APPLICATION_CREDENTIALS`; ADC picks it up.
+The old design wrote `GCP_BIGQUERY_USER_KEYFILE` to disk with
+`echo "$KEYFILE" > ./unit_tests/dbt-service-account.json` and pointed
+`conftest.py` at that path through a `GITHUB_ACTIONS` branch.
 
-Resulting root `conftest.py` (also relocated per §3.1):
+The credential is the same. **Two things change:**
 
-```python
-@pytest.fixture(scope="class")
-def dbt_profile_target():
-    return {
-        'type': 'bigquery',
-        'method': 'oauth',
-        'threads': 4,
-        'timeout_seconds': 300,
-        'project': os.environ['BIGQUERY_PROJECT'],
-    }
-```
+1. **The `GITHUB_ACTIONS` branch is deleted from `conftest.py`.**
+   `method: oauth` resolves through Application Default Credentials, which
+   covers both environments:
+   - **Locally:** `gcloud auth application-default login` (already in `CLAUDE.md`)
+   - **In CI:** `google-github-actions/auth` writes a credentials file and
+     exports `GOOGLE_APPLICATION_CREDENTIALS`; ADC picks it up
 
-This removes CI-specific logic from test code, eliminates the only static
-credential, and makes local and CI paths identical.
+   ```python
+   @pytest.fixture(scope="class")
+   def dbt_profile_target():
+       return {
+           'type': 'bigquery',
+           'method': 'oauth',
+           'threads': 4,
+           'timeout_seconds': 300,
+           'project': os.environ['BIGQUERY_PROJECT'],
+       }
+   ```
 
-**One-time admin setup** (in the existing sandbox project, decision 4):
+   This is the part worth keeping regardless of auth method: no CI-specific
+   logic in test code, and local and CI exercise the identical path. It is also
+   what makes the eventual WIF migration a **single-step diff** — `conftest.py`
+   does not care which kind of credential ADC found.
 
-1. Workload Identity Pool + Provider, attribute condition scoped to
-   `assertion.repository == 'Velir/dbt-ga4'` — and ideally further to
-   `assertion.ref` in (`refs/heads/main`, `refs/heads/release-candidate/*`), so a
-   leaked workflow on another ref cannot mint a token.
-2. A dedicated CI service account with **only** `roles/bigquery.jobUser` +
-   `roles/bigquery.dataEditor`, project-scoped.
-3. Grant it `roles/iam.workloadIdentityUser` for the pool principal.
-4. Repo secrets: `GCP_WORKLOAD_IDENTITY_PROVIDER`, `GCP_SERVICE_ACCOUNT`,
-   `BIGQUERY_PROJECT`.
+2. **`google-github-actions/auth` replaces the `echo > file.json` line.** It
+   keeps the key out of shell command construction, writes the file outside the
+   workspace so a later step cannot read it back as a repo file, and deletes it
+   at job end (`cleanup_credentials` defaults true).
+
+### What this does and does not fix
+
+The vulnerability is closed either way. The exposure was never that a key
+existed — it was `pull_request_target` handing that key to untrusted fork code.
+Tier 2 runs post-merge on reviewed code only, so no fork PR can reach it.
+
+What remains open is **hygiene**: a credential that was potentially observable
+during the vulnerable window stays in service until IT rotates it (§1.1).
+Accepted because the project is a sandbox.
+
+### Migrating to WIF later
+
+Follow [wif-setup.md](wif-setup.md), then in `main.yml` (and `release.yml`)
+swap `credentials_json:` for `workload_identity_provider:` + `service_account:`
+and re-add job-scoped `id-token: write`. Roughly ten lines per workflow. No
+change to `conftest.py`, the scripts, or the tests.
 
 ---
 
@@ -532,7 +571,7 @@ dataset, but it multiplies concurrent DDL. Defer; measure Tier 2 wall-clock firs
 | **0** | Revoke the old SA key, delete the secret (§1.1). | — |
 | **1** | ✅ **Unbreak + foundation.** Delivered — see §11.4. | No |
 | **2** | ✅ **Tier 1** `.github/workflows/pr.yml`. Delivered — see §11.5. | No |
-| **3** | **Tier 2** `main.yml` + reusable `_checks.yml`. Workflow delivered; **blocked on WIF setup** — see [wif-setup.md](wif-setup.md). (`conftest.py` simplification already landed in Step 1.) First live credential use. | Yes |
+| **3** | ✅ **Tier 2** `main.yml` + reusable `_checks.yml`. Authenticates with the existing `GCP_BIGQUERY_USER_KEYFILE` secret (decision 9), so nothing is blocked on IAM. Not yet run — first live credential use. | Yes |
 | **4** | **Tier 3** `release.yml` — four lanes + weekly schedule. | Yes |
 | **5** | `CODEOWNERS`, `dependabot.yml`, `scripts/release/cut-candidate.py`. (`cleanup-bq.sh` already shipped in Step 1 as a manual tool — no workflow needed.) | Mixed |
 | **6** | `require-dbt-version` ceiling → release as **6.3.0** (decision 3). | No |
