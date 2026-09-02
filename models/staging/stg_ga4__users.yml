@@ -64,7 +64,7 @@ as membership_expiry_timestamp_micros, true as npa)']
             , 321.0 as predictions_revenue_28d_in_usd
             , false as privacy_info_is_limited_ad_tracking
             , false as privacy_info_is_ads_personalization_allowed
-            , date('2024-12-10') as occurence_date
+            , date('2024-12-10') as occurrence_date
             , date('2024-12-12') as last_updated_date 
             , array[
               struct(
@@ -118,7 +118,7 @@ as membership_expiry_timestamp_micros, true as npa)']
             , 321.0 as predictions_revenue_28d_in_usd
             , false as privacy_info_is_limited_ad_tracking
             , false as privacy_info_is_ads_personalization_allowed
-            , date('2024-12-10') as occurence_date
+            , date('2024-12-10') as occurrence_date
             , date('2024-12-12') as last_updated_date 
             , array[
               struct(

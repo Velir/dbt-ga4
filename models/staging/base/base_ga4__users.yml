@@ -5,7 +5,7 @@ models:
     description: >
       Base user model that pulls all fields from the pseudonymous user table of the user export. The pseudonymous user table is keyed on 
       the user_pseudo_id which is the cid parameter in Gtag calls and is the main parameter in the from which the dbt-GA4 client_key is
-      created. The table is partitioned by occurence_date. This model also flattens some fields.
+      created. The table is partitioned by occurrence_date. This model also flattens some fields.
     columns:
       - name: pseudo_user_id
         description: >
@@ -26,7 +26,7 @@ models:
         description: Flattened version of device.mobile_brand_name.
       - name: device_mobile_model_name
         description: Flattened version of device.mobile_model_name.
-      - name: device_unified_sceen_name
+      - name: device_unified_screen_name
         description: Flattened version of device.unified_screen_name.
       - name: geo_city
         description: Flattened version of geo.city.
@@ -51,7 +51,7 @@ models:
       - name: predictions_in_app_purchase_score_7d
         description: >
             Probability that a user who was active in the last 28 days will log an in_app_purchase event within the next 7 days. 
-            Flattened ersion of predictions.in_app_purchase_score_7d.
+            Flattened version of predictions.in_app_purchase_score_7d.
       - name: predictions_purchase_score_7d
         description: >
             Probability that a user who was active in the last 28 days will log a purchase event within the next 7 days. 
@@ -77,7 +77,7 @@ models:
             because, in the most general case, some of the '(not set)' rows will include users that are not eligible for ads personalization. Users where 
             isAdsPersonalizationAllowed = 'false' can still be used for non-advertising use cases like A/B testing & data explorations. Flattened version of 
             privacy_info.is_ads_personalization_allowed.
-      - name: occurence_date
+      - name: occurrence_date
         description: Date when the record change was triggered. This is the partitioning column.
       - name: last_updated_date
-        desctiption: Date when the record was updated in the table.
+        description: Date when the record was updated in the table.
