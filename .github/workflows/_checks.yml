@@ -15,6 +15,14 @@
 # **Do not add secrets to this file.** If a future check needs credentials, add
 # it as a job in the calling workflow instead, so the trust boundary stays
 # visible at the call site. See specs/ci-rework/README.md §4.
+#
+# Every checkout sets `persist-credentials: false`. By default actions/checkout
+# writes the job's GITHUB_TOKEN into .git/config, where any later step — including
+# third-party code pulled in by uv/dbt/pytest — can read it. Nothing in this repo
+# needs authenticated git: scripts/ci/ runs no git commands, the harness installs
+# the package by local path, and dbt_utils comes from the Package Hub over HTTPS.
+# (Flagged as the "artipacked" pattern; low severity here since these tokens are
+# contents:read and no workflow uploads artifacts, but it costs nothing to close.)
 
 name: Structural checks
 
@@ -43,6 +51,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # No credential left in .git/config for later steps to read.
+          persist-credentials: false
 
       # Python version comes from .python-version (3.11), which uv reads
       # natively — one source of truth rather than restating it here.
@@ -72,6 +83,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # No credential left in .git/config for later steps to read.
+          persist-credentials: false
 
       - name: Set up uv
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
@@ -100,6 +114,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # No credential left in .git/config for later steps to read.
+          persist-credentials: false
 
       - name: Set up uv
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
