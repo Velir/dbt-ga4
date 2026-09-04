@@ -1,6 +1,17 @@
 name: 'ga4'
 version: '6.2.0'
 config-version: 2
+
+# Ceiling only, deliberately. dbt-core 2.0 is already on PyPI as a prerelease,
+# and this package has never been tested against it — without this, consumers
+# would upgrade into an unverified combination with no warning from us.
+#
+# The floor is intentionally loose. CI tests 1.10 and newer (see
+# scripts/ci/test.sh), so >=1.0.0 claims more than we verify — but tightening it
+# to the tested floor would block installs for consumers on older dbt, which is
+# a breaking change and belongs in a major release. Tracked in
+# specs/ci-rework/README.md §12.4.
+require-dbt-version: [">=1.0.0", "<2.0.0"]
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
