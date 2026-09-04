@@ -201,7 +201,7 @@
     , device.category as device_category
     , device.mobile_brand_name as device_mobile_brand_name
     , device.mobile_model_name as device_mobile_model_name
-    , device.unified_screen_name as device_unified_sceen_name
+    , device.unified_screen_name as device_unified_screen_name
     , geo.city as geo_city 
     , geo.country as geo_country 
     , geo.continent as geo_continent 
