@@ -1,0 +1,50 @@
+# Tier 1 — PR structural gate.
+#
+# Runs on every pull_request targeting `main`, including PRs from forks.
+#
+# SECURITY: this workflow uses the `pull_request` event, NOT
+# `pull_request_target`. That is the entire point. `pull_request_target` runs in
+# the base repo's context with secrets present in the environment, and the
+# workflow this replaces then checked out the PR head SHA and ran pytest against
+# it — handing attacker-controlled code a GCP service account key. Under
+# `pull_request`, secrets are *structurally absent* from the runner, so arbitrary
+# code execution here gains an attacker nothing.
+#
+# **Never add `pull_request_target` to this repository.** See
+# specs/ci-rework/README.md §1 (background) and §4 (threat model).
+#
+# Scope — what this tier deliberately does NOT do:
+#   - No tests. Every test in this package builds real BigQuery datasets, and
+#     this tier has no credentials by design. That is not a gap to be fixed; it
+#     is the trade-off that makes fork PRs safe. Tests run post-merge in Tier 2.
+#   - No sqlfluff. Deferred entirely — the jinja templater cannot resolve this
+#     package's `ga4.`-namespaced macro calls. See spec §5.1.
+#
+# What contributors get here is fast structural signal: does it resolve, does it
+# import, does it parse, is the workflow syntax valid.
+
+name: Tier 1 — PR checks
+
+on:
+  pull_request:
+    branches:
+      - main
+
+# No `id-token`, no `packages`, no escalation. Read the code and nothing else.
+permissions:
+  contents: read
+
+# One run per PR; a new push supersedes the previous run.
+concurrency:
+  group: tier1-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  # The whole of Tier 1 is the shared structural check set. No secrets are
+  # passed (and _checks.yml declares none), so nothing this job can do reaches
+  # a credential.
+  checks:
+    name: checks
+    uses: ./.github/workflows/_checks.yml
+    permissions:
+      contents: read
