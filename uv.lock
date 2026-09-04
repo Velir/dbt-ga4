@@ -359,8 +359,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "dbt-bigquery", specifier = ">=1.10.3" },
-    { name = "dbt-core", specifier = ">=1.10.15" },
+    { name = "dbt-bigquery", specifier = ">=1.10.3,<2.0.0" },
+    { name = "dbt-core", specifier = ">=1.10.15,<2.0.0" },
 ]
 
 [package.metadata.requires-dev]

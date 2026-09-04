@@ -1,0 +1,121 @@
+# Tier 3 — Release validation.
+#
+# The gate on cutting a release tag: if Tier 3 is green on a
+# `release-candidate/X.Y.Z` branch, the maintainer tags X.Y.Z from that
+# branch's HEAD.
+#
+# Triggers:
+#   - push to `release-candidate/**` — the standard flow: create the branch,
+#     push the version bump, watch this run, tag.
+#   - workflow_dispatch — manual re-runs and one-off validation.
+#   - schedule (weekly) — regression against `main`. Scheduled runs always
+#     execute on the default branch, so this validates the current state of
+#     `main` regardless of any in-flight release branch. This is what catches
+#     drift from upstream dbt-bigquery releases between our own releases; in
+#     the sibling dbt_artifacts repo the equivalent job is what surfaced a
+#     dbt-core prerelease leaking into a pinned lane.
+#
+# Trust model: identical to Tier 2. `release-candidate/**` branches are created
+# by maintainers from reviewed code on `main`, so the code here has already
+# cleared human review. See specs/ci-rework/README.md §4.
+#
+# Scope beyond Tier 2: the full version matrix. Tier 2 runs the locked default
+# lane on every merge; this runs every supported dbt lane, because
+# adapter-version breakage is a release concern rather than a per-merge one.
+
+name: Tier 3 — Release validation
+
+on:
+  push:
+    branches:
+      - "release-candidate/**"
+  workflow_dispatch:
+  schedule:
+    # Mondays 06:00 UTC — start of the workweek, so failures get attention
+    # promptly rather than sitting over a weekend.
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+
+# Never cancel: a maintainer pushing follow-up commits to a release branch
+# wants every intermediate state validated, and a cancelled release run
+# leaves an ambiguous signal on something about to be tagged.
+concurrency:
+  group: tier3-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # Everything Tiers 1 and 2 run.
+  checks:
+    name: checks
+    uses: ./.github/workflows/_checks.yml
+    permissions:
+      contents: read
+
+  # The full version matrix.
+  #
+  # Each lane is a (dbt-core, dbt-bigquery) pair resolved by scripts/ci/test.sh.
+  # Both are pinned together in every lane: pinning only the adapter lets
+  # dbt-core float, which in the sibling repo resolved onto a 2.0.0 alpha and
+  # broke lanes in a way that looked like a test failure. See spec §8.
+  #
+  # The empty `lane` value means "no argument" — test.sh then uses the locked
+  # default environment, exactly as Tier 2 and a bare local run do.
+  version-matrix:
+    name: integration (dbt ${{ matrix.lane_name }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Same reasoning as Tier 2: don't spend BigQuery quota if it doesn't parse.
+    needs: checks
+    permissions:
+      contents: read
+    env:
+      BIGQUERY_PROJECT: ${{ secrets.BIGQUERY_PROJECT }}
+    strategy:
+      # One lane failing must not mask the others — knowing that 1.10 and 1.12
+      # both break is very different from knowing only that 1.10 does.
+      fail-fast: false
+      # Throttled deliberately. Every test class creates and drops its own
+      # BigQuery dataset, so concurrency multiplies dataset DDL against a
+      # per-project quota. Datasets themselves are uniquely named per test
+      # class, so lanes cannot collide on data — this cap is about API rate,
+      # not correctness. See spec §10.1 and §10.3.
+      max-parallel: 4
+      matrix:
+        include:
+          # Floating, capped below 2.0.0. Early warning for adapter releases
+          # we have not pinned a lane for yet — expected to be the first lane
+          # to break when upstream ships something incompatible.
+          - lane: ""
+            lane_name: "locked default"
+          - lane: "1_12_0"
+            lane_name: "1.12"
+          - lane: "1_11_0"
+            lane_name: "1.11"
+          - lane: "1_10_0"
+            lane_name: "1.10"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # No credential left in .git/config for later steps to read.
+          persist-credentials: false
+
+      # See main.yml for why this uses the action rather than writing the key
+      # to the workspace, and why conftest.py needs no CI-specific branch.
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          credentials_json: ${{ secrets.GCP_BIGQUERY_USER_KEYFILE }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+
+      - name: Install dependencies (uv sync --locked)
+        run: ./scripts/ci/setup.sh
+
+      - name: Run tests against BigQuery (${{ matrix.lane_name }})
+        run: ./scripts/ci/test.sh ${{ matrix.lane }}

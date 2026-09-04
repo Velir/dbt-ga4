@@ -6,16 +6,26 @@ The dbt-ga4 package treats each model and macro as a 'unit' of code. If we fix t
 - https://github.com/dbt-labs/dbt-core/discussions/4455#discussioncomment-2766503
 
 ## Requirements
-You'll need to install pytest, pytest-dotenv and create a `.env` file with a `BIGQUERY_PROJECT` key containing the name of your BigQuery project. An 'oauth' connection method is assumed for local development.
 
-Installing pytest & pytest-dotenv can be done using the `unit_tests/requirements.txt` file or by using `uv` at the root of the repository.
+From the root of the repository:
+
 ```bash
-pip install -r unit_tests/requirements.txt
+./scripts/ci/setup.sh                  # uv sync --locked
+cp .env.example .env                   # then set BIGQUERY_PROJECT
+gcloud auth application-default login \
+  --scopes=https://www.googleapis.com/auth/bigquery,https://www.googleapis.com/auth/iam.test
 ```
-or
-```bash
-uv sync
-```
+
+`BIGQUERY_PROJECT` must name a project you are comfortable writing to — the
+tests create and drop datasets in it. Authentication uses `method: oauth`, which
+resolves through Google Application Default Credentials, so the `gcloud` login
+above is what makes it work. CI uses the identical code path with credentials
+supplied by the runner, which is why there is no CI-specific branch in
+`conftest.py`.
+
+> `unit_tests/requirements.txt` is left in place for now but is redundant with
+> `pyproject.toml`'s dev dependency group, and `pip install -r` will not give you
+> the locked versions CI uses. Prefer `./scripts/ci/setup.sh`.
 
 ## Configuration for file-based references
 New tests that require file references need to be configured in the `definitions.py` file in the root of the repository.
@@ -36,12 +46,33 @@ This will parse based on the file name and allow you to leverage the defined dic
 
 
 ## Running Tests
-To run the folder's suite of tests, simply run at the root of the repository:
+
+Use `scripts/ci/test.sh`. It is the same entry point CI uses, so a green run
+locally means the same thing it means in CI.
+
 ```bash
-python -m pytest .
+./scripts/ci/test.sh                          # whole suite, locked dbt version
+./scripts/ci/test.sh -- unit_tests/test_x.py  # one file
+./scripts/ci/test.sh -- -k derived_user       # anything after `--` goes to pytest
 ```
 
-To run a specific test:
+To reproduce a specific dbt version — the lanes CI's release matrix runs:
+
 ```bash
-python -m pytest path/to/test.py
+./scripts/ci/test.sh 1_12_0
+./scripts/ci/test.sh 1_11_0
+./scripts/ci/test.sh 1_10_0
 ```
+
+These build real BigQuery datasets, so `BIGQUERY_PROJECT` and working
+credentials are required (see Requirements above). Each test class creates and
+drops its own uniquely-named dataset, so parallel runs cannot collide.
+
+`uv run pytest .` also works and is what the script calls underneath. Prefer the
+script: it validates `BIGQUERY_PROJECT` up front with a clear error rather than
+failing deep inside dbt.
+
+> **Note:** these commands were previously documented as `python -m pytest .`.
+> That no longer works — pytest 9 requires `pytest_plugins` to be declared in a
+> root `conftest.py`, and the suite would not even reach collection. Always
+> invoke Python through `uv` in this repo so you get the locked environment.
