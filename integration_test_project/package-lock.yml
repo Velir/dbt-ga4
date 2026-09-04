@@ -1,0 +1,7 @@
+packages:
+  - local: ..
+    name: ga4
+  - name: dbt_utils
+    package: dbt-labs/dbt_utils
+    version: 1.4.1
+sha1_hash: c787411b652dd5d587210a94ffee257da65a5a49

@@ -1,0 +1,130 @@
+# Reusable structural checks — the shared body of every tier.
+#
+# Called by pr.yml (Tier 1), main.yml (Tier 2) and release.yml (Tier 3). The
+# tier model says each tier runs everything the previous one runs, plus its own
+# additions; defining these jobs once and calling them three times is how that
+# stays true. Copying them into each workflow would mean nine job definitions
+# drifting apart.
+#
+# SECURITY: this workflow declares no `secrets:` input and never references
+# `secrets.*`. Reusable workflows do not inherit secrets unless the caller
+# explicitly passes them (`secrets: inherit` or a named `secrets:` block), and
+# no caller does. So these jobs are secret-free no matter who calls them —
+# including when Tier 1 runs them on an untrusted fork PR.
+#
+# **Do not add secrets to this file.** If a future check needs credentials, add
+# it as a job in the calling workflow instead, so the trust boundary stays
+# visible at the call site. See specs/ci-rework/README.md §4.
+#
+# Every checkout sets `persist-credentials: false`. By default actions/checkout
+# writes the job's GITHUB_TOKEN into .git/config, where any later step — including
+# third-party code pulled in by uv/dbt/pytest — can read it. Nothing in this repo
+# needs authenticated git: scripts/ci/ runs no git commands, the harness installs
+# the package by local path, and dbt_utils comes from the Package Hub over HTTPS.
+# (Flagged as the "artipacked" pattern; low severity here since these tokens are
+# contents:read and no workflow uploads artifacts, but it costs nothing to close.)
+
+name: Structural checks
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  # Lockfile integrity + test collection.
+  #
+  # One job, not two: `uv sync --locked` IS the lockfile check, and collection
+  # needs a synced environment anyway, so splitting them would buy a second
+  # checkout and sync for nothing.
+  #
+  # Collection is the highest-value credential-free check in this repo:
+  # definitions.py raises on a missing TEST_FILE_PATHS key and read_file raises
+  # on a missing path, so a test pointing at a renamed or deleted model fails
+  # here rather than silently later. It is also what would have caught the
+  # pytest 9 conftest breakage that left this suite unrunnable.
+  collect:
+    name: lockfile + pytest collect
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # No credential left in .git/config for later steps to read.
+          persist-credentials: false
+
+      # Python version comes from .python-version (3.11), which uv reads
+      # natively — one source of truth rather than restating it here.
+      - name: Set up uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+
+      # Fails loudly if pyproject.toml was edited without re-locking.
+      - name: Install dependencies (uv sync --locked)
+        run: ./scripts/ci/setup.sh
+
+      - name: Collect tests
+        run: uv run pytest . --collect-only -q
+
+  # `dbt parse` over the whole package via the harness project.
+  #
+  # Catches Jinja syntax errors, bad ref()/source(), malformed .yml, and missing
+  # macro namespaces. This repo is a package, not a project — its dbt_project.yml
+  # declares no vars — so parsing requires the minimal consumer project in
+  # integration_test_project/. dbt parse registers the adapter but never opens a
+  # connection, which is what keeps this credential-free.
+  parse:
+    name: dbt parse
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # No credential left in .git/config for later steps to read.
+          persist-credentials: false
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+
+      - name: Install dependencies (uv sync --locked)
+        run: ./scripts/ci/setup.sh
+
+      - name: Parse the package
+        run: ./scripts/ci/parse.sh
+
+  # Lint the workflow files themselves.
+  #
+  # A guard rail on the security model: the workflows in this directory are what
+  # keep secrets away from untrusted code, so misconfigurations in them matter
+  # more than average.
+  #
+  # actionlint ships via PyPI (actionlint-py bundles the binary), so it runs
+  # through uv like everything else — no third-party action, no extra SHA to
+  # pin, no additional supply-chain surface.
+  actionlint:
+    name: actionlint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # No credential left in .git/config for later steps to read.
+          persist-credentials: false
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+
+      - name: Lint workflow files
+        run: |
+          uv run --isolated --no-project \
+            --with "actionlint-py==1.7.12.24" \
+            actionlint .github/workflows/*.yml
