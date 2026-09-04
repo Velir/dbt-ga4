@@ -1,0 +1,4 @@
+# target/, dbt_packages/ and logs/ are already covered by the root .gitignore.
+# .user.yml is dbt's per-machine anonymous-usage id file, written on every
+# invocation here; it is not covered at the root.
+.user.yml

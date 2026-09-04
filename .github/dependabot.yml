@@ -1,0 +1,44 @@
+# Dependabot configuration.
+#
+# Why this exists: every action in .github/workflows/ is pinned to a commit SHA
+# rather than a tag, which is the right call for supply-chain safety but removes
+# automatic updates. Without something watching, those pins silently rot.
+#
+# That is not hypothetical here. The actions are pinned to Node 24 releases
+# specifically because **Node 20 is removed from GitHub runners on 2026-09-16**;
+# workflows still on Node 20 actions break outright that day. Dependabot is what
+# surfaces the next such transition without anyone having to remember it.
+#
+# See specs/ci-rework/README.md §11.2 (shared hardening) and §11.3.
+
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    # One grouped PR per week rather than three separate ones that all need the
+    # same review attention.
+    groups:
+      github-actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"
+
+  # NOTE: Python dependencies (pyproject.toml / uv.lock) are intentionally NOT
+  # managed here.
+  #
+  # dbt-core and dbt-bigquery versions are the test surface area, not incidental
+  # dependencies — scripts/ci/test.sh defines a lane per supported minor and
+  # release.yml runs a matrix over them. An automated bump to the locked default
+  # would change what Tier 2 validates without touching either of those, so the
+  # three would drift apart silently.
+  #
+  # Bumping them deliberately means: update pyproject.toml, re-lock, add or
+  # retire a lane in test.sh, and update release.yml's matrix together. Revisit
+  # if this proves cumbersome, but a Dependabot PR cannot make that judgement.

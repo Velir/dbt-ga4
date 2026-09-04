@@ -1,0 +1,121 @@
+# Tier 2 — Post-merge integration.
+#
+# Runs on every push to `main` (i.e. after a maintainer-reviewed PR merge) and
+# on manual dispatch. This is the first workflow in the repository that touches
+# credentials, and the first tier that runs the test suite at all.
+#
+# TRUST BOUNDARY: what protects these credentials is **branch protection on
+# `main`** requiring PR + approving review. By the time this event fires, a
+# human has read the diff. That matters more here than it does in the sibling
+# dbt_artifacts repo: there, fork PRs get real containerised warehouse tests in
+# Tier 1, so Tier 2 is a second opinion. Here the package is BigQuery-only and
+# every test builds real datasets, so Tier 1 cannot run a single test and this
+# workflow is the *first* execution of any test code.
+#
+# If branch protection on `main` is ever relaxed, this workflow becomes the
+# weak point. See specs/ci-rework/README.md §4 (threat model) and §5.
+#
+# AUTH: the pre-existing `GCP_BIGQUERY_USER_KEYFILE` service account key, via
+# google-github-actions/auth rather than the old `echo "$KEYFILE" > file.json`.
+#
+# Workload Identity Federation is the better design and remains the target state
+# (see specs/ci-rework/README.md §7), but standing it up requires creating a
+# service account, pool and provider — IAM rights the maintainers do not have.
+# Blocking the restoration of all test signal on an IT request was the worse
+# trade, so this uses the credential that already exists.
+#
+# What this does NOT mean: the vulnerability is still closed. The exposure was
+# never the key's existence, it was `pull_request_target` handing that key to
+# untrusted fork code. This workflow only runs post-merge on reviewed code.
+#
+# Known loose end: the key that was reachable from fork PRs stays in service.
+# Accepted because the target project is a sandbox — but rotation is a real
+# outstanding task needing IT. See spec §1.1.
+
+name: Tier 2 — Post-merge integration
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# Read-only, and no job escalates. Nothing here needs `id-token: write` while
+# auth is key-based; that returns only if this moves to WIF, and job-scoped.
+permissions:
+  contents: read
+
+# Do NOT cancel in-progress runs on `main`. Each merge is a distinct state that
+# deserves its own validation — cancelling would leave a commit unverified.
+concurrency:
+  group: tier2-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # Everything Tier 1 runs, re-run post-merge on the merged result. Catches
+  # merge-resolution problems that PR-time validation could not see, since the
+  # merge commit did not exist yet.
+  #
+  # No secrets are passed to the reusable workflow, so these jobs stay
+  # credential-free even here.
+  checks:
+    name: checks
+    uses: ./.github/workflows/_checks.yml
+    permissions:
+      contents: read
+
+  # The actual test suite, against real BigQuery.
+  #
+  # Runs the locked default lane only. The full version matrix is Tier 3's job —
+  # running it on every merge would multiply BigQuery DDL for little signal,
+  # since adapter-version breakage is a release concern, not a per-merge one.
+  integration-bigquery:
+    name: integration (bigquery)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Gate on the structural checks: if the package does not even parse, there
+    # is no point spending BigQuery quota to discover that.
+    needs: checks
+    # No `id-token: write` — nothing here mints an OIDC token. Add it back only
+    # if this moves to Workload Identity Federation, and keep it job-scoped.
+    permissions:
+      contents: read
+    env:
+      # Consumed by conftest.py's dbt_profile_target fixture. Not a credential:
+      # it names the sandbox project the tests build throwaway datasets in.
+      BIGQUERY_PROJECT: ${{ secrets.BIGQUERY_PROJECT }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # No credential left in .git/config for later steps to read.
+          persist-credentials: false
+
+      # Writes the key to a temp credentials file and exports
+      # GOOGLE_APPLICATION_CREDENTIALS. dbt-bigquery's `method: oauth` resolves
+      # that through Application Default Credentials — the same code path a
+      # developer gets from `gcloud auth application-default login`, which is
+      # why conftest.py needs no CI-specific branch and why switching to WIF
+      # later touches only this step.
+      #
+      # Using the action rather than the old `echo "$KEYFILE" > f.json`: it
+      # keeps the key out of shell command construction, writes outside the
+      # workspace so a later step cannot read it back as a repo file, and
+      # removes the file at job end (cleanup_credentials defaults to true).
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          credentials_json: ${{ secrets.GCP_BIGQUERY_USER_KEYFILE }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+
+      - name: Install dependencies (uv sync --locked)
+        run: ./scripts/ci/setup.sh
+
+      # No lane argument = the locked default environment, matching what a
+      # contributor gets from a bare `./scripts/ci/test.sh` on their laptop.
+      - name: Run tests against BigQuery
+        run: ./scripts/ci/test.sh
