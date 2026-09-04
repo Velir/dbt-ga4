@@ -1,5 +1,8 @@
 # GA4 DBT Package
 
+[![Tier 2 — Post-merge integration](https://github.com/Velir/dbt-ga4/actions/workflows/main.yml/badge.svg)](https://github.com/Velir/dbt-ga4/actions/workflows/main.yml)
+[![Tier 3 — Release validation](https://github.com/Velir/dbt-ga4/actions/workflows/release.yml/badge.svg)](https://github.com/Velir/dbt-ga4/actions/workflows/release.yml)
+
 This [dbt](https://www.getdbt.com/) package connects to an exported GA4 dataset and provides useful transformations as well as report-ready dimensional models that can be used to build reports.
 
 Features include:
@@ -481,6 +484,28 @@ Here is a breakdown of the components of the `string_value` `ga_session_id` fiel
 - $h0: Enhanced Client ID (User ID?)
 
 The dbt-GA4 package automatically extracts the session ID portion of the string and converts it to an integer before storing it when a `string_value` type of `ga_session_id` is detected.
+
+# Supported dbt versions
+
+CI tests this package against dbt **1.10, 1.11 and 1.12**, plus whatever the
+latest release resolves to. `require-dbt-version` allows anything below 2.0.0,
+so older versions will still install — they are simply no longer verified on
+each release.
+
+dbt 2.0 is excluded until the package has been tested against it.
+
+# Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup and
+[docs/dev-workflow.md](docs/dev-workflow.md) for how a change moves from branch
+to release.
+
+One thing worth knowing up front: **PR CI does not run the test suite.** This
+package is BigQuery-only and every test builds real datasets, so the tests need
+warehouse credentials — which PR builds deliberately do not have, including on
+PRs from forks. PRs get structural checks (resolution, collection, `dbt parse`);
+the suite runs after merge. If your change touches SQL behaviour, run
+`./scripts/ci/test.sh` locally before opening the PR.
 
 # dbt Style Guide
 

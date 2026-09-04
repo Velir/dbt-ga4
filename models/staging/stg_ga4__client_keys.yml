@@ -17,6 +17,12 @@ unit_tests:
   - name: test_stg_ga4__client_keys_audiences
     description: >
       Testing that audiences process properly when configured.
+    # Disabled to match stg_ga4__client_keys, which ships `enabled = false`. dbt
+    # treats a unit test targeting a disabled model as a hard parsing error, so
+    # leaving this enabled breaks `dbt parse` for every consumer of the package.
+    # Enable it alongside the model (see README "GA4 User Export Settings").
+    config:
+      enabled: false
     model: stg_ga4__client_keys
     given: 
       - input: ref('base_ga4__pseudonymous_users')
@@ -33,6 +39,9 @@ as membership_expiry_timestamp_micros, true as npa)']
   - name: test_base_to_stg_ga4__client_keys
     description: >
       Testing that a given row of base_ga4__psuedonymous_users produces the expected output in stg_ga4__client_keys.
+    # Disabled to match stg_ga4__client_keys — see the note on the unit test above.
+    config:
+      enabled: false
     model: stg_ga4__client_keys
     given:
       - input: ref('base_ga4__pseudonymous_users')

@@ -1,0 +1,14 @@
+# Credential-free by design. `dbt parse` never opens a warehouse connection, so
+# the project name below only has to be syntactically valid. The env_var default
+# is what keeps the Tier 1 `dbt-parse` job runnable with no secrets at all.
+ga4_integration_tests:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('BIGQUERY_PROJECT', 'placeholder-parse-only') }}"
+      dataset: "ga4_integration_tests"
+      location: US
+      threads: 4
+      timeout_seconds: 300
