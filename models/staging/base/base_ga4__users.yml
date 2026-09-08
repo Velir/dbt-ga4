@@ -80,4 +80,4 @@ models:
       - name: occurence_date
         description: Date when the record change was triggered. This is the partitioning column.
       - name: last_updated_date
-        desctiption: Date when the record was updated in the table.
+        description: Date when the record was updated in the table.
