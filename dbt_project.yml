@@ -1,5 +1,5 @@
 name: 'ga4'
-version: '6.2.0'
+version: '6.3.0'
 config-version: 2
 
 # Ceiling only, deliberately. dbt-core 2.0 is already on PyPI as a prerelease,
