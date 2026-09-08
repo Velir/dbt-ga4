@@ -15,6 +15,9 @@ def get_test_configs(filename: str) -> dict:
     return test_configs
 
 TEST_FILE_PATHS = {
+    "test_macro_combine_property_data_statements": {
+        "macro_to_test": _construct_filepaths("macros/combine_property_data.sql"),
+    },
     "test_macro_default_channel_grouping": {
         "source_category_mapping": _construct_filepaths("seeds/ga4_source_categories.csv"),
         "macro_to_test": _construct_filepaths("macros/default_channel_grouping.sql"),
