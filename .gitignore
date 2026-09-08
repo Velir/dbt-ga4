@@ -177,5 +177,7 @@ cython_debug/
 CLAUDE.md
 .claude/
 
+planning/*
+
 # CI rework: local-only WIF runbook (contains GCP project specifics)
 specs/ci-rework/wif-setup.md

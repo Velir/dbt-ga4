@@ -101,7 +101,7 @@
     , session_traffic_source_last_click.manual_campaign.medium as session_traffic_source_last_click_manual_medium
     , session_traffic_source_last_click.manual_campaign.term as session_traffic_source_last_click_manual_term
     , session_traffic_source_last_click.manual_campaign.content as session_traffic_source_last_click_manual_content
-    , session_traffic_source_last_click.manual_campaign.source_platform as session_traffic_source_last_click_manual_source_polatform
+    , session_traffic_source_last_click.manual_campaign.source_platform as session_traffic_source_last_click_manual_source_platform
     , session_traffic_source_last_click.manual_campaign.creative_format as session_traffic_source_last_click_creative_format
     , session_traffic_source_last_click.manual_campaign.marketing_tactic as session_traffic_source_last_click_manual_marketing_tactic
     , collected_traffic_source.manual_campaign_id as collected_traffic_source_manual_campaign_id
