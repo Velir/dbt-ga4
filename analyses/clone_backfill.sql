@@ -31,13 +31,21 @@
         - When a daily table exists, the corresponding intraday clone is dropped
 #}
 
+{% if not var('clone_property_id', none) %}
+-- This analysis is a no-op unless clone_property_id and the other variables
+-- documented above are supplied. Compile it directly with --select clone_backfill.
+{% else %}
 {%- set property_id = var('clone_property_id') -%}
 {%- set earliest_shard = var('clone_start_date')|int -%}
 {%- set latest_shard = var('clone_end_date', modules.datetime.date.today()|string|replace("-", "")|int)|int -%}
 {%- set batch_size = var('clone_batch_size', 50) -%}
 {%- set delay_seconds = var('clone_delay_seconds', 15) -%}
 
+{% if execute %}
 {%- set tables = ga4.get_source_tables_to_clone(property_id, earliest_shard, latest_shard, var('source_project')) -%}
+{% else %}
+{%- set tables = [] -%}
+{% endif %}
 {%- set source_schema = "analytics_" ~ property_id|string -%}
 
 -- ============================================================
@@ -96,4 +104,5 @@ END IF;
 {% endfor %}
 
 SELECT FORMAT('Clone backfill complete. Processed %d operations for property %s.', operation_count, '{{ property_id }}') AS status;
+{% endif %}
 {% endif %}
